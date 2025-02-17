@@ -136,7 +136,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       children: [
         Container(
           color: AppColors.lightOrange,
-          height: Get.height * 0.685,
+          height: Get.height * 0.682,
           width: double.infinity, // Ensure full width
           child: Image.asset(
             'assets/images/${page['image']}',
