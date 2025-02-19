@@ -4,7 +4,11 @@ import 'package:todo_hive/modules/dashboard/widgets/dashboard_card.dart';
 
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
+import '../../grocery_list/views/grocery_list_screen.dart';
+import '../../notes/views/notes_list_screen.dart';
+import '../../reminders/views/reminder_list_screen.dart';
 import '../../todo_list/views/todo_list_screen.dart';
+import '../../voice_notes/views/voice_note_list_screen.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -60,7 +64,7 @@ class Dashboard extends StatelessWidget {
                 ),
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                   Get.to(()=> ReminderListScreen());
                   },
                   text: "Set\nReminder",
                   imagePath: 'assets/images/ic_reminder.webp',
@@ -73,7 +77,7 @@ class Dashboard extends StatelessWidget {
               children: [
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                   Get.to(()=> NotesListScreen());
                   },
                   text: "Notepad",
                   imagePath: 'assets/images/ic_notepad.webp',
@@ -81,9 +85,9 @@ class Dashboard extends StatelessWidget {
                 ),
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                  Get.to(()=>VoiceNoteListScreen());
                   },
-                  text: "Set\nReminder",
+                  text: "Voice\nNote",
                   imagePath: 'assets/images/ic_voicenote.webp',
                   color: AppColors.lightYellow,
                 ),
@@ -94,7 +98,7 @@ class Dashboard extends StatelessWidget {
               children: [
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                    Get.to(()=> GroceryListScreen());
                   },
                   text: "Grocery\nList",
                   imagePath: 'assets/images/ic_grocery.webp',
@@ -104,7 +108,7 @@ class Dashboard extends StatelessWidget {
                   onPressed: () {
                     print("To-Do List Pressed!");
                   },
-                  text: "Set\nReminder",
+                  text: "Income &\nExpense",
                   imagePath: 'assets/images/ic_income.webp',
                   color: AppColors.lightGreen2,
                 ),

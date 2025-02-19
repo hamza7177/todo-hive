@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../utils/app_colors.dart';
+import '../../../utils/app_text_style.dart';
+import '../../todo_list/widgets/todo_list_filter.dart';
+import '../controllers/notes_controller.dart';
+
+class NotesListScreen extends StatelessWidget {
+  NotesListScreen({super.key});
+
+  final NotesController noteC = Get.put(NotesController());
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Icon(
+            Icons.arrow_back_sharp,
+            color: AppColors.black,
+          ),
+        ),
+        title: Text(
+          'Notepad',
+          style:
+              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/ic_search.webp',
+                  height: 20,
+                ),
+                SizedBox(width: 10,),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(102)),
+                    backgroundColor: Color(0xffF0F0F0),
+                  ),
+                  child: Text('Edit', style: AppTextStyle.mediumPrimary14),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Your ultimate tool for capturing thoughts and staying organized.',
+                  style: AppTextStyle.mediumBlack16,
+                ),
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Obx(() => TodoListFilter(
+                            label: "All",
+                            isSelected: noteC.selectedFilter.value == "All",
+                            onTap: () => noteC.setFilter("All"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Personal",
+                            isSelected:
+                                noteC.selectedFilter.value == "Personal",
+                            onTap: () => noteC.setFilter("Personal"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Work",
+                            isSelected: noteC.selectedFilter.value == "Work",
+                            onTap: () => noteC.setFilter("Work"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Random",
+                            isSelected: noteC.selectedFilter.value == "Random",
+                            onTap: () => noteC.setFilter("Random"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Shopping",
+                            isSelected:
+                                noteC.selectedFilter.value == "Shopping",
+                            onTap: () => noteC.setFilter("Shopping"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Untiled",
+                            isSelected: noteC.selectedFilter.value == "Untiled",
+                            onTap: () => noteC.setFilter("Untiled"),
+                          )),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/ic_emptynote.webp',
+                    height: 140,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'No notes found!',
+                    style: AppTextStyle.mediumBlack18.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Click “+” to create your note.',
+                    style: AppTextStyle.regularBlack16,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+      floatingActionButton: SizedBox(
+        width: 70, // Adjust size as needed
+        height: 70,
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
+            child: Image.asset('assets/images/ic_notepad-1.webp'),
+          ),
+        ),
+      ),
+    );
+  }
+}

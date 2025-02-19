@@ -97,6 +97,8 @@ class TodoListScreen extends StatelessWidget {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  minLines: 1,
+                  maxLines: 3,
                   style: AppTextStyle.regularBlack16,
                 ),
                 SizedBox(height: 12),
@@ -119,7 +121,9 @@ class TodoListScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Obx(() => Text(
-                                todoC.selectedCategory.value,
+                                todoC.selectedCategory.value == ""
+                                    ? 'Add Category'
+                                    : todoC.selectedCategory.value,
                                 style: AppTextStyle.regularBlack16,
                               )),
                           Icon(Icons.add, color: Color(0xffAFAFAF)),
@@ -158,10 +162,167 @@ class TodoListScreen extends StatelessWidget {
       );
     }
 
+    void showUpdateCategoryDialog(
+        BuildContext context, String currentCategory) {
+      List<String> categories = [
+        "No Specific",
+        "Office Work",
+        "Wishlist",
+        "Birthday",
+        "Personal"
+      ];
+
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+      final double screenWidth = MediaQuery.of(context).size.width;
+      final double screenHeight = MediaQuery.of(context).size.height;
+      final double menuWidth = 200.0;
+      final double menuHeight = categories.length * 48.0;
+
+      final double left = screenWidth - menuWidth - 12;
+      final double top = screenHeight - menuHeight - 130;
+
+      showMenu(
+        color: AppColors.white,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        position: RelativeRect.fromLTRB(
+          left,
+          top,
+          left + menuWidth,
+          top + menuHeight,
+        ),
+        items: categories.map((category) {
+          return PopupMenuItem(
+            child: Text(category, style: AppTextStyle.regularBlack16),
+            onTap: () {
+              // Update category when selected
+              todoC.selectedUpdateCategory.value = category;
+            },
+          );
+        }).toList(),
+      );
+    }
+
+    void showUpdateTaskBottomSheet(BuildContext context, Task task, int index) {
+      final TextEditingController taskController =
+          TextEditingController(text: task.title);
+      final TodoController taskC = Get.find<TodoController>();
+
+      showModalBottomSheet(
+        backgroundColor: AppColors.white,
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 16),
+                TextField(
+                  controller: taskController,
+                  decoration: InputDecoration(
+                    hintText: "Input your new task here...",
+                    hintStyle: AppTextStyle.regularBlack16
+                        .copyWith(color: Color(0xffAFAFAF)),
+                    filled: true,
+                    fillColor: AppColors.cardColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  minLines: 1,
+                  maxLines: 3,
+                  style: AppTextStyle.regularBlack16,
+                ),
+                SizedBox(height: 12),
+                DottedBorder(
+                  color: Color(0xffE9E9E9),
+                  dashPattern: [8, 4],
+                  strokeWidth: 2,
+                  borderType: BorderType.RRect,
+                  radius: Radius.circular(12),
+                  child: GestureDetector(
+                    onTap: () =>
+                        showUpdateCategoryDialog(context, task.category),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Obx(() => Text(
+                                taskC.selectedUpdateCategory.value == ""
+                                    ? task.category
+                                    : taskC.selectedUpdateCategory.value,
+                                style: AppTextStyle.regularBlack16,
+                              )),
+                          Icon(Icons.add, color: Color(0xffAFAFAF)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    if (taskController.text.isNotEmpty) {
+                      // Update the task with the selected category
+                      taskC.updateTask(
+                          index,
+                          taskController.text,
+                          taskC.selectedUpdateCategory.value.isEmpty
+                              ? task.category
+                              : taskC.selectedUpdateCategory.value);
+                      Get.back();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: Center(
+                    child: Text("Update Task",
+                        style: AppTextStyle.mediumBlack16
+                            .copyWith(color: AppColors.white)),
+                  ),
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Icon(
@@ -237,96 +398,222 @@ class TodoListScreen extends StatelessWidget {
 
               return groupedTasks.isEmpty
                   ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/ic_emptytodo.webp',
-                      height: 140,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'No task is currently on list',
-                      style: AppTextStyle.mediumBlack18.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Click “+” to create your task',
-                      style: AppTextStyle.regularBlack16,
-                    ),
-                  ],
-                ),
-              )
-                  :ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                children: groupedTasks.entries.map((entry) {
-                  final date = entry.key;
-                  final tasksForDate = entry.value;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Text(
-                          "${date.day}-${date.month}-${date.year}",
-                          style: AppTextStyle.mediumBlack18.copyWith(
-                            fontWeight: FontWeight.bold,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/ic_emptytodo.webp',
+                            height: 140,
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'No task is currently on list',
+                            style: AppTextStyle.mediumBlack18.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Click “+” to create your task',
+                            style: AppTextStyle.regularBlack16,
+                          ),
+                        ],
                       ),
-                      ...tasksForDate.asMap().entries.map((taskEntry) {
-                        final taskIndex = taskEntry.key; // Get index
-                        final task = taskEntry.value; // Get task object
+                    )
+                  : ListView(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      children: groupedTasks.entries.map((entry) {
+                        final date = entry.key;
+                        final tasksForDate = entry.value;
 
                         return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              height: 60,
-                              width: Get.width,
-                              decoration: BoxDecoration(
-                                color: AppColors.cardColor,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      border: Border.all(color: Color(0xffD9D9D9)),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  SizedBox(width: 20),
-                                  Text(
-                                    task.title,
-                                    style: AppTextStyle.mediumBlack16,
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                    onTap: () => todoC.deleteTask(task),// Corrected delete logic
-                                    child: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
-                                  ),
-                                ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                "${date.day}-${date.month}-${date.year}",
+                                style: AppTextStyle.mediumBlack18.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 10),
+                            ...tasksForDate.asMap().entries.map((taskEntry) {
+                              final taskIndex = taskEntry.key; // Get index
+                              final task = taskEntry.value; // Get task object
+
+                              return Column(
+                                children: [
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                    height: 60,
+                                    width: Get.width,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.cardColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.white,
+                                            border: Border.all(
+                                                color: Color(0xffD9D9D9)),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        SizedBox(width: 20),
+                                        Expanded(
+                                          child: Text(
+                                            task.title,
+                                            style: AppTextStyle.mediumBlack16,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            popupMenuTheme: PopupMenuThemeData(
+                                              color: Colors.white,
+                                              // Set background color
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        12), // Apply border radius
+                                              ),
+                                            ),
+                                          ),
+                                          child: PopupMenuButton<String>(
+                                            icon: Icon(Icons.more_vert,
+                                                color: Color(0xffAFAFAF)),
+                                            onSelected: (value) async {
+                                              if (value == "Update") {
+                                                showUpdateTaskBottomSheet(
+                                                    context, task, taskIndex);
+                                              } else if (value == "Delete") {
+                                                bool? shouldDelete =
+                                                    await showDialog<bool>(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Container(
+                                                      child: AlertDialog(
+                                                        backgroundColor:
+                                                            AppColors.white,
+                                                        title: Text(
+                                                          "Delete Todo",
+                                                          style: AppTextStyle
+                                                              .mediumBlack16,
+                                                        ),
+                                                        content: Text(
+                                                          "Are you sure you want to delete this task?",
+                                                          style: AppTextStyle
+                                                              .regularBlack14,
+                                                        ),
+                                                        actions: [
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            style:
+                                                                ElevatedButton
+                                                                    .styleFrom(
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                              ),
+                                                              backgroundColor:
+                                                                  Color(
+                                                                      0xffF0F0F0),
+                                                            ),
+                                                            child: Text(
+                                                              'No',
+                                                              style: AppTextStyle
+                                                                  .mediumPrimary14,
+                                                            ),
+                                                          ),
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(true);
+                                                            },
+                                                            style:
+                                                                ElevatedButton
+                                                                    .styleFrom(
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                              ),
+                                                              backgroundColor:
+                                                                  AppColors
+                                                                      .primary,
+                                                            ),
+                                                            child: Text(
+                                                              "Yes",
+                                                              style: AppTextStyle
+                                                                  .mediumBlack14
+                                                                  .copyWith(
+                                                                color: AppColors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+
+                                                if (shouldDelete == true) {
+                                                  todoC.deleteTask(task);
+                                                }
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                value: "Update",
+                                                child: Text(
+                                                  "Update",
+                                                  style: AppTextStyle
+                                                      .regularBlack16,
+                                                ),
+                                              ),
+                                              PopupMenuItem(
+                                                value: "Delete",
+                                                child: Text(
+                                                  "Delete",
+                                                  style: AppTextStyle
+                                                      .mediumBlack16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                ],
+                              );
+                            }).toList(),
                           ],
                         );
                       }).toList(),
-                    ],
-                  );
-                }).toList(),
-              );
+                    );
             }),
           ),
-
         ],
       ),
       floatingActionButton: SizedBox(
@@ -345,3 +632,113 @@ class TodoListScreen extends StatelessWidget {
     );
   }
 }
+
+// class FloatingActionWithBubble extends StatefulWidget {
+//   @override
+//   _FloatingActionWithBubbleState createState() => _FloatingActionWithBubbleState();
+// }
+//
+// class _FloatingActionWithBubbleState extends State<FloatingActionWithBubble> {
+//   bool showBubble = true; // Controls visibility of speech bubble
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Stack(
+//         alignment: Alignment.bottomRight,
+//         children: [
+//           // Speech Bubble
+//           if (showBubble)
+//             Positioned(
+//               bottom: 100, // Adjust to position above FAB
+//               right: 20, // Align with FAB
+//               child: ClipPath(
+//                 clipper: BubbleClipper(), // Custom clipper for speech bubble
+//                 child: Container(
+//                   padding: EdgeInsets.all(12),
+//                   decoration: BoxDecoration(
+//                     color: Color(0xFF2D2E4A), // Dark navy background
+//                     borderRadius: BorderRadius.circular(12),
+//                   ),
+//                   child: Text(
+//                     "Get started by creating your\nfirst task",
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontSize: 14,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//
+//           // Floating Action Button
+//           Positioned(
+//             bottom: 20,
+//             right: 20,
+//             child: FloatingActionButton(
+//               onPressed: () {
+//                 setState(() {
+//                   showBubble = false; // Hide bubble when FAB is pressed
+//                 });
+//                 showTaskBottomSheet(context);
+//               },
+//               backgroundColor: Colors.transparent,
+//               elevation: 0,
+//               child: Container(
+//                 width: 70,
+//                 height: 70,
+//                 decoration: BoxDecoration(
+//                   shape: BoxShape.circle,
+//                   color: Colors.redAccent.withOpacity(0.2), // Outer glow effect
+//                 ),
+//                 child: Center(
+//                   child: Container(
+//                     width: 55,
+//                     height: 55,
+//                     decoration: BoxDecoration(
+//                       shape: BoxShape.circle,
+//                       color: Colors.redAccent, // Inner circle
+//                     ),
+//                     child: Icon(Icons.add, color: Colors.white, size: 30),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   void showTaskBottomSheet(BuildContext context) {
+//     showModalBottomSheet(
+//       context: context,
+//       builder: (context) => Container(
+//         height: 300,
+//         child: Center(child: Text("Task Bottom Sheet")),
+//       ),
+//     );
+//   }
+// }
+//
+// // Custom clipper for speech bubble
+// class BubbleClipper extends CustomClipper<Path> {
+//   @override
+//   Path getClip(Size size) {
+//     Path path = Path();
+//     double radius = 12.0;
+//
+//     path.addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, size.height - 10), Radius.circular(radius)));
+//
+//     // Bubble tail
+//     path.moveTo(size.width - 20, size.height - 10);
+//     path.lineTo(size.width - 10, size.height);
+//     path.lineTo(size.width - 5, size.height - 10);
+//     path.close();
+//
+//     return path;
+//   }
+//
+//   @override
+//   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+// }

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+
 import '../model/task_model.dart';
 
 class TodoController extends GetxController {
@@ -7,7 +8,9 @@ class TodoController extends GetxController {
 
   var selectedFilter = "All".obs;
   var tasks = <Task>[].obs;
-  var selectedCategory = "No Specific".obs; // Default should be "All" for filtering consistency.
+  var selectedCategory =
+      "".obs; // Default should be "All" for filtering consistency.
+  var selectedUpdateCategory = "".obs;
 
   @override
   void onInit() {
@@ -35,15 +38,15 @@ class TodoController extends GetxController {
     taskBox.add(task);
     tasks.add(task);
     tasks.refresh();
-    selectedCategory.value =='No Specific';
+    selectedCategory.value == 'No Specific';
     update();
   }
 
   void deleteTask(Task task) {
     int? taskKey = taskBox.keys.cast<int?>().firstWhere(
           (key) => taskBox.get(key) == task,
-      orElse: () => null,
-    );
+          orElse: () => null,
+        );
 
     if (taskKey != null) {
       taskBox.delete(taskKey);
@@ -51,21 +54,22 @@ class TodoController extends GetxController {
     }
   }
 
-
   /// **Get tasks based on selected filter**
   List<Task> getFilteredTasks() {
     if (selectedFilter.value == "All") {
       return tasks.toList(); // Return all tasks
-    }else if(selectedFilter.value == "Office Work"){
+    } else if (selectedFilter.value == "Office Work") {
       return tasks.where((task) => task.category == "Office Work").toList();
-    }else if(selectedFilter.value == "Wishlist"){
+    } else if (selectedFilter.value == "Wishlist") {
       return tasks.where((task) => task.category == "Wishlist").toList();
-    }else if(selectedFilter.value == "Personal"){
+    } else if (selectedFilter.value == "Personal") {
       return tasks.where((task) => task.category == "Personal").toList();
-    }else if(selectedFilter.value == "Birthday"){
+    } else if (selectedFilter.value == "Birthday") {
       return tasks.where((task) => task.category == "Birthday").toList();
     }
-    return tasks.where((task) => task.category == selectedCategory.value).toList();
+    return tasks
+        .where((task) => task.category == selectedCategory.value)
+        .toList();
   }
 
   /// **Group tasks by date for UI display**
@@ -73,7 +77,8 @@ class TodoController extends GetxController {
     final Map<DateTime, List<Task>> groupedTasks = {};
 
     for (var task in getFilteredTasks()) {
-      final normalizedDate = DateTime(task.date.year, task.date.month, task.date.day);
+      final normalizedDate =
+          DateTime(task.date.year, task.date.month, task.date.day);
 
       if (!groupedTasks.containsKey(normalizedDate)) {
         groupedTasks[normalizedDate] = [];
@@ -82,5 +87,23 @@ class TodoController extends GetxController {
     }
 
     return groupedTasks;
+  }
+
+  void updateTask(int index, String newTitle, String newCategory) {
+    final task = tasks[index];
+    task.title = newTitle;
+    task.category = newCategory;
+
+    // Update the task in Hive
+    int? taskKey = taskBox.keys.cast<int?>().firstWhere(
+          (key) => taskBox.get(key) == task,
+          orElse: () => null,
+        );
+
+    if (taskKey != null) {
+      taskBox.put(taskKey, task);
+      tasks.refresh(); // Refresh the observable list
+      update(); // Ensure UI refresh
+    }
   }
 }

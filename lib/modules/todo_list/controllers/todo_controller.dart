@@ -9,7 +9,8 @@ class TodoController extends GetxController {
   var selectedFilter = "All".obs;
   var tasks = <Task>[].obs;
   var selectedCategory =
-      "No Specific".obs; // Default should be "All" for filtering consistency.
+      "".obs; // Default should be "All" for filtering consistency.
+  var selectedUpdateCategory = "".obs;
 
   @override
   void onInit() {
@@ -37,7 +38,7 @@ class TodoController extends GetxController {
     taskBox.add(task);
     tasks.add(task);
     tasks.refresh();
-    selectedCategory.value == 'No Specific';
+    selectedCategory.value ="";
     update();
   }
 
@@ -86,5 +87,24 @@ class TodoController extends GetxController {
     }
 
     return groupedTasks;
+  }
+
+  void updateTask(int index, String newTitle, String newCategory) {
+    final task = tasks[index];
+    task.title = newTitle;
+    task.category = newCategory;
+
+    // Update the task in Hive
+    int? taskKey = taskBox.keys.cast<int?>().firstWhere(
+          (key) => taskBox.get(key) == task,
+          orElse: () => null,
+        );
+
+    if (taskKey != null) {
+      taskBox.put(taskKey, task);
+      tasks.refresh();
+      selectedUpdateCategory.value="";// Refresh the observable list
+      update(); // Ensure UI refresh
+    }
   }
 }

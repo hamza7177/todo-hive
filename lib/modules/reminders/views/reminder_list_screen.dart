@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:todo_hive/utils/app_text_style.dart';
+
+import '../../../utils/app_colors.dart';
+import '../../todo_list/widgets/todo_list_filter.dart';
+import '../controllers/reminder_controller.dart';
+
+class ReminderListScreen extends StatelessWidget {
+  ReminderListScreen({super.key});
+
+  final ReminderController reminderC = Get.put(ReminderController());
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Icon(
+            Icons.arrow_back_sharp,
+            color: AppColors.black,
+          ),
+        ),
+        title: Text(
+          'Reminder',
+          style:
+              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Your go-to solution for setting reminders and staying effortlessly organized.',
+                  style: AppTextStyle.mediumBlack16,
+                ),
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Obx(() => TodoListFilter(
+                            label: "All",
+                            isSelected: reminderC.selectedFilter.value == "All",
+                            onTap: () => reminderC.setFilter("All"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Office Work",
+                            isSelected:
+                                reminderC.selectedFilter.value == "History",
+                            onTap: () => reminderC.setFilter("History"),
+                          )),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'No reminder found!',
+                    style: AppTextStyle.mediumBlack18.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Click “+” to create your reminder',
+                    style: AppTextStyle.regularBlack16,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+      floatingActionButton: SizedBox(
+        width: 70, // Adjust size as needed
+        height: 70,
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
+            child: Image.asset('assets/images/ic_to_do.webp'),
+          ),
+        ),
+      ),
+    );
+  }
+}
