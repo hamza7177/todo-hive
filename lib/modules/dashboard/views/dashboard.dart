@@ -114,6 +114,27 @@ class Dashboard extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: 10,),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                DashboardCard(
+                  onPressed: () {
+                    Get.to(()=> GroceryListScreen());
+                  },
+                  text: "Schedule\nPlanner",
+                  imagePath: 'assets/images/ic_grocery.webp',
+                  color: AppColors.green,
+                ),
+                DashboardCard(
+                  onPressed: () {
+                    print("To-Do List Pressed!");
+                  },
+                  text: "Income &\nExpense",
+                  imagePath: 'assets/images/ic_income.webp',
+                  color: AppColors.lightGreen2,
+                ),
+              ],
+            ),
           ],
         ),
       ),

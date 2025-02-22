@@ -3,17 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:todo_hive/modules/notes/models/note_model.dart';
 import 'package:todo_hive/on_boarding_screen.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 
+import 'modules/reminders/models/reminder_model.dart';
 import 'modules/todo_list/model/task_model.dart';
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   var directory= await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
-  Hive.registerAdapter(TaskAdapter()); // Register the adapter
+  //Register Adapters
+  Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(NoteAdapter());// Register the adapter
+  Hive.registerAdapter(ReminderModelAdapter());
+  //Open Boxes
   await Hive.openBox<Task>('tasks'); // Open the tasks box
+  await Hive.openBox<Note>('notes');
+  await Hive.openBox<ReminderModel>('reminders');
   runApp(const MyApp());
 }
 

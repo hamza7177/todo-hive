@@ -43,7 +43,7 @@ class ReminderListScreen extends StatelessWidget {
                   style: AppTextStyle.mediumBlack16,
                 ),
                 const SizedBox(height: 10),
-
+               
               ],
             ),
           ),
