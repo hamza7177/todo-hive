@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import '../models/note_model.dart';
+import '../models/category_model.dart';
 
-class NotesController extends GetxController{
+class NotesController extends GetxController {
   final Box<Note> notesBox = Hive.box<Note>('notes');
+  final Box<Category> categoriesBox = Hive.box<Category>('categories');
   var notes = <Note>[].obs;
+  var categories = <Category>[].obs;
 
   var selectedFilter = "All".obs;
   var selectedCategory = ''.obs;
@@ -15,29 +18,124 @@ class NotesController extends GetxController{
   var noteController = TextEditingController();
   var maxWords = 1500.obs;
 
+  @override
+  void onInit() {
+    fetchNotes();
+    fetchCategories();
+    super.onInit();
+  }
+
+  void fetchNotes() {
+    notes.assignAll(notesBox.values.toList());
+    update();
+  }
+
+  void fetchCategories() {
+    if (categoriesBox.isEmpty) {
+      final defaultCategories = [
+        Category(name: "Personal"),
+        Category(name: "Work"),
+        Category(name: "Random"),
+        Category(name: "Shopping"),
+      ];
+      categoriesBox.addAll(defaultCategories);
+    }
+    categories.assignAll(categoriesBox.values.toList());
+    update();
+  }
+
+  void addCategory(String name) {
+    final category = Category(name: name);
+    categoriesBox.add(category);
+    categories.add(category);
+    update();
+  }
+
+  void updateCategory(Category oldCategory, String newName) {
+    final int? categoryKey = categoriesBox.keys.cast<int?>().firstWhere(
+          (key) => categoriesBox.get(key) == oldCategory,
+      orElse: () => null,
+    );
+    if (categoryKey != null) {
+      oldCategory.name = newName;
+      categoriesBox.put(categoryKey, oldCategory);
+      for (var note in notes) {
+        if (note.category == oldCategory.name) {
+          note.category = newName;
+          final int? noteKey = notesBox.keys.cast<int?>().firstWhere(
+                (key) => notesBox.get(key) == note,
+            orElse: () => null,
+          );
+          if (noteKey != null) {
+            notesBox.put(noteKey, note);
+          }
+        }
+      }
+      categories.refresh();
+      notes.refresh();
+      if (selectedFilter.value == oldCategory.name) {
+        selectedFilter.value = newName;
+      }
+      update();
+    }
+  }
+
+  void deleteCategory(Category category) {
+    final int? categoryKey = categoriesBox.keys.cast<int?>().firstWhere(
+          (key) => categoriesBox.get(key) == category,
+      orElse: () => null,
+    );
+    if (categoryKey != null) {
+      // Update notes with this category to "Untitled"
+      for (var note in notes) {
+        if (note.category == category.name) {
+          note.category = "Untitled"; // Or set to "" if preferred
+          final int? noteKey = notesBox.keys.cast<int?>().firstWhere(
+                (key) => notesBox.get(key) == note,
+            orElse: () => null,
+          );
+          if (noteKey != null) {
+            notesBox.put(noteKey, note);
+          }
+        }
+      }
+      // Delete the category from Hive
+      categoriesBox.delete(categoryKey);
+      categories.remove(category);
+      if (selectedFilter.value == category.name) {
+        selectedFilter.value = "All"; // Reset filter if deleted category was active
+      }
+      if (selectedCategory.value == category.name) {
+        selectedCategory.value = ""; // Reset selected category
+      }
+      if (selectedUpdateCategory.value == category.name) {
+        selectedUpdateCategory.value = ""; // Reset update category
+      }
+      notes.refresh();
+      update();
+    }
+  }
 
   void setFilter(String filter) {
     selectedFilter.value = filter;
     update();
   }
 
-
   void setCategory(String newCategory) {
     selectedCategory.value = newCategory;
     update();
   }
 
-  void fetchNotes() {
-    notes.assignAll(notesBox.values.toList());
-    update(); // Ensure UI refresh
-  }
-
-  void addNote(String title,String description, String category) {
-    final task = Note(title: title,description: description, category: category, dateTime: DateTime.now());
+  void addNote(String title, String description, String category) {
+    final task = Note(
+        title: title,
+        description: description,
+        category: category,
+        dateTime: DateTime.now());
     notesBox.add(task);
     notes.add(task);
     notes.refresh();
-    selectedCategory.value ="";
+    selectedCategory.value = "";
     titleController.clear();
     noteController.clear();
     update();
@@ -48,78 +146,51 @@ class NotesController extends GetxController{
           (key) => notesBox.get(key) == task,
       orElse: () => null,
     );
-
     if (taskKey != null) {
       notesBox.delete(taskKey);
-      fetchNotes(); // Refresh the UI
+      fetchNotes();
     }
   }
 
-  /// **Get notes based on selected filter**
   List<Note> getFilteredNotes() {
     if (selectedFilter.value == "All") {
-      return notes.toList(); // Return all tasks
-    } else if (selectedFilter.value == "Personal") {
-      return notes.where((task) => task.category == "Personal").toList();
-    } else if (selectedFilter.value == "Work") {
-      return notes.where((task) => task.category == "Work").toList();
-    } else if (selectedFilter.value == "Random") {
-      return notes.where((task) => task.category == "Random").toList();
-    } else if (selectedFilter.value == "Shopping") {
-      return notes.where((task) => task.category == "Shopping").toList();
-    }else if (selectedFilter.value == "Untitled") {
-      return notes.where((task) => task.category == "Untitled").toList();
+      return notes.toList();
     }
-    return notes
-        .where((task) => task.category == selectedCategory.value)
-        .toList();
+    return notes.where((task) => task.category == selectedFilter.value).toList();
   }
 
-  /// **Group tasks by date for UI display**
   Map<DateTime, List<Note>> getTasksGroupedByDate() {
     final Map<DateTime, List<Note>> groupedTasks = {};
-
     for (var task in getFilteredNotes()) {
       final normalizedDate =
       DateTime(task.dateTime.year, task.dateTime.month, task.dateTime.day);
-
       if (!groupedTasks.containsKey(normalizedDate)) {
         groupedTasks[normalizedDate] = [];
       }
       groupedTasks[normalizedDate]!.add(task);
     }
-
     return groupedTasks;
   }
 
-  void updateNote(int index, String newTitle,String newDescription, String newCategory) {
+  void updateNote(int index, String newTitle, String newDescription, String newCategory) {
     final task = notes[index];
     task.title = newTitle;
     task.description = newDescription;
     task.category = newCategory;
     task.dateTime = DateTime.now();
-
-    // Update the task in Hive
     int? taskKey = notesBox.keys.cast<int?>().firstWhere(
           (key) => notesBox.get(key) == task,
       orElse: () => null,
     );
-
     if (taskKey != null) {
       notesBox.put(taskKey, task);
       notes.refresh();
-      selectedUpdateCategory.value="";// Refresh the observable list
-      update(); // Ensure UI refresh
+      selectedUpdateCategory.value = "";
+      update();
     }
   }
 
   int getWordCount() {
     return noteController.text.split(RegExp(r'\s+')).length;
-  }
-
-  @override
-  void onInit() {
-    fetchNotes();
-    super.onInit();
   }
 }

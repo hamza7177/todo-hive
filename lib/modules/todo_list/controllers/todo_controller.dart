@@ -1,20 +1,21 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-
 import '../model/task_model.dart';
 
 class TodoController extends GetxController {
   final Box<Task> taskBox = Hive.box<Task>('tasks');
+  final Box<Task> completedTaskBox = Hive.box<Task>('completed_tasks'); // New box for completed tasks
 
   var selectedFilter = "All".obs;
   var tasks = <Task>[].obs;
-  var selectedCategory =
-      "".obs; // Default should be "All" for filtering consistency.
+  var completedTasks = <Task>[].obs; // List for completed tasks
+  var selectedCategory = "".obs;
   var selectedUpdateCategory = "".obs;
 
   @override
   void onInit() {
     fetchTasks();
+    fetchCompletedTasks(); // Load completed tasks
     super.onInit();
   }
 
@@ -30,7 +31,12 @@ class TodoController extends GetxController {
 
   void fetchTasks() {
     tasks.assignAll(taskBox.values.toList());
-    update(); // Ensure UI refresh
+    update();
+  }
+
+  void fetchCompletedTasks() {
+    completedTasks.assignAll(completedTaskBox.values.toList());
+    update();
   }
 
   void addTask(String title, String category) {
@@ -38,26 +44,38 @@ class TodoController extends GetxController {
     taskBox.add(task);
     tasks.add(task);
     tasks.refresh();
-    selectedCategory.value ="";
+    selectedCategory.value = "";
     update();
   }
 
   void deleteTask(Task task) {
     int? taskKey = taskBox.keys.cast<int?>().firstWhere(
           (key) => taskBox.get(key) == task,
-          orElse: () => null,
-        );
-
+      orElse: () => null,
+    );
     if (taskKey != null) {
       taskBox.delete(taskKey);
-      fetchTasks(); // Refresh the UI
+      fetchTasks();
     }
   }
 
-  /// **Get tasks based on selected filter**
+  void completeTask(Task task) {
+    // Create a new instance for completed box
+    final completedTask = Task(
+      title: task.title,
+      category: task.category,
+      date: task.date,
+      completedAt: DateTime.now(),
+    );
+    completedTaskBox.add(completedTask); // Add to completed box
+    deleteTask(task); // Remove from active tasks
+    fetchCompletedTasks(); // Refresh completed tasks
+    Get.snackbar('Success', 'Task marked as completed');
+  }
+
   List<Task> getFilteredTasks() {
     if (selectedFilter.value == "All") {
-      return tasks.toList(); // Return all tasks
+      return tasks.toList();
     } else if (selectedFilter.value == "Office Work") {
       return tasks.where((task) => task.category == "Office Work").toList();
     } else if (selectedFilter.value == "Wishlist") {
@@ -67,25 +85,18 @@ class TodoController extends GetxController {
     } else if (selectedFilter.value == "Birthday") {
       return tasks.where((task) => task.category == "Birthday").toList();
     }
-    return tasks
-        .where((task) => task.category == selectedCategory.value)
-        .toList();
+    return tasks.where((task) => task.category == selectedCategory.value).toList();
   }
 
-  /// **Group tasks by date for UI display**
   Map<DateTime, List<Task>> getTasksGroupedByDate() {
     final Map<DateTime, List<Task>> groupedTasks = {};
-
     for (var task in getFilteredTasks()) {
-      final normalizedDate =
-          DateTime(task.date.year, task.date.month, task.date.day);
-
+      final normalizedDate = DateTime(task.date.year, task.date.month, task.date.day);
       if (!groupedTasks.containsKey(normalizedDate)) {
         groupedTasks[normalizedDate] = [];
       }
       groupedTasks[normalizedDate]!.add(task);
     }
-
     return groupedTasks;
   }
 
@@ -93,18 +104,15 @@ class TodoController extends GetxController {
     final task = tasks[index];
     task.title = newTitle;
     task.category = newCategory;
-
-    // Update the task in Hive
     int? taskKey = taskBox.keys.cast<int?>().firstWhere(
           (key) => taskBox.get(key) == task,
-          orElse: () => null,
-        );
-
+      orElse: () => null,
+    );
     if (taskKey != null) {
       taskBox.put(taskKey, task);
       tasks.refresh();
-      selectedUpdateCategory.value="";// Refresh the observable list
-      update(); // Ensure UI refresh
+      selectedUpdateCategory.value = "";
+      update();
     }
   }
 }

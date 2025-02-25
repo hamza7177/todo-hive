@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_hive/utils/app_text_style.dart';
+import 'package:todo_hive/modules/grocery_list/controllers/grocery_list_controller.dart';
 
 import '../../../utils/app_colors.dart';
+import '../../../utils/app_text_style.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
-import '../controllers/reminder_controller.dart';
-import 'add_reminder_screen.dart';
 
-class ReminderListScreen extends StatelessWidget {
-  ReminderListScreen({super.key});
-
-  final ReminderController reminderC = Get.put(ReminderController());
+class ScheduleListScreen extends StatelessWidget {
+  ScheduleListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +23,11 @@ class ReminderListScreen extends StatelessWidget {
           ),
         ),
         title: Text(
-          'Reminder',
+          'Schedule Planner',
           style:
-              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
+
       ),
       body: Column(
         children: [
@@ -39,11 +37,11 @@ class ReminderListScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your go-to solution for setting reminders and staying effortlessly organized.',
+                  'Your ultimate companion for seamless scheduling and effortless planning.',
                   style: AppTextStyle.mediumBlack16,
                 ),
                 const SizedBox(height: 10),
-               
+
               ],
             ),
           ),
@@ -53,15 +51,20 @@ class ReminderListScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Image.asset(
+                    'assets/icons/ic_income.webp',
+                    height: 140,
+                  ),
+                  const SizedBox(height: 10),
                   Text(
-                    'No reminder found!',
+                    'Your schedule is empty',
                     style: AppTextStyle.mediumBlack18.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Click “+” to create your reminder',
+                    'Start adding tasks now to stay on track!',
                     style: AppTextStyle.regularBlack16,
                   ),
                 ],
@@ -74,14 +77,12 @@ class ReminderListScreen extends StatelessWidget {
         width: 70, // Adjust size as needed
         height: 70,
         child: FloatingActionButton(
-          onPressed: () {
-            Get.to(() =>  ReminderScreen());
-          },
+          onPressed: () {},
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
-            child: Image.asset('assets/images/ic_to_do.webp'),
+            child: Image.asset('assets/icons/ic_add_shedule.webp'),
           ),
         ),
       ),

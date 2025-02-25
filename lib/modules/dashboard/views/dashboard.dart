@@ -5,8 +5,10 @@ import 'package:todo_hive/modules/dashboard/widgets/dashboard_card.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../grocery_list/views/grocery_list_screen.dart';
+import '../../manage_project/views/project_list_screen.dart';
 import '../../notes/views/notes_list_screen.dart';
 import '../../reminders/views/reminder_list_screen.dart';
+import '../../schedule_planner/views/schedule_list_screen.dart';
 import '../../todo_list/views/todo_list_screen.dart';
 import '../../voice_notes/views/voice_note_list_screen.dart';
 
@@ -119,19 +121,19 @@ class Dashboard extends StatelessWidget {
               children: [
                 DashboardCard(
                   onPressed: () {
-                    Get.to(()=> GroceryListScreen());
+                    Get.to(()=> ProjectListScreen());
                   },
-                  text: "Schedule\nPlanner",
-                  imagePath: 'assets/images/ic_grocery.webp',
-                  color: AppColors.green,
+                  text: "Manager\nProject",
+                  imagePath: 'assets/icons/ic_manage_project.webp',
+                  color: AppColors.lightPurple,
                 ),
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                   Get.to(()=>ScheduleListScreen());
                   },
-                  text: "Income &\nExpense",
-                  imagePath: 'assets/images/ic_income.webp',
-                  color: AppColors.lightGreen2,
+                  text: "Schedule \nPlanner",
+                  imagePath: 'assets/icons/ic_shedule_planner.webp',
+                  color: AppColors.lightParrot,
                 ),
               ],
             ),

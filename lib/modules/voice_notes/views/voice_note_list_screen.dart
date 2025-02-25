@@ -88,7 +88,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'assets/images/ic_emptynote.webp',
+                    'assets/icons/ic_voice_note.webp',
                     height: 140,
                   ),
                   const SizedBox(height: 10),

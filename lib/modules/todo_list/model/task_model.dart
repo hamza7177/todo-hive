@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'task_model.g.dart'; // This will be generated
+part 'task_model.g.dart';
 
 @HiveType(typeId: 0)
 class Task extends HiveObject {
@@ -13,5 +13,13 @@ class Task extends HiveObject {
   @HiveField(2)
   DateTime date;
 
-  Task({required this.title, required this.category, required this.date});
+  @HiveField(3)
+  DateTime? completedAt; // New field for completion timestamp
+
+  Task({
+    required this.title,
+    required this.category,
+    required this.date,
+    this.completedAt,
+  });
 }

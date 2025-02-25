@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 
@@ -34,7 +35,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       'description': 'Lorem ipsum, or Ipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs.',
     },
   ];
-
+  Future<void> completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTime', false);
+    Get.offAll(() => Dashboard());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,7 +111,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ElevatedButton(
                   onPressed: () {
                     if (index == pages.length - 1) {
-                      Get.offAll(() => Dashboard());
+                      completeOnboarding();
                     } else {
                       controller.nextPage(
                           duration: const Duration(milliseconds: 400),

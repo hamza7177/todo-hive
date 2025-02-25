@@ -6,6 +6,7 @@ import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
 import '../controllers/notes_controller.dart';
+import 'categories_screen.dart';
 import 'note_add_screen.dart';
 import 'note_update_screen.dart';
 
@@ -45,7 +46,9 @@ class NotesListScreen extends StatelessWidget {
                   width: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => CategoriesScreen());
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(102)),
@@ -72,47 +75,24 @@ class NotesListScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
+                  child: Obx(() => Row(
                     children: [
-                      Obx(() => TodoListFilter(
-                            label: "All",
-                            isSelected: noteC.selectedFilter.value == "All",
-                            onTap: () => noteC.setFilter("All"),
-                          )),
+                      TodoListFilter(
+                        label: "All",
+                        isSelected: noteC.selectedFilter.value == "All",
+                        onTap: () => noteC.setFilter("All"),
+                      ),
                       const SizedBox(width: 8.0),
-                      Obx(() => TodoListFilter(
-                            label: "Personal",
-                            isSelected:
-                                noteC.selectedFilter.value == "Personal",
-                            onTap: () => noteC.setFilter("Personal"),
-                          )),
-                      const SizedBox(width: 8.0),
-                      Obx(() => TodoListFilter(
-                            label: "Work",
-                            isSelected: noteC.selectedFilter.value == "Work",
-                            onTap: () => noteC.setFilter("Work"),
-                          )),
-                      const SizedBox(width: 8.0),
-                      Obx(() => TodoListFilter(
-                            label: "Random",
-                            isSelected: noteC.selectedFilter.value == "Random",
-                            onTap: () => noteC.setFilter("Random"),
-                          )),
-                      const SizedBox(width: 8.0),
-                      Obx(() => TodoListFilter(
-                            label: "Shopping",
-                            isSelected:
-                                noteC.selectedFilter.value == "Shopping",
-                            onTap: () => noteC.setFilter("Shopping"),
-                          )),
-                      const SizedBox(width: 8.0),
-                      Obx(() => TodoListFilter(
-                            label: "Untiled",
-                            isSelected: noteC.selectedFilter.value == "Untiled",
-                            onTap: () => noteC.setFilter("Untiled"),
-                          )),
+                      ...noteC.categories.map((category) => Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: TodoListFilter(
+                          label: category.name,
+                          isSelected: noteC.selectedFilter.value == category.name,
+                          onTap: () => noteC.setFilter(category.name),
+                        ),
+                      )).toList(),
                     ],
-                  ),
+                  )),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -129,7 +109,7 @@ class NotesListScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/ic_emptynote.webp',
+                            'assets/icons/ic_notepad.webp',
                             height: 140,
                           ),
                           const SizedBox(height: 10),
@@ -185,7 +165,9 @@ class NotesListScreen extends StatelessWidget {
                                           Text(
                                             DateFormat('MM-dd-yyyy hh:mm a')
                                                 .format(task.dateTime),
-                                            style: AppTextStyle.mediumBlack16,
+                                            style: AppTextStyle.regularBlack12
+                                                .copyWith(
+                                                    color: Color(0xffAEAEAE)),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                           ),

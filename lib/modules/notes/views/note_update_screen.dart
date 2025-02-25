@@ -192,12 +192,12 @@ class NoteUpdateScreen extends StatelessWidget {
         left + menuWidth,
         top + menuHeight,
       ),
-      items: categories.map((category) {
+      items: noteController.categories.map((category) {
         return PopupMenuItem(
-          child: Text(category,
+          child: Text(category.name,
               style: TextStyle(fontSize: 16, color: Colors.black)),
           onTap: () {
-            noteController.selectedUpdateCategory(category);
+            noteController.selectedUpdateCategory(category.name);
           },
         );
       }).toList(),

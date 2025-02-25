@@ -2,10 +2,12 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_hive/utils/app_colors.dart';
+
 import '../../../utils/app_text_style.dart';
 import '../controllers/todo_controller.dart';
 import '../model/task_model.dart';
 import '../widgets/todo_list_filter.dart';
+import 'completed_todo_screen.dart';
 
 class TodoListScreen extends StatelessWidget {
   TodoListScreen({super.key});
@@ -334,6 +336,13 @@ class TodoListScreen extends StatelessWidget {
           style:
               AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Get.to(() => CompletedTodoScreen());
+              },
+              icon: Icon(Icons.done, color: AppColors.black))
+        ],
       ),
       body: Column(
         children: [
@@ -455,16 +464,6 @@ class TodoListScreen extends StatelessWidget {
                                     ),
                                     child: Row(
                                       children: [
-                                        Container(
-                                          height: 20,
-                                          width: 20,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.white,
-                                            border: Border.all(
-                                                color: Color(0xffD9D9D9)),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
                                         SizedBox(width: 20),
                                         Expanded(
                                           child: Text(
@@ -479,11 +478,9 @@ class TodoListScreen extends StatelessWidget {
                                           data: Theme.of(context).copyWith(
                                             popupMenuTheme: PopupMenuThemeData(
                                               color: Colors.white,
-                                              // Set background color
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                        12), // Apply border radius
+                                                    BorderRadius.circular(12),
                                               ),
                                             ),
                                           ),
@@ -498,105 +495,82 @@ class TodoListScreen extends StatelessWidget {
                                                 bool? shouldDelete =
                                                     await showDialog<bool>(
                                                   context: context,
-                                                  builder: (context) {
-                                                    return Container(
-                                                      child: AlertDialog(
-                                                        backgroundColor:
-                                                            AppColors.white,
-                                                        title: Text(
-                                                          "Delete Todo",
-                                                          style: AppTextStyle
-                                                              .mediumBlack16,
-                                                        ),
-                                                        content: Text(
-                                                          "Are you sure you want to delete this task?",
-                                                          style: AppTextStyle
-                                                              .regularBlack14,
-                                                        ),
-                                                        actions: [
-                                                          ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              shape:
-                                                                  RoundedRectangleBorder(
+                                                  builder: (context) =>
+                                                      AlertDialog(
+                                                    backgroundColor:
+                                                        AppColors.white,
+                                                    title: Text("Delete Todo",
+                                                        style: AppTextStyle
+                                                            .mediumBlack16),
+                                                    content: Text(
+                                                        "Are you sure you want to delete this task?",
+                                                        style: AppTextStyle
+                                                            .regularBlack14),
+                                                    actions: [
+                                                      ElevatedButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                context),
+                                                        style: ElevatedButton.styleFrom(
+                                                            backgroundColor:
+                                                                Color(
+                                                                    0xffF0F0F0),
+                                                            shape: RoundedRectangleBorder(
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
-                                                                            8),
-                                                              ),
-                                                              backgroundColor:
-                                                                  Color(
-                                                                      0xffF0F0F0),
-                                                            ),
-                                                            child: Text(
-                                                              'No',
-                                                              style: AppTextStyle
-                                                                  .mediumPrimary14,
-                                                            ),
-                                                          ),
-                                                          ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(true);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
-                                                              ),
-                                                              backgroundColor:
-                                                                  AppColors
-                                                                      .primary,
-                                                            ),
-                                                            child: Text(
-                                                              "Yes",
-                                                              style: AppTextStyle
-                                                                  .mediumBlack14
-                                                                  .copyWith(
-                                                                color: AppColors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
+                                                                            8))),
+                                                        child: Text('No',
+                                                            style: AppTextStyle
+                                                                .mediumPrimary14),
                                                       ),
-                                                    );
-                                                  },
+                                                      ElevatedButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(true),
+                                                        style: ElevatedButton.styleFrom(
+                                                            backgroundColor:
+                                                                AppColors
+                                                                    .primary,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8))),
+                                                        child: Text("Yes",
+                                                            style: AppTextStyle
+                                                                .mediumBlack14
+                                                                .copyWith(
+                                                                    color: AppColors
+                                                                        .white)),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 );
-
                                                 if (shouldDelete == true) {
                                                   todoC.deleteTask(task);
                                                 }
+                                              } else if (value == "Complete") {
+                                                todoC.completeTask(task);
                                               }
                                             },
                                             itemBuilder: (context) => [
                                               PopupMenuItem(
-                                                value: "Update",
-                                                child: Text(
-                                                  "Update",
-                                                  style: AppTextStyle
-                                                      .regularBlack16,
-                                                ),
-                                              ),
+                                                  value: "Complete",
+                                                  child: Text("Complete",
+                                                      style: AppTextStyle
+                                                          .regularBlack16)),
                                               PopupMenuItem(
-                                                value: "Delete",
-                                                child: Text(
-                                                  "Delete",
-                                                  style: AppTextStyle
-                                                      .mediumBlack16,
-                                                ),
-                                              ),
+                                                  value: "Update",
+                                                  child: Text("Update",
+                                                      style: AppTextStyle
+                                                          .regularBlack16)),
+                                              PopupMenuItem(
+                                                  value: "Delete",
+                                                  child: Text("Delete",
+                                                      style: AppTextStyle
+                                                          .mediumBlack16)),
                                             ],
                                           ),
                                         ),
@@ -631,5 +605,3 @@ class TodoListScreen extends StatelessWidget {
     );
   }
 }
-
-

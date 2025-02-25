@@ -25,6 +25,9 @@ class AppColors {
   static const blue = Color(0xffD4F5FF);
   static const lightOrange = Color(0xffFFE9D4);
   static const orange = Color(0xffE85F51);
+  static const purple = Color(0xffAA60C8);
+  static const lightPurple = Color(0xffF8F2FB);
+  static const lightParrot = Color(0xffEFF6F4);
 
   static const MaterialColor primarySwatch = MaterialColor(
     0xff0F172A,

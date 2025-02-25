@@ -13,7 +13,6 @@ class NoteAddScreen extends StatelessWidget {
     "Work",
     "Random",
     "Shopping",
-    "Untitled"
   ];
 
    NoteAddScreen({super.key});
@@ -169,12 +168,12 @@ class NoteAddScreen extends StatelessWidget {
         left + menuWidth,
         top + menuHeight,
       ),
-      items: categories.map((category) {
+      items: noteController.categories.map((category) {
         return PopupMenuItem(
-          child: Text(category,
+          child: Text(category.name,
               style: TextStyle(fontSize: 16, color: Colors.black)),
           onTap: () {
-            noteController.setCategory(category);
+            noteController.setCategory(category.name);
           },
         );
       }).toList(),

@@ -1,32 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_hive/modules/notes/models/note_model.dart';
 import 'package:todo_hive/on_boarding_screen.dart';
 import 'package:todo_hive/utils/app_colors.dart';
-
+import 'package:timezone/data/latest.dart' as tz;
+import 'modules/dashboard/views/dashboard.dart';
+import 'modules/notes/models/category_model.dart';
 import 'modules/reminders/models/reminder_model.dart';
 import 'modules/todo_list/model/task_model.dart';
-
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  final prefs = await SharedPreferences.getInstance();
+  final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher'); // Use your app's launcher icon
+
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   var directory= await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
   //Register Adapters
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(NoteAdapter());// Register the adapter
   Hive.registerAdapter(ReminderModelAdapter());
+  Hive.registerAdapter(CategoryAdapter());
   //Open Boxes
-  await Hive.openBox<Task>('tasks'); // Open the tasks box
+  await Hive.openBox<Task>('tasks');
+  await Hive.openBox<Task>('completed_tasks');
+  await Hive.openBox<Category>('categories');
   await Hive.openBox<Note>('notes');
   await Hive.openBox<ReminderModel>('reminders');
-  runApp(const MyApp());
+  await Hive.openBox<ReminderModel>('completed_reminders');
+  runApp( MyApp(isFirstTime: isFirstTime,));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isFirstTime;
+   MyApp({super.key,required this.isFirstTime});
 
   // This widget is the root of your application.
   @override
@@ -48,7 +74,7 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         useMaterial3: true,
       ),
-      home: OnBoardingScreen(),
+      home: isFirstTime ? const OnBoardingScreen() : Dashboard(),
     );
   }
 }
