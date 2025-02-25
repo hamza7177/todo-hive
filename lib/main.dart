@@ -13,6 +13,7 @@ import 'modules/dashboard/views/dashboard.dart';
 import 'modules/notes/models/category_model.dart';
 import 'modules/reminders/models/reminder_model.dart';
 import 'modules/todo_list/model/task_model.dart';
+import 'modules/voice_notes/models/voice_note_model.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 void main()async {
@@ -40,6 +41,7 @@ void main()async {
   Hive.registerAdapter(NoteAdapter());// Register the adapter
   Hive.registerAdapter(ReminderModelAdapter());
   Hive.registerAdapter(CategoryAdapter());
+  Hive.registerAdapter(VoiceNoteAdapter());
   //Open Boxes
   await Hive.openBox<Task>('tasks');
   await Hive.openBox<Task>('completed_tasks');
@@ -47,6 +49,7 @@ void main()async {
   await Hive.openBox<Note>('notes');
   await Hive.openBox<ReminderModel>('reminders');
   await Hive.openBox<ReminderModel>('completed_reminders');
+  await Hive.openBox<VoiceNote>('voiceNotes');
   runApp( MyApp(isFirstTime: isFirstTime,));
 }
 

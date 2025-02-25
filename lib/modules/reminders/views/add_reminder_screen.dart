@@ -91,7 +91,10 @@ class AddReminderScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => controller.saveReminder(),
+                onPressed: () {
+                  controller.saveReminder();
+                  Navigator.pop(context);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(

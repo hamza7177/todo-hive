@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_hive/modules/grocery_list/controllers/grocery_list_controller.dart';
 
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
+import '../controllers/schedule_controller.dart';
 
 class ScheduleListScreen extends StatelessWidget {
   ScheduleListScreen({super.key});
+
+  final ScheduleController scheduleC = Get.put(ScheduleController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,8 @@ class ScheduleListScreen extends StatelessWidget {
         title: Text(
           'Schedule Planner',
           style:
-          AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
-
       ),
       body: Column(
         children: [
@@ -41,7 +42,40 @@ class ScheduleListScreen extends StatelessWidget {
                   style: AppTextStyle.mediumBlack16,
                 ),
                 const SizedBox(height: 10),
-
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Obx(() => TodoListFilter(
+                            label: "All",
+                            isSelected: scheduleC.selectedFilter.value == "All",
+                            onTap: () => scheduleC.setFilter("All"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Low",
+                            isSelected: scheduleC.selectedFilter.value == "Low",
+                            onTap: () => scheduleC.setFilter("Low"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "Medium",
+                            isSelected:
+                                scheduleC.selectedFilter.value == "Medium",
+                            onTap: () => scheduleC.setFilter("Medium"),
+                          )),
+                      const SizedBox(width: 8.0),
+                      Obx(() => TodoListFilter(
+                            label: "High",
+                            isSelected:
+                                scheduleC.selectedFilter.value == "High",
+                            onTap: () => scheduleC.setFilter("High"),
+                          )),
+                      const SizedBox(width: 8.0),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
               ],
             ),
           ),

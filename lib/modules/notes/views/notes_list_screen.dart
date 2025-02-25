@@ -38,10 +38,10 @@ class NotesListScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/images/ic_search.webp',
-                  height: 20,
-                ),
+                // Image.asset(
+                //   'assets/images/ic_search.webp',
+                //   height: 20,
+                // ),
                 SizedBox(
                   width: 10,
                 ),
@@ -76,23 +76,27 @@ class NotesListScreen extends StatelessWidget {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Obx(() => Row(
-                    children: [
-                      TodoListFilter(
-                        label: "All",
-                        isSelected: noteC.selectedFilter.value == "All",
-                        onTap: () => noteC.setFilter("All"),
-                      ),
-                      const SizedBox(width: 8.0),
-                      ...noteC.categories.map((category) => Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: TodoListFilter(
-                          label: category.name,
-                          isSelected: noteC.selectedFilter.value == category.name,
-                          onTap: () => noteC.setFilter(category.name),
-                        ),
-                      )).toList(),
-                    ],
-                  )),
+                        children: [
+                          TodoListFilter(
+                            label: "All",
+                            isSelected: noteC.selectedFilter.value == "All",
+                            onTap: () => noteC.setFilter("All"),
+                          ),
+                          const SizedBox(width: 8.0),
+                          ...noteC.categories
+                              .map((category) => Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: TodoListFilter(
+                                      label: category.name,
+                                      isSelected: noteC.selectedFilter.value ==
+                                          category.name,
+                                      onTap: () =>
+                                          noteC.setFilter(category.name),
+                                    ),
+                                  ))
+                              .toList(),
+                        ],
+                      )),
                 ),
                 const SizedBox(height: 10),
               ],
