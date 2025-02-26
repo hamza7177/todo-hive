@@ -42,7 +42,7 @@ class ReminderListScreen extends StatelessWidget {
               onPressed: () {
                 Get.to(() => CompletedTasksScreen());
               },
-              icon: Icon(Icons.done, color: AppColors.black)),
+              icon: Icon(Icons.check_circle, color: AppColors.black)),
         ],
       ),
       body: Column(
@@ -184,7 +184,7 @@ class ReminderListScreen extends StatelessWidget {
                         ),
                       ),
                       child: PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
+                        icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
                         onSelected: (value) async {
                           if (value == "Complete") {
                             controller.completeReminder(reminder.id);
@@ -384,7 +384,7 @@ class ReminderListScreen extends StatelessWidget {
                           ),
                           child: PopupMenuButton<String>(
                             icon:
-                                Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
+                                Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
                             onSelected: (value) async {
                               if (value == "Complete") {
                                 controller.completeReminder(reminder.id);
@@ -604,7 +604,7 @@ class ReminderListScreen extends StatelessWidget {
                                 ),
                               ),
                               child: PopupMenuButton<String>(
-                                icon: Icon(Icons.more_vert,
+                                icon: Icon(Icons.more_horiz,
                                     color: Color(0xffAFAFAF)),
                                 onSelected: (value) async {
                                   if (value == "Complete") {

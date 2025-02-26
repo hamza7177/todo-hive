@@ -3,12 +3,12 @@ import 'package:todo_hive/utils/app_text_style.dart';
 
 import '../../../utils/app_colors.dart';
 
-class TodoListFilter extends StatelessWidget {
+class PriorityFilter extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  TodoListFilter(
+  PriorityFilter(
       {required this.label, required this.isSelected, required this.onTap});
 
   @override
@@ -16,19 +16,19 @@ class TodoListFilter extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 40.0,
+        height: 49.0,
+        width: 113,
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.lightRed : Colors.white,
-          borderRadius: BorderRadius.circular(102),
-          border: Border.all(
-              color: isSelected ? AppColors.lightRed : Color(0xffD9D9D9),
-              width: 1.0),
+          color: isSelected
+              ? AppColors.lightRed.withOpacity(0.1)
+              : Color(0xffE9E9E9),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Center(
           child: Text(label,
-              style: AppTextStyle.regularBlack14.copyWith(
-                color: isSelected ? Colors.white : Colors.black,
+              style: AppTextStyle.regularBlack16.copyWith(
+                color: isSelected ? AppColors.lightRed : Color(0xffAFAFAF),
               )),
         ),
       ),

@@ -310,7 +310,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           note.title,
-                                          style: AppTextStyle.mediumBlack16.copyWith(fontWeight: FontWeight.w700),
+                                          style: AppTextStyle.mediumBlack16,
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         ),

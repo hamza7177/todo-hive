@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../controllers/notes_controller.dart';
-import '../models/note_model.dart';
 
-class NoteUpdateScreen extends StatelessWidget {
-  final Note note;
-  final int index;
-
-  NoteUpdateScreen({super.key, required this.note, required this.index});
-
+class NoteAddScreen extends StatelessWidget {
   final NotesController noteController = Get.find<NotesController>();
 
   final List<String> categories = [
@@ -20,19 +13,21 @@ class NoteUpdateScreen extends StatelessWidget {
     "Work",
     "Random",
     "Shopping",
-    "Untitled"
   ];
+
+   NoteAddScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController titleController =
-        TextEditingController(text: note.title);
-    final TextEditingController descriptionController =
-        TextEditingController(text: note.description);
     return Scaffold(
       backgroundColor: AppColors.cardColor,
       appBar: AppBar(
         backgroundColor: AppColors.cardColor,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_sharp,
@@ -46,7 +41,7 @@ class NoteUpdateScreen extends StatelessWidget {
               AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
         actions: [
-          _buildCategoryDropdown(context, note),
+          _buildCategoryDropdown(context),
           SizedBox(width: 10),
         ],
       ),
@@ -60,7 +55,7 @@ class NoteUpdateScreen extends StatelessWidget {
                     .copyWith(color: Color(0xffC5C5C5))),
             SizedBox(height: 10),
             TextField(
-              controller: titleController,
+              controller: noteController.titleController,
               decoration: InputDecoration(
                 hintText: "Title",
                 hintStyle: AppTextStyle.mediumBlack16.copyWith(
@@ -69,8 +64,6 @@ class NoteUpdateScreen extends StatelessWidget {
                     fontWeight: FontWeight.w600),
                 border: InputBorder.none,
               ),
-              minLines: 1,
-              maxLines: 2,
               style: AppTextStyle.boldBlack20,
             ),
             Container(
@@ -79,7 +72,7 @@ class NoteUpdateScreen extends StatelessWidget {
             ),
             Expanded(
               child: TextField(
-                controller: descriptionController,
+                controller: noteController.noteController,
                 maxLines: null,
                 onChanged: (_) => noteController.update(),
                 decoration: InputDecoration(
@@ -101,15 +94,9 @@ class NoteUpdateScreen extends StatelessWidget {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                if (titleController.text.isNotEmpty &&
-                    descriptionController.text.isNotEmpty) {
-                  noteController.updateNote(
-                      index,
-                      titleController.text,
-                      descriptionController.text,
-                      noteController.selectedUpdateCategory.value == ""
-                          ? note.category
-                          : noteController.selectedUpdateCategory.value);
+                if (noteController.titleController.text.isNotEmpty && noteController.noteController.text.isNotEmpty && noteController.selectedCategory.value.isNotEmpty) {
+                  noteController.addNote(
+                      noteController.titleController.text,noteController.noteController.text, noteController.selectedCategory.value);
                   Get.back();
                 }
               },
@@ -121,7 +108,7 @@ class NoteUpdateScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 14),
               ),
               child: Center(
-                child: Text("Update Note",
+                child: Text("Save Note",
                     style: AppTextStyle.mediumBlack16
                         .copyWith(color: AppColors.white)),
               ),
@@ -133,7 +120,7 @@ class NoteUpdateScreen extends StatelessWidget {
   }
 
   /// Custom dropdown button with dotted border
-  Widget _buildCategoryDropdown(BuildContext context, Note note) {
+  Widget _buildCategoryDropdown(BuildContext context) {
     return GestureDetector(
       onTap: () => showCategoryDialog(context),
       child: Container(
@@ -147,19 +134,13 @@ class NoteUpdateScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Obx(() => Text(
-                  noteController.selectedUpdateCategory.value == ""
-                      ? note.category
-                      : noteController.selectedUpdateCategory.value,
+                  noteController.selectedCategory.value == ""
+                      ? 'Add Category'
+                      : noteController.selectedCategory.value,
                   style: AppTextStyle.regularBlack14,
                 )),
-            SizedBox(
-              width: 5,
-            ),
-            Icon(
-              FontAwesomeIcons.chevronDown,
-              color: Color(0xffAFAFAF),
-              size: 15,
-            ),
+            SizedBox(width: 5,),
+            Icon(FontAwesomeIcons.chevronDown, color: Color(0xffAFAFAF),size: 15,),
           ],
         ),
       ),
@@ -194,10 +175,10 @@ class NoteUpdateScreen extends StatelessWidget {
       ),
       items: noteController.categories.map((category) {
         return PopupMenuItem(
-          child: Text(category,
+          child: Text(category.name,
               style: TextStyle(fontSize: 16, color: Colors.black)),
           onTap: () {
-            noteController.selectedUpdateCategory(category);
+            noteController.setCategory(category.name);
           },
         );
       }).toList(),

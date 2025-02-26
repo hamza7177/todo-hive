@@ -215,8 +215,8 @@ class VoiceNoteController extends GetxController{
     final note = voiceBox.getAt(index);
     if (note != null) {
       note.isStarred = !note.isStarred;
-      await note.save(); // Save works now because VoiceNote extends HiveObject
-      loadVoiceNotes();
+      await note.save(); // Save the updated note to Hive
+      loadVoiceNotes(); // Refresh the list based on current filter
     }
   }
   @override

@@ -78,7 +78,6 @@ class ReminderController extends GetxController {
     final reminder = reminderBox.values.firstWhere((element) => element.id == id);
     reminder.delete();
     loadReminders();
-    Get.snackbar('Success', 'Reminder deleted successfully');
     countdowns.remove(id);
     nextTriggerTimes.remove(id);
     triggeredNotifications.remove(id); // Clean up trigger flag

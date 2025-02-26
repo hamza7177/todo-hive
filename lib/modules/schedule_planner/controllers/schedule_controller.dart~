@@ -38,7 +38,7 @@ class ScheduleController extends GetxController {
 
   Future<void> initializeNotifications() async {
     tz.initializeTimeZones();
-    final String timeZoneName = tz.local.name;
+    final String timeZoneName = tz.local.currentTimeZone.toString();
     print('Current time zone: $timeZoneName');
 
     const AndroidInitializationSettings initializationSettingsAndroid =

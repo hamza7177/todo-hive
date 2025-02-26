@@ -21,9 +21,14 @@ class NotesListScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_sharp,
             color: AppColors.black,
           ),
@@ -42,7 +47,7 @@ class NotesListScreen extends StatelessWidget {
                 //   'assets/images/ic_search.webp',
                 //   height: 20,
                 // ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 ElevatedButton(
@@ -52,7 +57,7 @@ class NotesListScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(102)),
-                    backgroundColor: Color(0xffF0F0F0),
+                    backgroundColor: const Color(0xffF0F0F0),
                   ),
                   child: Text('Edit', style: AppTextStyle.mediumPrimary14),
                 )
@@ -83,18 +88,15 @@ class NotesListScreen extends StatelessWidget {
                             onTap: () => noteC.setFilter("All"),
                           ),
                           const SizedBox(width: 8.0),
-                          ...noteC.categories
-                              .map((category) => Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: TodoListFilter(
-                                      label: category.name,
-                                      isSelected: noteC.selectedFilter.value ==
-                                          category.name,
-                                      onTap: () =>
-                                          noteC.setFilter(category.name),
-                                    ),
-                                  ))
-                              .toList(),
+                          ...noteC.categories.map((category) => Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: TodoListFilter(
+                                  label: category.name,
+                                  isSelected: noteC.selectedFilter.value ==
+                                      category.name,
+                                  onTap: () => noteC.setFilter(category.name),
+                                ),
+                              )),
                         ],
                       )),
                 ),
@@ -132,7 +134,7 @@ class NotesListScreen extends StatelessWidget {
                       ),
                     )
                   : ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: groupedTasks.entries.expand((entry) {
                         final tasksForDate = entry.value;
 
@@ -140,8 +142,8 @@ class NotesListScreen extends StatelessWidget {
                           return Column(
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 14),
                                 width: Get.width,
                                 decoration: BoxDecoration(
                                   color: AppColors.cardColor,
@@ -149,36 +151,50 @@ class NotesListScreen extends StatelessWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: Get.width * 0.6,
+                                          child: Text(
                                             task.title,
-                                            style: AppTextStyle.mediumBlack16,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                          Text(
-                                            task.description,
-                                            style: AppTextStyle.mediumBlack16,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                          Text(
-                                            DateFormat('MM-dd-yyyy hh:mm a')
-                                                .format(task.dateTime),
-                                            style: AppTextStyle.regularBlack12
+                                            style: AppTextStyle.mediumBlack16
                                                 .copyWith(
-                                                    color: Color(0xffAEAEAE)),
+                                                    fontWeight:
+                                                        FontWeight.w700),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        SizedBox(
+                                          width: Get.width * 0.6,
+                                          child: Text(
+                                            task.description,
+                                            style: AppTextStyle.regularBlack14,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          DateFormat('MM-dd-yyyy hh:mm a')
+                                              .format(task.dateTime),
+                                          style: AppTextStyle.regularBlack12
+                                              .copyWith(
+                                                  color:
+                                                      const Color(0xffAEAEAE)),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 30),
+                                    Spacer(),
                                     Theme(
                                       data: Theme.of(context).copyWith(
                                         popupMenuTheme: PopupMenuThemeData(
@@ -190,7 +206,7 @@ class NotesListScreen extends StatelessWidget {
                                         ),
                                       ),
                                       child: PopupMenuButton<String>(
-                                        icon: Icon(Icons.more_vert,
+                                        icon: const Icon(Icons.more_vert,
                                             color: Color(0xffAFAFAF)),
                                         onSelected: (value) async {
                                           if (value == "Update") {
@@ -231,7 +247,8 @@ class NotesListScreen extends StatelessWidget {
                                                                   .circular(8),
                                                         ),
                                                         backgroundColor:
-                                                            Color(0xffF0F0F0),
+                                                            const Color(
+                                                                0xffF0F0F0),
                                                       ),
                                                       child: Text(
                                                         'No',
@@ -297,7 +314,7 @@ class NotesListScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                             ],
                           );
                         }).toList();

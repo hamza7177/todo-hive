@@ -341,7 +341,7 @@ class TodoListScreen extends StatelessWidget {
               onPressed: () {
                 Get.to(() => CompletedTodoScreen());
               },
-              icon: Icon(Icons.done, color: AppColors.black))
+              icon: Icon(Icons.check_circle, color: AppColors.black))
         ],
       ),
       body: Column(
@@ -464,11 +464,20 @@ class TodoListScreen extends StatelessWidget {
                                     ),
                                     child: Row(
                                       children: [
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: Color(0xffD9D9D9)),
+                                            shape: BoxShape.circle
+                                          ),
+                                        ),
                                         SizedBox(width: 20),
-                                        Expanded(
+                                        SizedBox(
+                                          width: Get.width * 0.6,
                                           child: Text(
                                             task.title,
-                                            style: AppTextStyle.mediumBlack16,
+                                            style: AppTextStyle.regularBlack14,
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                           ),

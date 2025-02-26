@@ -17,6 +17,11 @@ class GroceryListScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Icon(

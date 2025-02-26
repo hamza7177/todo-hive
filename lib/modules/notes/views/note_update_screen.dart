@@ -33,6 +33,11 @@ class NoteUpdateScreen extends StatelessWidget {
       backgroundColor: AppColors.cardColor,
       appBar: AppBar(
         backgroundColor: AppColors.cardColor,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_sharp,

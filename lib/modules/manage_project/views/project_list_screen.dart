@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_hive/modules/grocery_list/controllers/grocery_list_controller.dart';
-
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
+import '../controllers/manage_project_controller.dart';
+import 'add_project_screen.dart';
 
 class ProjectListScreen extends StatelessWidget {
   ProjectListScreen({super.key});
 
-  final GroceryListController groceryC = Get.put(GroceryListController());
+  final ManageProjectController projectC = Get.put(ManageProjectController());
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +17,11 @@ class ProjectListScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Icon(
@@ -48,27 +53,27 @@ class ProjectListScreen extends StatelessWidget {
                     children: [
                       Obx(() => TodoListFilter(
                             label: "All",
-                            isSelected: groceryC.selectedFilter.value == "All",
-                            onTap: () => groceryC.setFilter("All"),
+                            isSelected: projectC.selectedFilter.value == "All",
+                            onTap: () => projectC.setFilter("All"),
                           )),
                       const SizedBox(width: 8.0),
                       Obx(() => TodoListFilter(
                             label: "High",
-                            isSelected: groceryC.selectedFilter.value == "High",
-                            onTap: () => groceryC.setFilter("High"),
+                            isSelected: projectC.selectedFilter.value == "High",
+                            onTap: () => projectC.setFilter("High"),
                           )),
                       const SizedBox(width: 8.0),
                       Obx(() => TodoListFilter(
                             label: "Medium",
                             isSelected:
-                                groceryC.selectedFilter.value == "Medium",
-                            onTap: () => groceryC.setFilter("Medium"),
+                                projectC.selectedFilter.value == "Medium",
+                            onTap: () => projectC.setFilter("Medium"),
                           )),
                       const SizedBox(width: 8.0),
                       Obx(() => TodoListFilter(
                             label: "Low",
-                            isSelected: groceryC.selectedFilter.value == "Low",
-                            onTap: () => groceryC.setFilter("Low"),
+                            isSelected: projectC.selectedFilter.value == "Low",
+                            onTap: () => projectC.setFilter("Low"),
                           )),
                     ],
                   ),
@@ -109,12 +114,14 @@ class ProjectListScreen extends StatelessWidget {
         width: 70, // Adjust size as needed
         height: 70,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Get.to(()=> AddProjectScreen());
+          },
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
-            child: Image.asset('assets/images/ic_grocery-1.webp'),
+            child: Image.asset('assets/icons/ic_add_project.png'),
           ),
         ),
       ),

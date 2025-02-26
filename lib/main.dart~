@@ -59,7 +59,6 @@ void main() async {
   await Hive.openBox<ReminderModel>('completed_reminders');
   await Hive.openBox<VoiceNote>('voiceNotes');
   await Hive.openBox<ScheduleModel>('schedules');
-  await Hive.openBox<ScheduleModel>('completedSchedules');
   runApp(MyApp(
     isFirstTime: isFirstTime,
   ));
