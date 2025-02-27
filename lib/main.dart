@@ -12,6 +12,7 @@ import 'package:todo_hive/on_boarding_screen.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 
 import 'modules/dashboard/views/dashboard.dart';
+import 'modules/grocery_list/models/grocery_model.dart';
 import 'modules/notes/models/category_model.dart';
 import 'modules/reminders/models/reminder_model.dart';
 import 'modules/schedule_planner/models/schedule_model.dart';
@@ -49,6 +50,8 @@ void main() async {
   Hive.registerAdapter(CategoryAdapter());
   Hive.registerAdapter(VoiceNoteAdapter());
   Hive.registerAdapter(ScheduleModelAdapter());
+  Hive.registerAdapter(GroceryListAdapter()); // Registers the GroceryList adapter
+  Hive.registerAdapter(GroceryItemAdapter()); // Registers the GroceryItem adapter
 
   //Open Boxes
   await Hive.openBox<Task>('tasks');
@@ -60,6 +63,9 @@ void main() async {
   await Hive.openBox<VoiceNote>('voiceNotes');
   await Hive.openBox<ScheduleModel>('schedules');
   await Hive.openBox<ScheduleModel>('completedSchedules');
+  await Hive.openBox<GroceryList>('groceryLists');
+  await Hive.openBox<GroceryItem>('groceryItems');
+
   runApp(MyApp(
     isFirstTime: isFirstTime,
   ));

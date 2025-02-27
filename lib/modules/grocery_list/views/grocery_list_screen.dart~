@@ -272,7 +272,7 @@ class GroceryListScreen extends StatelessWidget {
             Text('Suggestions', style: AppTextStyle.mediumBlack16),
             SizedBox(height: 8),
             Wrap(
-              spacing: 24,
+              spacing: 26,
               runSpacing: 10,
               children: groceryC.initialSuggestions.map((suggestion) {
                 return GestureDetector(
