@@ -34,20 +34,20 @@ class Dashboard extends StatelessWidget {
                 "To-Do",
                 style: AppTextStyle.mediumBlack16.copyWith(
                     color: AppColors.lightRed,
-                    fontSize: 23,
+                    fontSize: 21,
                     fontWeight: FontWeight.w700),
               ),
               Text(
                 " List",
                 style: AppTextStyle.mediumBlack16
-                    .copyWith(fontSize: 23, fontWeight: FontWeight.w700),
+                    .copyWith(fontSize: 21, fontWeight: FontWeight.w700),
               ),
               Spacer(),
               Padding(
                 padding: const EdgeInsets.only(right: 10.0),
                 child: Image.asset(
                   'assets/images/ic_setting.webp',
-                  height: 30,
+                  height: 25,
                 ),
               ),
             ]),

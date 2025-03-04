@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,7 +11,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:todo_hive/modules/notes/models/note_model.dart';
 import 'package:todo_hive/on_boarding_screen.dart';
 import 'package:todo_hive/utils/app_colors.dart';
-
+import 'package:workmanager/workmanager.dart';
 import 'modules/dashboard/views/dashboard.dart';
 import 'modules/grocery_list/models/grocery_model.dart';
 import 'modules/notes/models/category_model.dart';
@@ -21,6 +22,7 @@ import 'modules/voice_notes/models/voice_note_model.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +38,7 @@ void main() async {
       AndroidInitializationSettings(
           '@mipmap/ic_launcher'); // Use your app's launcher icon
 
-  final InitializationSettings initializationSettings = InitializationSettings(
+  final InitializationSettings initializationSettings = const InitializationSettings(
     android: initializationSettingsAndroid,
   );
 
@@ -65,12 +67,85 @@ void main() async {
   await Hive.openBox<ScheduleModel>('completedSchedules');
   await Hive.openBox<GroceryList>('groceryLists');
   await Hive.openBox<GroceryItem>('groceryItems');
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
   runApp(MyApp(
     isFirstTime: isFirstTime,
   ));
 }
 
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    try {
+      // Initialize Hive in the background isolate
+      final dir = await getApplicationDocumentsDirectory();
+      Hive.init(dir.path);
+      Hive.registerAdapter(ReminderModelAdapter());
+      final reminderBox = await Hive.openBox<ReminderModel>('reminders');
+      final completedBox = await Hive.openBox<ReminderModel>('completed_reminders');
+
+      // Background task logic
+      final reminders = reminderBox.values.toList();
+      final now = DateTime.now();
+      for (var reminder in reminders) {
+        DateTime? nextTime = calculateNextTriggerTime(reminder, now);
+        if (nextTime != null && nextTime.isBefore(now)) {
+          print("Background: Reminder ${reminder.name} time is up");
+          // Note: Notifications can't be triggered here directly without additional setup
+          if (reminder.isRepeating) {
+            // Update next trigger time for repeating reminders
+            DateTime newNextTime = calculateNextTriggerTime(reminder, now.add(const Duration(minutes: 1)))!;
+            reminderBox.put(reminder.key, reminder); // Update in Hive if needed
+          }
+        }
+      }
+      await reminderBox.close();
+      await completedBox.close();
+      return Future.value(true);
+    } catch (e) {
+      print("Background task error: $e");
+      return Future.value(false);
+    }
+  });
+}
+
+DateTime? calculateNextTriggerTime(ReminderModel reminder, DateTime now) {
+  if (reminder.reminderType == 'interval') {
+    int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
+    DateTime initialTriggerTime = reminder.createdAt!.add(Duration(minutes: totalMinutes));
+    if (!reminder.isRepeating) {
+      return initialTriggerTime;
+    }
+    DateTime nextTime = initialTriggerTime;
+    while (nextTime.isBefore(now)) {
+      nextTime = nextTime.add(Duration(minutes: totalMinutes));
+    }
+    return nextTime;
+  } else if (reminder.reminderType == 'date_time') {
+    if (reminder.dateTime!.isAfter(now)) return reminder.dateTime!;
+    if (reminder.isRepeating) {
+      DateTime nextTime = reminder.dateTime!;
+      while (nextTime.isBefore(now)) {
+        nextTime = nextTime.add(const Duration(days: 1));
+      }
+      return nextTime;
+    }
+    return reminder.dateTime!;
+  } else if (reminder.reminderType == 'weekday') {
+    int targetHour = reminder.dateTime!.hour;
+    int targetMinute = reminder.dateTime!.minute;
+    for (int i = 0; i < 7; i++) {
+      int checkDay = (now.weekday + i - 1) % 7;
+      if (reminder.weekdays.contains(checkDay)) {
+        DateTime candidate = DateTime(now.year, now.month, now.day, targetHour, targetMinute).add(Duration(days: i));
+        if (candidate.isAfter(now)) return candidate;
+      }
+    }
+  }
+  return null;
+}
 Future<void> _requestNotificationPermission() async {
   PermissionStatus status = await Permission.notification.request();
   if (status.isDenied || status.isPermanentlyDenied) {
@@ -104,7 +179,7 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         useMaterial3: true,
       ),
-      home: isFirstTime ? const OnBoardingScreen() : Dashboard(),
+      home: isFirstTime ? const OnBoardingScreen() : const Dashboard(),
     );
   }
 }

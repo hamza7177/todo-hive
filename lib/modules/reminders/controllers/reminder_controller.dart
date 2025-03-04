@@ -5,18 +5,23 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_hive/utils/app_text_style.dart';
+import 'package:todo_hive/utils/app_text_style.dart'; // Assuming this exists
+import 'package:workmanager/workmanager.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import '../models/reminder_model.dart';
 
 class ReminderController extends GetxController {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  final Box<ReminderModel> reminderBox = Hive.box('reminders');
-  final Box<ReminderModel> completedBox = Hive.box('completed_reminders');
-  final triggeredNotifications = <String, bool>{}.obs;
-  var reminders = <ReminderModel>[].obs; // RxList to hold reminders
+  late Box<ReminderModel> reminderBox;
+  late Box<ReminderModel> completedBox;
+  final triggeredNotifications = <String, bool>{}.obs; // Tracks if notification was triggered
+  var reminders = <ReminderModel>[].obs;
+
   void loadReminders() {
-    reminders.value = reminderBox.values.toList(); // Convert Hive data to RxList
+    reminders.value = reminderBox.values.toList();
   }
+
   var completedReminders = <ReminderModel>[].obs;
   RxInt intervalHours = 5.obs;
   RxBool isRepeating = false.obs;
@@ -26,9 +31,9 @@ class ReminderController extends GetxController {
   void loadCompletedReminders() {
     completedReminders.value = completedBox.values.toList();
   }
-  var selectedMinutes = 1.obs;
-  var isMinutesSelected = true.obs; // Toggle between Minutes & Hours
 
+  var selectedMinutes = 1.obs;
+  var isMinutesSelected = true.obs;
   RxBool isInterval = false.obs;
   RxBool isDateTime = false.obs;
   RxBool isWeekday = false.obs;
@@ -37,9 +42,10 @@ class ReminderController extends GetxController {
   Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
   RxList<bool> selectedWeekdays = List.generate(7, (index) => false).obs;
   RxInt intervalMinutes = 0.obs;
-  final countdowns = <String, Duration>{}.obs; // Store countdown timers for each reminder
-  final nextTriggerTimes = <String, DateTime>{}.obs; // Store next execution times
+  final countdowns = <String, Duration>{}.obs;
+  final nextTriggerTimes = <String, DateTime>{}.obs;
   Timer? _timer;
+
   void toggleInterval() {
     isInterval.value = !isInterval.value;
     if (isInterval.value) {
@@ -80,13 +86,12 @@ class ReminderController extends GetxController {
     loadReminders();
     countdowns.remove(id);
     nextTriggerTimes.remove(id);
-    triggeredNotifications.remove(id); // Clean up trigger flag
+    triggeredNotifications.remove(id);
     Get.snackbar('Success', 'Reminder deleted successfully');
   }
 
   Future<void> pickDate(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
-
     await showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -103,7 +108,7 @@ class ReminderController extends GetxController {
                 maximumDate: DateTime(2100),
                 onDateTimeChanged: (DateTime newDate) {
                   selectedDateTime.value = newDate;
-                  selectedDate.value = '${newDate.day}/${newDate.month}/${newDate.year}';
+                  selectedDate.value = DateFormat('EEE, MMM d').format(newDate);
                 },
               ),
             ),
@@ -119,7 +124,6 @@ class ReminderController extends GetxController {
 
   Future<void> pickTime(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
-
     await showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -134,8 +138,7 @@ class ReminderController extends GetxController {
                 initialDateTime: selected,
                 onDateTimeChanged: (DateTime newTime) {
                   selectedDateTime.value = newTime;
-                  selectedTime.value =
-                  '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+                  selectedTime.value = DateFormat('hh:mm a').format(newTime);
                 },
               ),
             ),
@@ -150,10 +153,8 @@ class ReminderController extends GetxController {
   }
 
   void saveReminder() {
-    print('Starting saveReminder');
     if (reminderName.value.isEmpty) {
       Get.snackbar('Error', 'Please enter a reminder name');
-      print('Empty reminder name, exiting');
       return;
     }
 
@@ -163,7 +164,6 @@ class ReminderController extends GetxController {
     int intervalMinutes = 0;
     int intervalHours = 0;
 
-    print('Determining reminder type');
     if (isInterval.value) {
       reminderType = 'interval';
       if (isMinutesSelected.value) {
@@ -176,20 +176,13 @@ class ReminderController extends GetxController {
       dateTime = selectedDateTime.value;
     } else if (isWeekday.value) {
       reminderType = 'weekday';
-      weekdays = selectedWeekdays
-          .asMap()
-          .entries
-          .where((entry) => entry.value)
-          .map((entry) => entry.key)
-          .toList();
+      weekdays = selectedWeekdays.asMap().entries.where((entry) => entry.value).map((entry) => entry.key).toList();
       dateTime = selectedDateTime.value;
     } else {
       Get.snackbar('Error', 'Please select a reminder type');
-      print('No reminder type selected, exiting');
       return;
     }
 
-    print('Creating ReminderModel');
     final reminder = ReminderModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: reminderName.value,
@@ -200,50 +193,41 @@ class ReminderController extends GetxController {
       intervalHours: intervalHours,
       isRepeating: isRepeating.value,
       color: selectedColor.value,
+      createdAt: DateTime.now(),
     );
 
     if (!reminder.isValid()) {
       Get.snackbar('Error', 'Invalid reminder configuration');
-      print('Invalid reminder configuration, exiting');
       return;
     }
 
     try {
-      print('Adding reminder to box');
       reminderBox.add(reminder);
-      print('Loading reminders');
       loadReminders();
-      print('Showing success snackbar');
+      scheduleNotification(reminder);
       Get.snackbar('Success', 'Reminder saved successfully');
-      print('Resetting form');
       resetForm();
-      print('Attempting to navigate back');
       Get.back();
-      print('Navigation back executed');
     } catch (e) {
       print('Error saving reminder: $e');
       Get.snackbar('Error', 'Failed to save reminder');
     }
   }
 
-
-
-
-  // Method to toggle a weekday
   void toggleWeekday(int index) {
     selectedWeekdays[index] = !selectedWeekdays[index];
   }
 
-  void triggerNotification(ReminderModel reminder) async {
+  Future<void> triggerNotification(ReminderModel reminder) async {
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'reminder_channel',
       'Reminders',
       importance: Importance.high,
       priority: Priority.high,
     );
-
     NotificationDetails details = NotificationDetails(android: androidDetails);
 
+    print("Triggering notification for ${reminder.name}");
     await flutterLocalNotificationsPlugin.show(
       reminder.id.hashCode,
       reminder.name,
@@ -252,115 +236,145 @@ class ReminderController extends GetxController {
     );
   }
 
+  Future<void> scheduleNotification(ReminderModel reminder) async {
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'reminder_channel',
+      'Reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    NotificationDetails details = NotificationDetails(android: androidDetails);
 
+    DateTime now = DateTime.now();
+    updateNextTriggerTime(reminder);
+    DateTime? triggerTime = nextTriggerTimes[reminder.id];
 
+    if (triggerTime == null || triggerTime.isBefore(now)) {
+      print("Notification for ${reminder.name} not scheduled: triggerTime is $triggerTime, now is $now");
+      return;
+    }
+
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(triggerTime, tz.local);
+    print("Scheduling notification for ${reminder.name} at $scheduledTime");
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      reminder.id.hashCode,
+      reminder.name,
+      'Reminder time is up!',
+      scheduledTime,
+      details,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
 
   Future<void> initNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final DarwinInitializationSettings initializationSettingsIOS =
-    DarwinInitializationSettings();
-
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     final InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-    );
-  }
-  void _initializeNextTriggerTimes() {
-    for (var reminder in reminders) {
-      if (reminder.reminderType == 'interval') {
-        int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
-        nextTriggerTimes[reminder.id] = DateTime.now().add(Duration(minutes: totalMinutes));
-      } else if (reminder.reminderType == 'weekday') {
-        nextTriggerTimes[reminder.id] = _getNextWeekday(reminder.weekdays.first);
+    final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
+    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      final bool? granted = await androidPlugin.requestNotificationsPermission();
+      if (granted == true) {
+        print("Notification permission granted");
       } else {
-        nextTriggerTimes[reminder.id] = reminder.dateTime!;
+        print("Notification permission denied");
       }
     }
+
+    bool? initialized = await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    if (initialized == true) {
+      print("Notifications initialized successfully");
+    } else {
+      print("Failed to initialize notifications");
+    }
+    tz.initializeTimeZones();
   }
 
-
-
-
+  void _initializeNextTriggerTimes() {
+    for (var reminder in reminders) {
+      updateNextTriggerTime(reminder);
+    }
+  }
 
   void resetReminder(ReminderModel reminder) {
-    if (reminder.reminderType == 'interval') {
-      int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
-      nextTriggerTimes[reminder.id] = DateTime.now().add(Duration(minutes: totalMinutes));
-    } else if (reminder.reminderType == 'weekday') {
-      nextTriggerTimes[reminder.id] = _getNextWeekday(reminder.weekdays.first);
-    } else if (reminder.reminderType == 'date_time') {
-      nextTriggerTimes[reminder.id] = reminder.dateTime!;
-    }
-    reminders.refresh(); // Refresh the reminders list to update the UI
+    updateNextTriggerTime(reminder);
+    triggeredNotifications[reminder.id] = false; // Reset notification trigger
+    reminders.refresh();
   }
-
 
   DateTime _getNextWeekday(int day) {
     DateTime now = DateTime.now();
-    int currentDay = now.weekday;
+    int currentDay = now.weekday % 7; // 1-7, adjust to 0-6
     int daysUntilNext = (day - currentDay + 7) % 7;
+    if (daysUntilNext == 0) daysUntilNext = 7; // Ensure it moves forward
     return now.add(Duration(days: daysUntilNext));
   }
 
-
-
   void _startCountdownTimers() {
-    _timer?.cancel(); // Cancel any existing timer
+    _timer?.cancel();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       DateTime now = DateTime.now();
       for (var reminder in reminders) {
         if (!nextTriggerTimes.containsKey(reminder.id)) {
-          _updateNextTriggerTime(reminder);
-          triggeredNotifications[reminder.id] = false; // Reset trigger flag
+          updateNextTriggerTime(reminder);
         }
+        Duration remaining = nextTriggerTimes[reminder.id]!.difference(now);
+        countdowns[reminder.id] = remaining;
 
-        if (nextTriggerTimes[reminder.id] != null) {
-          Duration remaining = nextTriggerTimes[reminder.id]!.difference(now);
-          countdowns[reminder.id] = remaining;
-
-          // Check if timer has reached or passed zero and notification hasn't been triggered yet
-          if (remaining.inSeconds <= 0 && !(triggeredNotifications[reminder.id] ?? false)) {
+        if (remaining.inSeconds <= 0) {
+          if (triggeredNotifications[reminder.id] != true) {
             triggerNotification(reminder);
-            triggeredNotifications[reminder.id] = true; // Mark as triggered
-
-            // For repeating reminders, reset the timer
-            if (reminder.isRepeating) {
-              _updateNextTriggerTime(reminder);
-              triggeredNotifications[reminder.id] = false; // Reset for next cycle
-            }
+            triggeredNotifications[reminder.id] = true;
           }
+
+          if (reminder.isRepeating) {
+            updateNextTriggerTime(reminder);
+            triggeredNotifications[reminder.id] = false;
+            scheduleNotification(reminder);
+          }
+          // Non-repeating reminders: no further updates, stays at "Time is up!"
         }
       }
-      countdowns.refresh(); // Update UI
+      countdowns.refresh();
     });
   }
 
-  void _updateNextTriggerTime(ReminderModel reminder) {
+  void updateNextTriggerTime(ReminderModel reminder) {
     DateTime now = DateTime.now();
     if (reminder.reminderType == 'interval') {
       int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
-      DateTime nextTime = nextTriggerTimes[reminder.id] ?? now;
-      // Ensure next time is in the future
-      while (nextTime.isBefore(now) || nextTime.isAtSameMomentAs(now)) {
-        nextTime = nextTime.add(Duration(minutes: totalMinutes));
+      DateTime initialTriggerTime = reminder.createdAt!.add(Duration(minutes: totalMinutes));
+
+      if (!nextTriggerTimes.containsKey(reminder.id)) {
+        // Set initial trigger time when reminder is first added
+        nextTriggerTimes[reminder.id] = initialTriggerTime;
+      } else if (reminder.isRepeating) {
+        // For repeating reminders, update to next interval
+        DateTime currentTriggerTime = nextTriggerTimes[reminder.id]!;
+        while (currentTriggerTime.isBefore(now)) {
+          currentTriggerTime = currentTriggerTime.add(Duration(minutes: totalMinutes));
+        }
+        nextTriggerTimes[reminder.id] = currentTriggerTime;
       }
-      nextTriggerTimes[reminder.id] = nextTime;
-    }
-    else if (reminder.reminderType == 'weekday') {
+      // Non-repeating: Do nothing if time is up, keep initialTriggerTime
+    } else if (reminder.reminderType == 'weekday') {
       nextTriggerTimes[reminder.id] = _getNextWeekdayTime(reminder);
-    }
-    else if (reminder.reminderType == 'date_time') {
+    } else if (reminder.reminderType == 'date_time') {
       if (reminder.dateTime!.isAfter(now)) {
         nextTriggerTimes[reminder.id] = reminder.dateTime!;
       } else if (reminder.isRepeating) {
-        DateTime nextTime = nextTriggerTimes[reminder.id] ?? reminder.dateTime!;
-        while (nextTime.isBefore(now) || nextTime.isAtSameMomentAs(now)) {
+        DateTime nextTime = reminder.dateTime!;
+        while (nextTime.isBefore(now)) {
           nextTime = nextTime.add(Duration(days: 1));
         }
         nextTriggerTimes[reminder.id] = nextTime;
@@ -373,6 +387,8 @@ class ReminderController extends GetxController {
   DateTime _getNextWeekdayTime(ReminderModel reminder) {
     DateTime now = DateTime.now();
     DateTime nextTime = now;
+    int targetHour = reminder.dateTime!.hour;
+    int targetMinute = reminder.dateTime!.minute;
 
     for (int i = 0; i < 7; i++) {
       int checkDay = (now.weekday + i - 1) % 7;
@@ -381,10 +397,9 @@ class ReminderController extends GetxController {
           now.year,
           now.month,
           now.day,
-          reminder.dateTime!.hour,
-          reminder.dateTime!.minute,
+          targetHour,
+          targetMinute,
         ).add(Duration(days: i));
-
         if (candidate.isAfter(now)) {
           nextTime = candidate;
           break;
@@ -397,30 +412,27 @@ class ReminderController extends GetxController {
   void completeReminder(String id) {
     try {
       final reminder = reminderBox.values.firstWhere((element) => element.id == id);
-      // Create a new instance for the completed box
       final completedReminder = ReminderModel(
         id: reminder.id,
         name: reminder.name,
         reminderType: reminder.reminderType,
         dateTime: reminder.dateTime,
-        weekdays: List.from(reminder.weekdays), // Create a new list to avoid reference issues
+        weekdays: List.from(reminder.weekdays),
         intervalMinutes: reminder.intervalMinutes,
         intervalHours: reminder.intervalHours,
         isRepeating: reminder.isRepeating,
         color: reminder.color,
-        completedAt: DateTime.now(), // Set completion time
+        completedAt: DateTime.now(),
+        createdAt: reminder.createdAt,
       );
 
-      completedBox.add(completedReminder); // Add the new instance to completed box
-      reminder.delete(); // Remove from active reminders
+      completedBox.add(completedReminder);
+      reminder.delete();
       loadReminders();
       loadCompletedReminders();
-      completedReminders.refresh(); // Force UI update
       countdowns.remove(id);
       nextTriggerTimes.remove(id);
       triggeredNotifications.remove(id);
-      print('Completed reminder added to box: ${completedReminder.name}, Completed at: ${completedReminder.completedAt}');
-      print('Completed box size: ${completedBox.length}');
       Get.snackbar('Success', 'Reminder marked as completed');
     } catch (e) {
       print('Error completing reminder: $e');
@@ -428,15 +440,26 @@ class ReminderController extends GetxController {
     }
   }
 
+  void scheduleBackgroundTask() {
+    Workmanager().registerPeriodicTask(
+      "reminderTask",
+      "checkReminders",
+      frequency: Duration(minutes: 1),
+      initialDelay: Duration(seconds: 10),
+    );
+  }
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+    reminderBox = Hive.box('reminders');
+    completedBox = Hive.box('completed_reminders');
     loadReminders();
     loadCompletedReminders();
-    initNotifications().then((_) {
-      _initializeNextTriggerTimes();
-      _startCountdownTimers();
-    });
+    await initNotifications();
+    _initializeNextTriggerTimes();
+    _startCountdownTimers();
+    scheduleBackgroundTask();
   }
 
   @override

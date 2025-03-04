@@ -114,15 +114,23 @@ class VoiceNoteListScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 // Timer (mm:ss format)
                 Obx(
-                  () {
-                    final totalSeconds = 60; // 1-minute limit
-                    final elapsedSeconds =
-                        voiceC.recordingProgress.value.toInt();
+                      () {
+                    const totalSeconds = 120; // 2-minute limit (adjust as needed)
+                    final elapsedSeconds = voiceC.recordingProgress.value.toInt();
                     final remainingSeconds = totalSeconds - elapsedSeconds;
-                    final formattedTime =
-                        '${elapsedSeconds.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+
+                    // Format elapsed time (e.g., "00:12")
+                    final elapsedMinutes = (elapsedSeconds ~/ 60).toString().padLeft(2, '0');
+                    final elapsedSecs = (elapsedSeconds % 60).toString().padLeft(2, '0');
+                    final formattedElapsed = '$elapsedMinutes:$elapsedSecs';
+
+                    // Format total time (e.g., "02:00")
+                    final totalMinutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+                    final totalSecs = (totalSeconds % 60).toString().padLeft(2, '0');
+                    final formattedTotal = '$totalMinutes:$totalSecs';
+
                     return Text(
-                      '$formattedTime/01:00', // e.g., "00:04/01:00"
+                      '$formattedElapsed / $formattedTotal', // e.g., "00:12 / 02:00"
                       style: AppTextStyle.mediumBlack16,
                     );
                   },
@@ -136,7 +144,11 @@ class VoiceNoteListScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () => Get.back(),
+                onPressed: () async{
+                  await voiceC.cancelRecording(); // Cancel the recording
+                  titleController.clear(); // Clear the title field
+                  Get.back();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.lightRed,
                   shape: RoundedRectangleBorder(

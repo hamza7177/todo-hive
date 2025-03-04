@@ -176,6 +176,33 @@ class VoiceNoteController extends GetxController{
     }
   }
 
+  Future<void> cancelRecording() async {
+    try {
+      if (isRecording.value || currentRecordingPath != null) {
+        await _recorder.stopRecorder();
+        isRecording.value = false;
+        recordingProgress.value = 0.0;
+
+        // Cancel the progress subscription
+        await _recordingProgressSubscription?.cancel();
+        _recordingProgressSubscription = null;
+
+        // Delete the temporary file if it exists
+        if (currentRecordingPath != null) {
+          final file = File(currentRecordingPath!);
+          if (await file.exists()) {
+            await file.delete();
+            print('Temporary recording file deleted: $currentRecordingPath');
+          }
+          currentRecordingPath = null;
+        }
+      }
+    } catch (e) {
+      print('Error cancelling recording: $e');
+      Get.snackbar('Error', 'Failed to cancel recording: $e');
+    }
+  }
+
   // Fallback method to update progress periodically (1 second intervals)
   void _updateProgressPeriodically() {
     if (isRecording.value && recordingProgress.value < 60) {
