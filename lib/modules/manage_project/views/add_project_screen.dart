@@ -4,15 +4,11 @@ import 'package:todo_hive/modules/manage_project/controllers/manage_project_cont
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 
-import '../../schedule_planner/widgets/priority_filter.dart';
-import 'add_task_screen.dart';
-
 class AddProjectScreen extends StatelessWidget {
   AddProjectScreen({super.key});
 
   final ManageProjectController projectC = Get.find<ManageProjectController>();
   final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +17,7 @@ class AddProjectScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        // Removes the shadow when not scrolled
         scrolledUnderElevation: 0,
-        // Prevents shadow on scroll with Material 3
         surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
@@ -34,8 +28,7 @@ class AddProjectScreen extends StatelessWidget {
         ),
         title: Text(
           'Add Project',
-          style:
-              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       body: ListView(
@@ -50,8 +43,7 @@ class AddProjectScreen extends StatelessWidget {
             controller: titleController,
             decoration: InputDecoration(
               hintText: "Name your project...",
-              hintStyle: AppTextStyle.regularBlack16
-                  .copyWith(color: Color(0xffAFAFAF)),
+              hintStyle: AppTextStyle.regularBlack16.copyWith(color: Color(0xffAFAFAF)),
               filled: true,
               fillColor: AppColors.cardColor,
               border: OutlineInputBorder(
@@ -80,106 +72,33 @@ class AddProjectScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Obx(() => Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_month,
-                        color: Color(0xffAFAFAF),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        projectC.selectedDate.value,
-                        style: AppTextStyle.mediumBlack16
-                            .copyWith(color: Color(0xffAFAFAF)),
-                      ),
-                    ],
-                  )),
-            ),
-          ),
-          SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Description',
-                style: AppTextStyle.mediumBlack16,
-              ),
-              SizedBox(width: 5,),
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(
-                  '(Optional)',
-                  style: AppTextStyle.mediumBlack14
-                      .copyWith(color: Color(0xff8A8A8A)),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: descriptionController,
-            decoration: InputDecoration(
-              hintText: "Write something here...",
-              hintStyle: AppTextStyle.regularBlack16
-                  .copyWith(color: Color(0xffAFAFAF)),
-              filled: true,
-              fillColor: AppColors.cardColor,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            minLines: 3,
-            maxLines: 5,
-            style: AppTextStyle.regularBlack16,
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Priority Level',
-            style: AppTextStyle.mediumBlack16,
-          ),
-          SizedBox(height: 10),
-          Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
                 children: [
-                  Obx(() => PriorityFilter(
-                        label: "Low",
-                        isSelected: projectC.selectedPriority.value == "Low",
-                        onTap: () => projectC.selectedPriority("Low"),
-                      )),
-                  const SizedBox(width: 8.0),
-                  Obx(() => PriorityFilter(
-                        label: "Medium",
-                        isSelected: projectC.selectedPriority.value == "Medium",
-                        onTap: () => projectC.selectedPriority("Medium"),
-                      )),
-                  const SizedBox(width: 8.0),
-                  Obx(() => PriorityFilter(
-                        label: "High",
-                        isSelected: projectC.selectedPriority.value == "High",
-                        onTap: () => projectC.selectedPriority("High"),
-                      )),
+                  Icon(
+                    Icons.calendar_month,
+                    color: Color(0xffAFAFAF),
+                  ),
+                  SizedBox(width: 5),
+                  Text(
+                    projectC.selectedDate.value,
+                    style: AppTextStyle.mediumBlack16.copyWith(color: Color(0xffAFAFAF)),
+                  ),
                 ],
-              ),
+              )),
             ),
           ),
-          const SizedBox(height: 10.0),
           SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // if (titleController.text.isNotEmpty) {
-              //   controller.addSchedule(
-              //     title: titleController.text,
-              //     description: descriptionController.text,
-              //   );
-              //   Get.back();
-              // } else {
-              //   Get.snackbar('Error', 'Please enter a title');
-              // }
-              Get.to(()=> AddTaskScreen());
+              if (titleController.text.isNotEmpty && projectC.selectedDateTime.value != null) {
+                projectC.addProject(
+                  titleController.text,
+                  projectC.selectedDateTime.value!,
+                );
+                titleController.clear(); // Clear the title field
+                Get.back();
+              } else {
+                Get.snackbar('Error', 'Please enter a title and select a due date');
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -189,9 +108,10 @@ class AddProjectScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 14),
             ),
             child: Center(
-              child: Text("Save the project",
-                  style: AppTextStyle.mediumBlack16
-                      .copyWith(color: AppColors.white)),
+              child: Text(
+                "Save the project",
+                style: AppTextStyle.mediumBlack16.copyWith(color: AppColors.white),
+              ),
             ),
           ),
           SizedBox(height: 16),

@@ -221,13 +221,9 @@ class AddTaskScreen extends StatelessWidget {
                 } else {
                   projectC.updateTaskStatus(projectIndex, taskIndex!, projectC.taskStatus.value);
                   final project = projectC.projectBox.getAt(projectIndex);
-                  project?.tasks = List<ProjectTask>.from(project.tasks); // Ensure modifiable
                   project?.tasks[taskIndex!] = newTask;
                   project?.save();
                 }
-                // Clear the fields after saving/updating
-                titleController.clear();
-                descriptionController.clear();
                 Get.back();
               } else {
                 Get.snackbar('Error', 'Please enter a title and select a due date');

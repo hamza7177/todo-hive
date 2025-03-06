@@ -5,6 +5,7 @@ import 'package:todo_hive/modules/dashboard/widgets/dashboard_card.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../grocery_list/views/grocery_list_screen.dart';
+import '../../income_and_expense/views/main_screen.dart';
 import '../../manage_project/views/project_list_screen.dart';
 import '../../notes/views/notes_list_screen.dart';
 import '../../reminders/views/reminder_list_screen.dart';
@@ -108,7 +109,7 @@ class Dashboard extends StatelessWidget {
                 ),
                 DashboardCard(
                   onPressed: () {
-                    print("To-Do List Pressed!");
+                   Get.to(()=> MainScreen());
                   },
                   text: "Income &\nExpense",
                   imagePath: 'assets/images/ic_income.webp',

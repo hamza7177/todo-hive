@@ -90,8 +90,6 @@ class ReminderListScreen extends StatelessWidget {
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
-          highlightElevation: 0,   // Pressed elevation
-          splashColor: Colors.transparent, // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
             child: Image.asset('assets/images/ic_to_do.webp'),

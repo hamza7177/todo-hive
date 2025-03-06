@@ -8,12 +8,16 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:todo_hive/modules/income_and_expense/database_service/database_service.dart';
 import 'package:todo_hive/modules/notes/models/note_model.dart';
 import 'package:todo_hive/on_boarding_screen.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:workmanager/workmanager.dart';
 import 'modules/dashboard/views/dashboard.dart';
 import 'modules/grocery_list/models/grocery_model.dart';
+import 'modules/income_and_expense/controllers/transaction_controller.dart';
+import 'modules/manage_project/models/project.dart';
+import 'modules/manage_project/models/task.dart';
 import 'modules/notes/models/category_model.dart';
 import 'modules/reminders/models/reminder_model.dart';
 import 'modules/schedule_planner/models/schedule_model.dart';
@@ -26,6 +30,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseService().init();
   tz.initializeTimeZones();
   final prefs = await SharedPreferences.getInstance();
   final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
@@ -54,7 +59,8 @@ void main() async {
   Hive.registerAdapter(ScheduleModelAdapter());
   Hive.registerAdapter(GroceryListAdapter()); // Registers the GroceryList adapter
   Hive.registerAdapter(GroceryItemAdapter()); // Registers the GroceryItem adapter
-
+  Hive.registerAdapter(ProjectAdapter());
+  Hive.registerAdapter(ProjectTaskAdapter());
   //Open Boxes
   await Hive.openBox<Task>('tasks');
   await Hive.openBox<Task>('completed_tasks');
@@ -67,6 +73,7 @@ void main() async {
   await Hive.openBox<ScheduleModel>('completedSchedules');
   await Hive.openBox<GroceryList>('groceryLists');
   await Hive.openBox<GroceryItem>('groceryItems');
+  await Hive.openBox<Project>('projects');
   Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
   runApp(MyApp(
@@ -180,6 +187,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: isFirstTime ? const OnBoardingScreen() : const Dashboard(),
+      initialBinding: BindingsBuilder(() {
+        Get.put(TransactionController());
+      }),
     );
   }
 }

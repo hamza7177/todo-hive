@@ -213,7 +213,9 @@ class GroceryListScreen extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: () => _showCreateListBottomSheet(context),
           backgroundColor: Colors.transparent,
-          elevation: 0,
+          elevation: 0,           // Resting elevation
+          highlightElevation: 0,   // Pressed elevation
+          splashColor: Colors.transparent, // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: Image.asset('assets/images/ic_grocery-1.webp'),

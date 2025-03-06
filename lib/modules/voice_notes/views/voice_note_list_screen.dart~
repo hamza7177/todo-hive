@@ -477,9 +477,7 @@ class VoiceNoteListScreen extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: () => _showRecordingBottomSheet(context),
           backgroundColor: Colors.transparent,
-          elevation: 0,           // Resting elevation
-          highlightElevation: 0,   // Pressed elevation
-          splashColor: Colors.transparent, // Removes ripple effect
+          elevation: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
             child: Image.asset('assets/images/ic_voicenote-1.webp'),

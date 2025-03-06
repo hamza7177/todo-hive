@@ -602,9 +602,11 @@ class TodoListScreen extends StatelessWidget {
         width: 70, // Adjust size as needed
         height: 70,
         child: FloatingActionButton(
-          onPressed: () => showTaskBottomSheet(context),
           backgroundColor: Colors.transparent,
-          elevation: 0,
+          elevation: 0,           // Resting elevation
+          highlightElevation: 0,   // Pressed elevation
+          splashColor: Colors.transparent, // Removes ripple effect
+          onPressed: () => showTaskBottomSheet(context),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
             child: Image.asset('assets/images/ic_to_do.webp'),

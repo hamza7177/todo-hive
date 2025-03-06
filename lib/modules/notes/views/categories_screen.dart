@@ -161,10 +161,26 @@ class CategoriesScreen extends StatelessWidget {
           );
         },
       )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showCategoryBottomSheet(context),
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: AppColors.white),
+      bottomNavigationBar:  Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          height: 60,
+          child: ElevatedButton(
+            onPressed: () => showCategoryBottomSheet(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.symmetric(vertical: 14),
+            ),
+            child: Center(
+              child: Text("Add a new Category",
+                  style: AppTextStyle.mediumBlack16
+                      .copyWith(color: AppColors.white)),
+            ),
+          ),
+        ),
       ),
     );
   }

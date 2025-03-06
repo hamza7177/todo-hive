@@ -50,6 +50,7 @@ dependencies:
   just_audio: ^0.9.46
   permission_handler: ^10.4.3
   workmanager: ^0.5.2
+  flutter_expandable_fab: ^2.3.0
 
 
 dev_dependencies:
