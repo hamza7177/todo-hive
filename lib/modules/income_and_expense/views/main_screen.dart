@@ -5,11 +5,16 @@ import 'package:intl/intl.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../controllers/transaction_controller.dart';
+import '../models/transaction.dart';
 import 'new_transaction_screen.dart';
 
 class MainScreen extends GetView<TransactionController> {
   @override
   Widget build(BuildContext context) {
+    String formatCurrency(num amount) {
+      return NumberFormat('#,##0').format(amount);
+    }
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -46,19 +51,19 @@ class MainScreen extends GetView<TransactionController> {
                       .copyWith(color: Color(0xff8A8A8A)),
                 ),
                 SizedBox(height: 8),
-                Obx(() => Text(
-                      'Rs ${(controller.totalIncome.value - controller.totalExpense.value).toStringAsFixed(0)}',
-                      style: AppTextStyle.mediumBlack28
-                          .copyWith(fontWeight: FontWeight.w600),
-                    )),
+                Obx(
+                  () => Text(
+                    'Rs ${formatCurrency(controller.totalIncome.value - controller.totalExpense.value)}',
+                    style: AppTextStyle.mediumBlack28
+                        .copyWith(fontWeight: FontWeight.w600),
+                  ),
+                ),
                 SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildBalanceItem(
-                        'Expense', controller.totalExpense.value, Colors.red),
-                    _buildBalanceItem(
-                        'Income', controller.totalIncome.value, Colors.green),
+                    Obx(() => _buildBalanceItem('Expense', controller.totalExpense.value, Colors.red)),
+                    Obx(() => _buildBalanceItem('Income', controller.totalIncome.value, Colors.green)),
                   ],
                 ),
               ],
@@ -90,77 +95,174 @@ class MainScreen extends GetView<TransactionController> {
             ),
           ),
           Expanded(
-            child: Obx(() => controller.transactions.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/icons/ic_income-1.webp',
-                            height: 140),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Your transaction history is empty.',
-                          style: AppTextStyle.mediumBlack18
-                              .copyWith(fontWeight: FontWeight.w600),
+            child: Obx(
+              () => controller.transactions.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/icons/ic_income-1.webp',
+                              height: 140),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Your transaction history is empty.',
+                            style: AppTextStyle.mediumBlack18
+                                .copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 10),
+                          Text('Start managing your journey now!',
+                              style: AppTextStyle.regularBlack16),
+                        ],
+                      ),
+                    )
+                  :ListView.builder(
+                itemCount: controller.groupedTransactions.length,
+                itemBuilder: (context, index) {
+                  String date = controller.groupedTransactions.keys.elementAt(index);
+                  List<Transaction> transactions = List<Transaction>.from(controller.groupedTransactions[date]!['transactions']);
+
+                  // Calculate total income and total expenses
+                  double totalIncome = transactions
+                      .where((t) => t.type == 'income')
+                      .fold(0.0, (sum, t) => sum + t.amount);
+
+                  double totalExpenses = transactions
+                      .where((t) => t.type == 'expense')
+                      .fold(0.0, (sum, t) => sum + t.amount);
+
+                  double dayTotal = totalIncome - totalExpenses; // Net total for the day
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Date Header with Correctly Formatted Daily Total
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                       height: 35,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardColor,
                         ),
-                        const SizedBox(height: 10),
-                        Text('Start managing your journey now!',
-                            style: AppTextStyle.regularBlack16),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: controller.transactions.length,
-                    itemBuilder: (context, index) {
-                      final transaction = controller.transactions[index];
-                      return Card(
-                        color: AppColors.cardColor,
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ListTile(
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            padding: EdgeInsets.all(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              date,
+                              style: AppTextStyle.regularBlack14.copyWith(color: Color(0xff8A8A8a)),
+                            ),
+                            Text(
+                              "Rs ${formatCurrency(dayTotal)}", // Show positive/negative correctly
+                              style: AppTextStyle.regularBlack14.copyWith(
+                                color: Color(0xff8A8A8a),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // List of Transactions for that Date
+                      ...transactions.map((transaction) {
+                        return Dismissible(
+                          key: Key(transaction.id.toString()), // Unique key for each transaction
+                          direction: DismissDirection.endToStart, // Swipe from right to left
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 20),
                             decoration: BoxDecoration(
-                                color: transaction.type == 'income'
-                                    ? AppColors.lightGreen3
-                                    : Color(0xffFFEEEE),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Image.asset(
-                              transaction.type == 'income'
-                                  ? 'assets/icons/ic_downward.png'
-                                  : 'assets/icons/ic_upward.png',
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(Icons.delete, color: Colors.white),
+                          ),
+                          confirmDismiss: (direction) async {
+                            return await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  backgroundColor: AppColors.white,
+                                  title: Text(
+                                    "Delete Transaction",
+                                    style: AppTextStyle.mediumBlack16,
+                                  ),
+                                  content: Text(
+                                    "Are you sure you want to delete this transaction?",
+                                    style: AppTextStyle.regularBlack14,
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context, false);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        backgroundColor: const Color(0xffF0F0F0),
+                                      ),
+                                      child: Text(
+                                        'No',
+                                        style: AppTextStyle.mediumPrimary14,
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        controller.deleteTransaction(transaction.id);
+                                        Get.back(result: true);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        backgroundColor: AppColors.primary,
+                                      ),
+                                      child: Text(
+                                        "Yes",
+                                        style: AppTextStyle.mediumBlack14.copyWith(color: AppColors.white),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: ListTile(
+                            leading: Container(
                               height: 40,
+                              width: 40,
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: transaction.type == 'income' ? AppColors.lightGreen3 : Color(0xffFFEEEE),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Image.asset(
+                                transaction.type == 'income' ? 'assets/icons/ic_downward.png' : 'assets/icons/ic_upward.png',
+                                height: 40,
+                              ),
+                            ),
+                            title: Text(
+                              transaction.category ?? 'Transfer',
+                              style: AppTextStyle.regularBlack18,
+                            ),
+                            subtitle: transaction.note != null && transaction.note!.isNotEmpty
+                                ? Text(
+                              transaction.note!,
+                              style: AppTextStyle.regularBlack14.copyWith(color: Color(0xff8A8A8A)),
+                              overflow: TextOverflow.ellipsis,
+                            )
+                                : null,
+                            trailing: Text(
+                              '${transaction.type == 'income' ? '+' : '-'}Rs${formatCurrency(transaction.amount)}',
+                              style: AppTextStyle.regularBlack14.copyWith(
+                                color: transaction.type == 'income' ? Colors.green : Color(0xffED1C24),
+                              ),
                             ),
                           ),
-                          title: Text(
-                            transaction.category ?? 'Transfer',
-                            style: AppTextStyle.regularBlack18,
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                DateFormat('EEE, dd/MM/yyyy')
-                                    .format(transaction.date),
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              if (transaction.note != null &&
-                                  transaction.note!.isNotEmpty)
-                                Text(transaction.note!,
-                                    style: AppTextStyle.regularBlack14
-                                        .copyWith(color: Color(0xff8A8A8A))),
-                            ],
-                          ),
-                          trailing: Text(
-                            '${transaction.type == 'income' ? '+' : '-'}Rs${transaction.amount.toStringAsFixed(0)}',
-                            style: AppTextStyle.regularBlack14.copyWith(color: transaction.type == 'income' ? Colors.green : Color(0xffED1C24)),
-                          ),
-                        ),
-                      );
-                    },
-                  )),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -231,7 +333,7 @@ class MainScreen extends GetView<TransactionController> {
                       .copyWith(color: Color(0xff8A8A8A)),
                 ),
                 Text(
-                  'Rs${value.toStringAsFixed(0)}',
+                  'Rs${NumberFormat('#,##0').format(value)}',
                   style: AppTextStyle.mediumBlack16
                       .copyWith(fontWeight: FontWeight.w600),
                 ),

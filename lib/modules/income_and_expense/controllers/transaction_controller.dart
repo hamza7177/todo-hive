@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../database_service/database_service.dart';
 import '../models/transaction.dart';
 
@@ -33,6 +34,32 @@ class TransactionController extends GetxController {
     _db.addTransaction(t);
     loadTransactions();
   }
+
+  void deleteTransaction(String id) {
+    _db.deleteTransaction(id);
+    loadTransactions();
+  }
+
+  Map<String, Map<String, dynamic>> get groupedTransactions {
+    Map<String, Map<String, dynamic>> grouped = {};
+
+    for (var transaction in transactions) {
+      String dateKey = DateFormat('EEE dd/MM/yyyy').format(transaction.date);
+
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = {
+          'transactions': [],
+          'total': 0.0,
+        };
+      }
+
+      grouped[dateKey]!['transactions'].add(transaction);
+      grouped[dateKey]!['total'] += transaction.amount; // Sum daily total
+    }
+
+    return grouped;
+  }
+
 
   void updateFilter(String newFilter) {
     filter.value = newFilter;

@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import '../../../utils/app_colors.dart';
+import '../../../utils/app_text_style.dart';
 import '../controllers/transaction_controller.dart';
 import '../models/transaction.dart';
 import '../widgets/category_bottom_sheet.dart';
@@ -27,19 +29,30 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: Text('New Transaction'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        // Removes the shadow when not scrolled
+        scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
+        surfaceTintColor: Colors.transparent,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Icon(Icons.arrow_back_sharp, color: AppColors.black),
+        ),
+        title: Text(
+          'New Transaction',
+          style:
+              AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
-      body: Column(
-        children: [
-          // Tabs
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10),
+        child: ListView(
+          children: [
+            // Tabs
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: ['Expense', 'Income', 'Transfer'].map((tab) {
                 return GestureDetector(
@@ -48,181 +61,312 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       selectedTab = tab;
                     });
                   },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: selectedTab == tab ? Colors.blue[900] : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      tab,
-                      style: TextStyle(
-                        color: selectedTab == tab ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
+                  child: Column(
+                    children: [
+                      Text(
+                        tab,
+                        style: selectedTab == tab
+                            ? AppTextStyle.mediumBlack16
+                            : AppTextStyle.regularBlack16
+                                .copyWith(color: Color(0xff8A8A8A)),
                       ),
-                    ),
+                      if (selectedTab == tab)
+                        Container(
+                          margin: EdgeInsets.only(top: 4),
+                          height: 2,
+                          width: 70,
+                          color: Colors.black,
+                        ),
+                    ],
                   ),
                 );
               }).toList(),
             ),
-          ),
-          // Amount
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: selectedTab == 'Income' ? Colors.green[50] : Colors.red[50],
-              borderRadius: BorderRadius.circular(12),
+            SizedBox(
+              height: 10,
             ),
-            child: TextField(
-              decoration: InputDecoration(
-                prefixText: 'Rs ',
-                hintText: '0',
-                border: InputBorder.none,
-                hintStyle: TextStyle(color: Colors.grey[600]),
+            // Amount
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color:
+                    selectedTab == 'Income' ? Colors.green[50] : Colors.red[50],
+                borderRadius: BorderRadius.circular(12),
               ),
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                amount = double.tryParse(value) ?? 0.0;
-              },
+              child: TextField(
+                decoration: InputDecoration(
+                  prefixText: 'Rs ',
+                  hintText: '0',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  amount = double.tryParse(value) ?? 0.0;
+                },
+              ),
             ),
-          ),
-          // Fields
-          if (selectedTab != 'Transfer') ...[
-            ListTile(
-              title: Text('Category'),
-              trailing: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            SizedBox(
+              height: 10,
+            ),
+            // Fields
+            if (selectedTab != 'Transfer') ...[
+              Container(
                 decoration: BoxDecoration(
                   color: AppColors.cardColor,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  selectedCategory ?? 'Select',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-              onTap: () {
-                Get.bottomSheet(CategoryBottomSheet(
-                  onCategorySelected: (category) {
-                    setState(() {
-                      selectedCategory = category;
-                    });
-                  },
-                  transactionType: selectedTab.toLowerCase(),
-                ));
-              },
-            ),
-            ListTile(
-              title: Text('Payment Method'),
-              trailing: Text(selectedPaymentMethod ?? 'Select'),
-              onTap: () {
-                Get.bottomSheet(PaymentMethodBottomSheet(
-                  onMethodSelected: (method) {
-                    setState(() {
-                      selectedPaymentMethod = method;
-                    });
-                  },
-                ));
-              },
-            ),
-          ] else ...[
-            ListTile(
-              title: Text('From Wallet'),
-              trailing: Text(fromWallet ?? 'Select'),
-              onTap: () {
-                Get.bottomSheet(WalletBottomSheet(
-                  onWalletSelected: (wallet) {
-                    setState(() {
-                      fromWallet = wallet;
-                    });
-                  },
-                ));
-              },
-            ),
-            ListTile(
-              title: Text('To Wallet'),
-              trailing: Text(toWallet ?? 'Select'),
-              onTap: () {
-                Get.bottomSheet(WalletBottomSheet(
-                  onWalletSelected: (wallet) {
-                    setState(() {
-                      toWallet = wallet;
-                    });
-                  },
-                ));
-              },
-            ),
-          ],
-          ListTile(
-            title: Text('Date'),
-            trailing: Text(DateFormat('EEE, dd/MM/yyyy').format(selectedDate)),
-            onTap: () {
-              showCupertinoModalPopup(
-                context: context,
-                builder: (context) => Container(
-                  height: 200,
-                  color: Colors.white,
-                  child: CupertinoDatePicker(
-                    initialDateTime: selectedDate,
-                    onDateTimeChanged: (date) {
-                      setState(() {
-                        selectedDate = date;
-                      });
-                    },
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  title: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Category',
+                        style: AppTextStyle.regularBlack16,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.lightRed,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        selectedCategory ?? 'Select',
+                        style: AppTextStyle.mediumBlack16,
+                      ),
+                    ],
                   ),
+                  onTap: () {
+                    Get.bottomSheet(CategoryBottomSheet(
+                      onCategorySelected: (category) {
+                        setState(() {
+                          selectedCategory = category;
+                        });
+                      },
+                      transactionType: selectedTab.toLowerCase(),
+                    ));
+                  },
                 ),
-              );
-            },
-          ),
-          ListTile(
-            title: TextField(
-              decoration: InputDecoration(
-                hintText: 'Note',
-                border: InputBorder.none,
               ),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text(
+                        'Payment Method',
+                        style: AppTextStyle.regularBlack16,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.lightRed,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        selectedPaymentMethod ?? 'Select',
+                        style: AppTextStyle.mediumBlack16,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Get.bottomSheet(PaymentMethodBottomSheet(
+                      onMethodSelected: (method) {
+                        setState(() {
+                          selectedPaymentMethod = method;
+                        });
+                      },
+                    ));
+                  },
+                ),
+              ),
+            ] else ...[
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text(
+                        'From',
+                        style: AppTextStyle.regularBlack16,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.lightRed,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        fromWallet ?? 'Select',
+                        style: AppTextStyle.mediumBlack16,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Get.bottomSheet(WalletBottomSheet(
+                      onWalletSelected: (wallet) {
+                        setState(() {
+                          fromWallet = wallet;
+                        });
+                      },
+                    ));
+                  },
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text(
+                        'To',
+                        style: AppTextStyle.regularBlack16,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.lightRed,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        toWallet ?? 'Select',
+                        style: AppTextStyle.mediumBlack16,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Get.bottomSheet(WalletBottomSheet(
+                      onWalletSelected: (wallet) {
+                        setState(() {
+                          toWallet = wallet;
+                        });
+                      },
+                    ));
+                  },
+                ),
+              ),
+            ],
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardColor,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                title: Row(
+                  children: [
+                    Text(
+                      'Date',
+                      style: AppTextStyle.regularBlack16,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.lightRed,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      DateFormat('EEE, dd/MM/yyyy').format(selectedDate),
+                      style: AppTextStyle.mediumBlack16,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) => Container(
+                      height: 200,
+                      color: Colors.white,
+                      child: CupertinoDatePicker(
+                        initialDateTime: selectedDate,
+                        onDateTimeChanged: (date) {
+                          setState(() {
+                            selectedDate = date;
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Note",
+                hintStyle: AppTextStyle.regularBlack16
+                    .copyWith(color: Color(0xffAFAFAF)),
+                filled: true,
+                fillColor: AppColors.cardColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              minLines: 3,
+              maxLines: 5,
+              style: AppTextStyle.regularBlack16,
               onChanged: (value) {
                 note = value;
               },
             ),
-          ),
-          // Buttons
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => Get.back(),
-                  child: Text('Continue'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black, backgroundColor: Colors.white,
-                  ),
+            // Buttons
+            SizedBox(height: 20,),
+            ElevatedButton(
+              onPressed: () {
+                final controller = Get.find<TransactionController>();
+                final transaction = Transaction(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  amount: amount,
+                  date: selectedDate,
+                  type: selectedTab.toLowerCase(),
+                  category: selectedCategory,
+                  paymentMethod: selectedPaymentMethod,
+                  note: note,
+                  fromWallet: fromWallet,
+                  toWallet: toWallet,
+                );
+                controller.addTransaction(transaction);
+                Get.back();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    final controller = Get.find<TransactionController>();
-                    final transaction = Transaction(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      amount: amount,
-                      date: selectedDate,
-                      type: selectedTab.toLowerCase(),
-                      category: selectedCategory,
-                      paymentMethod: selectedPaymentMethod,
-                      note: note,
-                      fromWallet: fromWallet,
-                      toWallet: toWallet,
-                    );
-                    controller.addTransaction(transaction);
-                    Get.back();
-                  },
-                  child: Text('Save'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[900]),
-                ),
-              ],
+                padding: EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: Center(
+                child: Text("Save",
+                    style: AppTextStyle.mediumBlack16
+                        .copyWith(color: AppColors.white)),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

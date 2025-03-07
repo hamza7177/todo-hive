@@ -8,11 +8,12 @@ class PaymentMethodBottomSheet extends StatelessWidget {
 
   PaymentMethodBottomSheet({required this.onMethodSelected});
 
-  final methods = ['Cash', 'Card', 'Account'];
+  final methods = ['Cash', 'Debit Card', 'Account','GPay','Other'];
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: Get.width,
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -23,15 +24,6 @@ class PaymentMethodBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.close, color: AppColors.black),
-                  onPressed: () => Get.back(),
-                ),
-              ],
-            ),
             Text('Payment Method', style: AppTextStyle.mediumBlack16),
             SizedBox(height: 16),
             Wrap(

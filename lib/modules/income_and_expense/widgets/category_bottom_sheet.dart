@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_hive/utils/app_text_style.dart';
+
 import '../../../utils/app_colors.dart';
-import '../../../utils/app_text_style.dart';
 
 class CategoryBottomSheet extends StatelessWidget {
   final Function(String) onCategorySelected;
   final String transactionType;
+  final String? selectedCategory; // Add this to track the selected category
 
-  CategoryBottomSheet({required this.onCategorySelected, required this.transactionType});
+  CategoryBottomSheet({
+    required this.onCategorySelected,
+    required this.transactionType,
+    this.selectedCategory, // Optional selected category
+  });
 
   // Define main categories and their subcategories
   final Map<String, List<String>> expenseCategories = {
@@ -36,45 +42,54 @@ class CategoryBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = transactionType == 'income' ? incomeCategories : expenseCategories.keys.toList();
+    final categories = transactionType == 'income'
+        ? incomeCategories
+        : expenseCategories.keys.toList();
 
     return DefaultTabController(
       length: transactionType == 'income' ? 1 : expenseCategories.length,
       child: Container(
+        width: Get.width,
+        height: Get.height * 0.27,
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.close, color: AppColors.black),
-                  onPressed: () => Get.back(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Text('Category', style: AppTextStyle.mediumBlack16),
+              SizedBox(height: 16),
+              if (transactionType == 'expense')
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: TabBar(
+                    labelColor: AppColors.black,
+                    labelStyle: AppTextStyle.mediumBlack14,
+                    unselectedLabelStyle: AppTextStyle.regularBlack14
+                        .copyWith(color: Color(0xff8A8A8a)),
+                    isScrollable: true,
+                    tabs: categories
+                        .map((category) => Tab(text: category))
+                        .toList(),
+                  ),
                 ),
-              ],
-            ),
-            Text('Category', style: AppTextStyle.mediumBlack16),
-            SizedBox(height: 16),
-            if (transactionType == 'expense')
-              TabBar(
-                isScrollable: true,
-                tabs: categories.map((category) => Tab(text: category)).toList(),
+              SizedBox(height: 16),
+              Expanded(
+                child: transactionType == 'income'
+                    ? _buildCategoryList(incomeCategories)
+                    : TabBarView(
+                        children: categories.map((category) {
+                          return _buildCategoryList(
+                              expenseCategories[category]!);
+                        }).toList(),
+                      ),
               ),
-            SizedBox(height: 16),
-            Expanded(
-              child: transactionType == 'income'
-                  ? _buildCategoryList(incomeCategories)
-                  : TabBarView(
-                children: categories.map((category) {
-                  return _buildCategoryList(expenseCategories[category]!);
-                }).toList(),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -82,9 +97,12 @@ class CategoryBottomSheet extends StatelessWidget {
 
   Widget _buildCategoryList(List<String> categories) {
     return Wrap(
-      spacing: 12,
+      spacing: 24,
       runSpacing: 10,
       children: categories.map((category) {
+        // Check if the current category is selected
+        final isSelected = selectedCategory == category;
+
         return GestureDetector(
           onTap: () {
             onCategorySelected(category);
@@ -93,12 +111,18 @@ class CategoryBottomSheet extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.cardColor,
+              // Apply red color if selected, otherwise use the default card color
+              color: isSelected ? Colors.red : AppColors.cardColor,
               borderRadius: BorderRadius.circular(62),
             ),
             child: Text(
               category,
-              style: AppTextStyle.regularBlack14.copyWith(color: AppColors.grey),
+              style: AppTextStyle.regularBlack14.copyWith(
+                color: isSelected
+                    ? AppColors.white
+                    : AppColors
+                        .grey, // White text for selected, gray for unselected
+              ),
             ),
           ),
         );
