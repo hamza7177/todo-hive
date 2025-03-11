@@ -320,9 +320,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
         type: ExpandableFabType.up,
         childrenAnimation: ExpandableFabAnimation.none,
         distance: 65,
-        overlayStyle: ExpandableFabOverlayStyle(
-          color: Colors.white.withOpacity(0.9),
-        ),
+        // overlayStyle: ExpandableFabOverlayStyle(
+        //   color: Colors.white.withOpacity(0.9),
+        // ),
         openButtonBuilder: RotateFloatingActionButtonBuilder(
           child: const Icon(Icons.add),
           fabSize: ExpandableFabSize.regular,

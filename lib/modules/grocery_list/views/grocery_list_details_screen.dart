@@ -67,21 +67,31 @@ class GroceryListDetailScreen extends StatelessWidget {
                         return Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 10),
+                            decoration: BoxDecoration(
+                                color: AppColors.cardColor,
+                                borderRadius: BorderRadius.circular(10)),
                             child: Row(
                               children: [
                                 Checkbox(
                                   value: item?.isCompleted,
                                   onChanged: (value) {
                                     if (item != null) {
-                                      groceryC.toggleItemCompletion(item.name, value ?? false);
+                                      groceryC.toggleItemCompletion(
+                                          item.name, value ?? false);
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4), // Rounded shape
+                                    borderRadius: BorderRadius.circular(
+                                        10), // Rounded shape
                                   ),
-                                  checkColor: Colors.white, // Tick color when checked
-                                  activeColor: Colors.green, // Box color when checked
-                                  side: BorderSide(color: Colors.grey, width: 1.5), // Border color for unchecked state
+                                  checkColor: Colors.white,
+                                  // Tick color when checked
+                                  activeColor: Colors.green,
+                                  // Box color when checked
+                                  side: BorderSide(
+                                      color: Colors.grey,
+                                      width:
+                                          1.5), // Border color for unchecked state
                                 ),
                                 SizedBox(
                                   width: 5,

@@ -68,7 +68,6 @@ class MainScreen extends GetView<TransactionController> {
               ],
             ),
           ),
-          SizedBox(height: 10,),
           // Transactions List
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),

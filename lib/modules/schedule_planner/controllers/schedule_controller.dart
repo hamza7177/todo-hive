@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,7 +26,9 @@ class ScheduleController extends GetxController {
   late Box<ScheduleModel> completedScheduleBox;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
+
+  Timer? _cleanupTimer; // Timer for periodic cleanup
 
   @override
   void onInit() async {
@@ -34,6 +38,47 @@ class ScheduleController extends GetxController {
     loadSchedules();
     loadCompletedSchedules();
     await initializeNotifications();
+    startCleanupTimer(); // Start the timer for cleanup
+  }
+
+  @override
+  void onClose() {
+    _cleanupTimer?.cancel(); // Cancel the timer when the controller is disposed
+    super.onClose();
+  }
+
+  void startCleanupTimer() {
+    // Check every hour for completed schedules to delete
+    _cleanupTimer = Timer.periodic(Duration(hours: 1), (timer) {
+      cleanupOldCompletedSchedules();
+    });
+  }
+
+  void cleanupOldCompletedSchedules() {
+    final now = DateTime.now();
+    final schedulesToDelete = <int>[]; // Store keys of schedules to delete
+
+    for (var schedule in completedScheduleBox.values) {
+      if (schedule.isCompleted && schedule.createdAt != null) {
+        final durationSinceCompletion = now.difference(schedule.createdAt!);
+        if (durationSinceCompletion.inHours >= 24) {
+          int? scheduleKey = completedScheduleBox.keys.cast<int?>().firstWhere(
+                (key) => completedScheduleBox.get(key) == schedule,
+            orElse: () => null,
+          );
+          if (scheduleKey != null) {
+            schedulesToDelete.add(scheduleKey);
+          }
+        }
+      }
+    }
+
+    // Delete the schedules
+    for (var key in schedulesToDelete) {
+      completedScheduleBox.delete(key);
+    }
+
+    loadCompletedSchedules(); // Refresh the completed schedules list
   }
 
   Future<void> initializeNotifications() async {
@@ -94,7 +139,7 @@ class ScheduleController extends GetxController {
         isReminder: schedule.isReminder,
         dateTime: schedule.dateTime,
         category: schedule.category,
-        createdAt: schedule.createdAt,
+        createdAt: DateTime.now(), // Use current time as completion time
         id: _generateValidId(), // Generate a new valid ID
         isCompleted: true,
       );
@@ -196,8 +241,6 @@ class ScheduleController extends GetxController {
       print('Error scheduling notification: $error');
     });
   }
-
-
 
   void setFilter(String filter) {
     selectedFilter.value = filter;

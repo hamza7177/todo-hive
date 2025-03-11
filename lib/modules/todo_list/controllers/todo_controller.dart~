@@ -1,66 +1,22 @@
-import 'dart:async';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import '../model/task_model.dart';
 
 class TodoController extends GetxController {
   final Box<Task> taskBox = Hive.box<Task>('tasks');
-  final Box<Task> completedTaskBox = Hive.box<Task>('completed_tasks');
+  final Box<Task> completedTaskBox = Hive.box<Task>('completed_tasks'); // New box for completed tasks
 
   var selectedFilter = "All".obs;
   var tasks = <Task>[].obs;
-  var completedTasks = <Task>[].obs;
+  var completedTasks = <Task>[].obs; // List for completed tasks
   var selectedCategory = "".obs;
   var selectedUpdateCategory = "".obs;
-
-  Timer? _cleanupTimer; // Timer for periodic cleanup
 
   @override
   void onInit() {
     fetchTasks();
-    fetchCompletedTasks();
-    startCleanupTimer(); // Start the timer for cleanup
+    fetchCompletedTasks(); // Load completed tasks
     super.onInit();
-  }
-
-  @override
-  void onClose() {
-    _cleanupTimer?.cancel(); // Cancel the timer when the controller is disposed
-    super.onClose();
-  }
-
-  void startCleanupTimer() {
-    // Check every hour for completed tasks to delete
-    _cleanupTimer = Timer.periodic(Duration(hours: 1), (timer) {
-      cleanupOldCompletedTasks();
-    });
-  }
-
-  void cleanupOldCompletedTasks() {
-    final now = DateTime.now();
-    final tasksToDelete = <int>[]; // Store keys of tasks to delete
-
-    for (var task in completedTaskBox.values) {
-      if (task.completedAt != null) {
-        final durationSinceCompletion = now.difference(task.completedAt!);
-        if (durationSinceCompletion.inHours >= 24) {
-          int? taskKey = completedTaskBox.keys.cast<int?>().firstWhere(
-                (key) => completedTaskBox.get(key) == task,
-            orElse: () => null,
-          );
-          if (taskKey != null) {
-            tasksToDelete.add(taskKey);
-          }
-        }
-      }
-    }
-
-    // Delete the tasks
-    for (var key in tasksToDelete) {
-      completedTaskBox.delete(key);
-    }
-
-    fetchCompletedTasks(); // Refresh the completed tasks list
   }
 
   void setFilter(String filter) {
@@ -104,15 +60,16 @@ class TodoController extends GetxController {
   }
 
   void completeTask(Task task) {
+    // Create a new instance for completed box
     final completedTask = Task(
       title: task.title,
       category: task.category,
       date: task.date,
       completedAt: DateTime.now(),
     );
-    completedTaskBox.add(completedTask);
-    deleteTask(task);
-    fetchCompletedTasks();
+    completedTaskBox.add(completedTask); // Add to completed box
+    deleteTask(task); // Remove from active tasks
+    fetchCompletedTasks(); // Refresh completed tasks
     Get.snackbar('Success', 'Task marked as completed');
   }
 
@@ -135,18 +92,6 @@ class TodoController extends GetxController {
     final Map<DateTime, List<Task>> groupedTasks = {};
     for (var task in getFilteredTasks()) {
       final normalizedDate = DateTime(task.date.year, task.date.month, task.date.day);
-      if (!groupedTasks.containsKey(normalizedDate)) {
-        groupedTasks[normalizedDate] = [];
-      }
-      groupedTasks[normalizedDate]!.add(task);
-    }
-    return groupedTasks;
-  }
-
-  Map<DateTime, List<Task>> getCompletedTasksGroupedByDate() {
-    final Map<DateTime, List<Task>> groupedTasks = {};
-    for (var task in completedTasks) {
-      final normalizedDate = DateTime(task.completedAt!.year, task.completedAt!.month, task.completedAt!.day);
       if (!groupedTasks.containsKey(normalizedDate)) {
         groupedTasks[normalizedDate] = [];
       }
