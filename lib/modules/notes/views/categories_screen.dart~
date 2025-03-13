@@ -162,22 +162,14 @@ class CategoriesScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () => showCategoryBottomSheet(context,
                             categoryToUpdate: category),
-                        child: Icon(
-                          Icons.edit,
-                          color: Color(0xffAFAFAF),
-                          size: 20,
-                        ),
+                        child: Icon(Icons.edit, color: Color(0xffAFAFAF),size: 20,),
                       ),
                       SizedBox(
-                        width: 10,
+                        width: 5,
                       ),
                       GestureDetector(
                         onTap: () => confirmDeleteCategory(context, category),
-                        child: Icon(
-                          Icons.delete,
-                          color: Color(0xffAFAFAF),
-                          size: 20,
-                        ),
+                        child: Icon(Icons.delete, color: Color(0xffAFAFAF),size: 20,),
                       ),
                     ],
                   ),

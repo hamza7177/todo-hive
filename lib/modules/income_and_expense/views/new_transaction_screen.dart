@@ -17,7 +17,7 @@ class NewTransactionScreen extends StatefulWidget {
 }
 
 class _NewTransactionScreenState extends State<NewTransactionScreen> {
-  String selectedTab = 'Expense';
+  String selectedTab = 'Income';
   double amount = 0.0;
   String? selectedCategory;
   String? selectedPaymentMethod;
@@ -54,7 +54,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
             // Tabs
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: ['Expense', 'Income', 'Transfer'].map((tab) {
+              children: ['Income', 'Expense', 'Transfer'].map((tab) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -273,7 +273,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                 color: AppColors.cardColor,
                 borderRadius: BorderRadius.circular(16),
               ),
-              margin: const EdgeInsets.only(bottom: 8),
+              margin: const EdgeInsets.only(bottom: 8), // Note: 'custom' should probably be 'bottom' or another valid parameter
               child: ListTile(
                 title: Row(
                   children: [
@@ -281,9 +281,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       'Date',
                       style: AppTextStyle.regularBlack16,
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                    SizedBox(width: 5),
                     Icon(
                       Icons.chevron_right,
                       color: AppColors.lightRed,
@@ -295,22 +293,31 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                     ),
                   ],
                 ),
-                onTap: () {
-                  showCupertinoModalPopup(
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
                     context: context,
-                    builder: (context) => Container(
-                      height: 200,
-                      color: Colors.white,
-                      child: CupertinoDatePicker(
-                        initialDateTime: selectedDate,
-                        onDateTimeChanged: (date) {
-                          setState(() {
-                            selectedDate = date;
-                          });
-                        },
-                      ),
-                    ),
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000), // You can adjust these limits as needed
+                    lastDate: DateTime(2100),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: AppColors.primary,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
+                          dialogBackgroundColor: Colors.white,
+                        ),
+                        child: child!,
+                      );
+                    },
                   );
+                  if (picked != null && picked != selectedDate) {
+                    setState(() {
+                      selectedDate = picked;
+                    });
+                  }
                 },
               ),
             ),

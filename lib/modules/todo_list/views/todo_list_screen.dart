@@ -323,7 +323,7 @@ class TodoListScreen extends StatelessWidget {
         title: Text(
           'To-Do List',
           style:
-          AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -335,7 +335,7 @@ class TodoListScreen extends StatelessWidget {
               children: [
                 Text(
                   'Your ultimate tool for tracking and completing tasks on time with ease.',
-                  style: AppTextStyle.mediumBlack16,
+                  style: AppTextStyle.regularBlack16,
                 ),
                 const SizedBox(height: 10),
                 SingleChildScrollView(
@@ -387,10 +387,23 @@ class TodoListScreen extends StatelessWidget {
               final groupedTasks = todoC.getTasksGroupedByDate();
               final groupedCompletedTasks = todoC.getCompletedTasksGroupedByDate();
 
-              // Combine all dates from both active and completed tasks
+              // Apply category filter to completed tasks as well
+              final filteredCompletedTasks = todoC.getFilteredCompletedTasks();
+              final Map<DateTime, List<Task>> filteredGroupedCompletedTasks = {};
+
+              // Group filtered completed tasks by date
+              for (var task in filteredCompletedTasks) {
+                final normalizedDate = DateTime(task.completedAt!.year, task.completedAt!.month, task.completedAt!.day);
+                if (!filteredGroupedCompletedTasks.containsKey(normalizedDate)) {
+                  filteredGroupedCompletedTasks[normalizedDate] = [];
+                }
+                filteredGroupedCompletedTasks[normalizedDate]!.add(task);
+              }
+
+              // Combine all dates from both active and filtered completed tasks
               final allDates = <DateTime>{};
               allDates.addAll(groupedTasks.keys);
-              allDates.addAll(groupedCompletedTasks.keys);
+              allDates.addAll(filteredGroupedCompletedTasks.keys);
 
               if (allDates.isEmpty) {
                 return Center(
@@ -412,7 +425,7 @@ class TodoListScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         'Click “+” to create your task',
-                        style: AppTextStyle.regularBlack16,
+                        style: AppTextStyle.regularBlack14,
                       ),
                     ],
                   ),
@@ -423,7 +436,7 @@ class TodoListScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 children: allDates.map((date) {
                   final tasksForDate = groupedTasks[date] ?? [];
-                  final completedTasksForDate = groupedCompletedTasks[date] ?? [];
+                  final completedTasksForDate = filteredGroupedCompletedTasks[date] ?? [];
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,7 +458,7 @@ class TodoListScreen extends StatelessWidget {
                         return Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              padding: EdgeInsets.only(left: 15),
                               height: 60,
                               width: Get.width,
                               decoration: BoxDecoration(
@@ -495,57 +508,44 @@ class TodoListScreen extends StatelessWidget {
                                       ),
                                     ),
                                     child: PopupMenuButton<String>(
-                                      icon: Icon(Icons.more_vert,
-                                          color: Color(0xffAFAFAF)),
+                                   padding: EdgeInsets.zero,
+                                      icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
                                       onSelected: (value) async {
-                                        if (value == "Update") {
-                                          showUpdateTaskBottomSheet(
-                                              context, task, taskIndex);
+                                        if (value == "Edit") {
+                                          showUpdateTaskBottomSheet(context, task, taskIndex);
                                         } else if (value == "Delete") {
-                                          bool? shouldDelete =
-                                          await showDialog<bool>(
+                                          bool? shouldDelete = await showDialog<bool>(
                                             context: context,
                                             builder: (context) => AlertDialog(
                                               backgroundColor: AppColors.white,
                                               title: Text("Delete Todo",
-                                                  style:
-                                                  AppTextStyle.mediumBlack16),
+                                                  style: AppTextStyle.mediumBlack16),
                                               content: Text(
                                                   "Are you sure you want to delete this task?",
-                                                  style:
-                                                  AppTextStyle.regularBlack14),
+                                                  style: AppTextStyle.regularBlack14),
                                               actions: [
                                                 ElevatedButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
+                                                  onPressed: () => Navigator.pop(context),
                                                   style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                      Color(0xffF0F0F0),
+                                                      backgroundColor: Color(0xffF0F0F0),
                                                       shape: RoundedRectangleBorder(
                                                           borderRadius:
-                                                          BorderRadius.circular(
-                                                              8))),
+                                                          BorderRadius.circular(8))),
                                                   child: Text('No',
-                                                      style: AppTextStyle
-                                                          .mediumPrimary14),
+                                                      style: AppTextStyle.mediumPrimary14),
                                                 ),
                                                 ElevatedButton(
                                                   onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(true),
+                                                      Navigator.of(context).pop(true),
                                                   style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                      AppColors.primary,
+                                                      backgroundColor: AppColors.primary,
                                                       shape: RoundedRectangleBorder(
                                                           borderRadius:
-                                                          BorderRadius.circular(
-                                                              8))),
+                                                          BorderRadius.circular(8))),
                                                   child: Text("Yes",
-                                                      style: AppTextStyle
-                                                          .mediumBlack14
+                                                      style: AppTextStyle.mediumBlack14
                                                           .copyWith(
-                                                          color:
-                                                          AppColors.white)),
+                                                          color: AppColors.white)),
                                                 ),
                                               ],
                                             ),
@@ -557,15 +557,13 @@ class TodoListScreen extends StatelessWidget {
                                       },
                                       itemBuilder: (context) => [
                                         PopupMenuItem(
-                                            value: "Update",
-                                            child: Text("Update",
-                                                style:
-                                                AppTextStyle.regularBlack16)),
+                                            value: "Edit",
+                                            child: Text("Edit",
+                                                style: AppTextStyle.regularBlack16)),
                                         PopupMenuItem(
                                             value: "Delete",
                                             child: Text("Delete",
-                                                style:
-                                                AppTextStyle.mediumBlack16)),
+                                                style: AppTextStyle.mediumBlack16)),
                                       ],
                                     ),
                                   ),
@@ -581,27 +579,32 @@ class TodoListScreen extends StatelessWidget {
                         return Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              padding: EdgeInsets.only(left: 15),
                               height: 60,
                               width: Get.width,
                               decoration: BoxDecoration(
-                                color: Colors.greenAccent.withOpacity(0.3), // Change color for completed tasks
+                                color: Colors.greenAccent.withOpacity(0.3),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Color(0xffD9D9D9)),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.check,
-                                        size: 14,
-                                        color: Colors.green,
+                                  GestureDetector(
+                                    onTap: () {
+                                      todoC.uncompleteTask(task);
+                                    },
+                                    child: Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Color(0xffD9D9D9)),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: Colors.green,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -616,93 +619,83 @@ class TodoListScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Spacer(),
-                                  Theme(
-                                    data: Theme.of(context).copyWith(
-                                      popupMenuTheme: PopupMenuThemeData(
-                                        color: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        popupMenuTheme: PopupMenuThemeData(
+                                          color: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: PopupMenuButton<String>(
-                                      icon: Icon(Icons.more_vert,
-                                          color: Color(0xffAFAFAF)),
-                                      onSelected: (value) async {
-                                        if (value == "Delete") {
-                                          bool? shouldDelete =
-                                          await showDialog<bool>(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              backgroundColor: AppColors.white,
-                                              title: Text("Delete Completed Task",
-                                                  style:
-                                                  AppTextStyle.mediumBlack16),
-                                              content: Text(
-                                                  "Are you sure you want to delete this completed task?",
-                                                  style:
-                                                  AppTextStyle.regularBlack14),
-                                              actions: [
-                                                ElevatedButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                      Color(0xffF0F0F0),
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                          BorderRadius.circular(
-                                                              8))),
-                                                  child: Text('No',
-                                                      style: AppTextStyle
-                                                          .mediumPrimary14),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(true),
-                                                  style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                      AppColors.primary,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                          BorderRadius.circular(
-                                                              8))),
-                                                  child: Text("Yes",
-                                                      style: AppTextStyle
-                                                          .mediumBlack14
-                                                          .copyWith(
-                                                          color:
-                                                          AppColors.white)),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                          if (shouldDelete == true) {
-                                            int? taskKey = todoC.completedTaskBox.keys
-                                                .cast<int?>()
-                                                .firstWhere(
-                                                  (key) =>
-                                              todoC.completedTaskBox.get(key) ==
-                                                  task,
-                                              orElse: () => null,
+                                      child: PopupMenuButton<String>(
+                                        padding: EdgeInsets.zero,
+                                        icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
+                                        onSelected: (value) async {
+                                          if (value == "Delete") {
+                                            bool? shouldDelete = await showDialog<bool>(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                backgroundColor: AppColors.white,
+                                                title: Text("Delete Completed Task",
+                                                    style: AppTextStyle.mediumBlack16),
+                                                content: Text(
+                                                    "Are you sure you want to delete this completed task?",
+                                                    style: AppTextStyle.regularBlack14),
+                                                actions: [
+                                                  ElevatedButton(
+                                                    onPressed: () => Navigator.pop(context),
+                                                    style: ElevatedButton.styleFrom(
+                                                        backgroundColor: Color(0xffF0F0F0),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                            BorderRadius.circular(8))),
+                                                    child: Text('No',
+                                                        style: AppTextStyle.mediumPrimary14),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () =>
+                                                        Navigator.of(context).pop(true),
+                                                    style: ElevatedButton.styleFrom(
+                                                        backgroundColor: AppColors.primary,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                            BorderRadius.circular(8))),
+                                                    child: Text("Yes",
+                                                        style: AppTextStyle.mediumBlack14
+                                                            .copyWith(
+                                                            color: AppColors.white)),
+                                                  ),
+                                                ],
+                                              ),
                                             );
-                                            if (taskKey != null) {
-                                              todoC.completedTaskBox.delete(taskKey);
-                                              todoC.fetchCompletedTasks();
-                                              Get.snackbar(
-                                                  'Success', 'Completed task deleted');
+                                            if (shouldDelete == true) {
+                                              int? taskKey = todoC.completedTaskBox.keys
+                                                  .cast<int?>()
+                                                  .firstWhere(
+                                                    (key) =>
+                                                todoC.completedTaskBox.get(key) ==
+                                                    task,
+                                                orElse: () => null,
+                                              );
+                                              if (taskKey != null) {
+                                                todoC.completedTaskBox.delete(taskKey);
+                                                todoC.fetchCompletedTasks();
+                                                Get.snackbar(
+                                                    'Success', 'Completed task deleted');
+                                              }
                                             }
                                           }
-                                        }
-                                      },
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                            value: "Delete",
-                                            child: Text("Delete",
-                                                style:
-                                                AppTextStyle.mediumBlack16)),
-                                      ],
+                                        },
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                              value: "Delete",
+                                              child: Text("Delete",
+                                                  style: AppTextStyle.mediumBlack16)),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],

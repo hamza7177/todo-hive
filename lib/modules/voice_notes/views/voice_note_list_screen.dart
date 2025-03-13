@@ -15,7 +15,7 @@ class VoiceNoteListScreen extends StatelessWidget {
 
   void _showRecordingBottomSheet(BuildContext context) {
     Get.bottomSheet(Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -31,163 +31,210 @@ class VoiceNoteListScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Title field with light grey background and rounded corners
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                hintText: 'Give a Title to your voice note',
-                hintStyle: AppTextStyle.regularGrey16,
-                border: InputBorder.none, // Remove default border
-                focusedBorder: InputBorder.none, // Remove focused border
+          SizedBox(height: 20),
+          // Title field
+          TextField(
+            controller: titleController,
+            decoration: InputDecoration(
+              hintText: "Give a Title to your voice note",
+              hintStyle: AppTextStyle.regularBlack16.copyWith(color: Color(0xffAFAFAF)),
+              filled: true,
+              fillColor: AppColors.cardColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
-              style: AppTextStyle.mediumBlack16,
             ),
+            style: AppTextStyle.regularBlack16,
           ),
           const SizedBox(height: 20),
-          // Recording button and timer
+          // Conditional content based on recording state
           Obx(
-            () => Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (voiceC.isRecording.value)
-                      IconButton(
-                        icon: Icon(Icons.pause, color: AppColors.grey),
-                        onPressed: () => voiceC.pauseRecording(),
-                      ),
-                    if (!voiceC.isRecording.value &&
-                        voiceC.currentRecordingPath != null)
-                      IconButton(
-                        icon: Icon(Icons.play_arrow, color: AppColors.grey),
-                        onPressed: () => voiceC.resumeRecording(),
-                      ),
-                    // Record/Stop button
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: voiceC.isRecording.value
-                            ? AppColors.lightRed
-                            : AppColors
-                                .blue, // Pink when recording, blue when not
-                      ),
-                      child: IconButton(
-                        icon: Stack(
-                          alignment: Alignment.center,
+            () => voiceC.isRecording.value ||
+                    voiceC.currentRecordingPath != null
+                ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(19),
+                      border: Border.all(color: Color(0xffD2D2D2)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await voiceC.cancelRecording();
+                            titleController.clear();
+                            Get.back();
+                          },
+                          child: Container(
+                            height: 53,
+                            width: 87,
+                            decoration: BoxDecoration(
+                              color: Color(0xffFEE8E8),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Cancel',
+                                style: AppTextStyle.mediumBlack14
+                                    .copyWith(color: Color(0xffF21A18)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              voiceC.isRecording.value
+                                  ? 'Recording...'
+                                  : 'Paused',
+                              style: AppTextStyle.regularBlack14,
+                            ),
+                            SizedBox(height: 4),
+                            Obx(
+                              () {
+                                const totalSeconds = 120;
+                                final elapsedSeconds =
+                                    voiceC.recordingProgress.value.toInt();
+                                final elapsedMinutes = (elapsedSeconds ~/ 60)
+                                    .toString()
+                                    .padLeft(2, '0');
+                                final elapsedSecs = (elapsedSeconds % 60)
+                                    .toString()
+                                    .padLeft(2, '0');
+                                final formattedElapsed =
+                                    '$elapsedMinutes:$elapsedSecs';
+                                final totalMinutes = (totalSeconds ~/ 60)
+                                    .toString()
+                                    .padLeft(2, '0');
+                                final totalSecs = (totalSeconds % 60)
+                                    .toString()
+                                    .padLeft(2, '0');
+                                final formattedTotal =
+                                    '$totalMinutes:$totalSecs';
+                                return Text(
+                                  '$formattedElapsed / $formattedTotal',
+                                  style: AppTextStyle.regularBlack14,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
                           children: [
                             if (voiceC.isRecording.value)
-                              Icon(Icons.stop,
-                                  color: AppColors.white, size: 30),
-                            if (!voiceC.isRecording.value)
-                              Icon(Icons.mic, color: AppColors.white, size: 30),
-                            if (!voiceC.isRecording.value)
-                              Positioned(
-                                top: 8,
-                                left: 8,
+                              GestureDetector(
+                                onTap: () => voiceC.pauseRecording(),
                                 child: Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
+                                  height: 45,
+                                  width: 45,
+                                  decoration: BoxDecoration(
+                                      color: AppColors.cardColor,
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Center(
+                                    child: Icon(Icons.pause, color: AppColors.black)
                                   ),
                                 ),
                               ),
+
+                            if (!voiceC.isRecording.value &&
+                                voiceC.currentRecordingPath != null)
+                            GestureDetector(
+                              onTap: () => voiceC.resumeRecording(),
+                              child: Container(
+                                height: 45,
+                                width: 45,
+                                decoration: BoxDecoration(
+                                    color: AppColors.cardColor,
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/icons/play.png',
+                                    height: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                        onPressed: voiceC.isRecording.value
-                            ? () => voiceC.stopRecording(titleController.text)
-                            : () => voiceC.startRecording(),
-                        padding: EdgeInsets.zero, // Remove default padding
+                        GestureDetector(
+                          onTap: () {
+                            if (voiceC.currentRecordingPath != null &&
+                                titleController.text.isNotEmpty) {
+                              voiceC.stopRecording(titleController.text);
+                              titleController.clear();
+                              Get.back();
+                            }
+                          },
+                          child: Container(
+                            height: 53,
+                            width: 87,
+                            decoration: BoxDecoration(
+                              color: Color(0xffEFF9EF),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.check,
+                                    color: Color(0xff48B02C),
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Done',
+                                    style: AppTextStyle.mediumBlack14
+                                        .copyWith(color: Color(0xff5EC363)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: voiceC.isRecording.value
+                        ? () => voiceC.stopRecording(titleController.text)
+                        : () => voiceC.startRecording(),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(19),
+                        border: Border.all(color: Color(0xffD2D2D2)),
+                      ),
+                      child: Container(
+                        width: Get.width * 0.9,
+                        height: 53,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset('assets/icons/record_icon.png',
+                                  height: 20),
+                              SizedBox(width: 6),
+                              Text(
+                                'Record',
+                                style: AppTextStyle.mediumBlack16
+                                    .copyWith(color: AppColors.white),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                // Timer (mm:ss format)
-                Obx(
-                      () {
-                    const totalSeconds = 120; // 2-minute limit (adjust as needed)
-                    final elapsedSeconds = voiceC.recordingProgress.value.toInt();
-                    final remainingSeconds = totalSeconds - elapsedSeconds;
-
-                    // Format elapsed time (e.g., "00:12")
-                    final elapsedMinutes = (elapsedSeconds ~/ 60).toString().padLeft(2, '0');
-                    final elapsedSecs = (elapsedSeconds % 60).toString().padLeft(2, '0');
-                    final formattedElapsed = '$elapsedMinutes:$elapsedSecs';
-
-                    // Format total time (e.g., "02:00")
-                    final totalMinutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-                    final totalSecs = (totalSeconds % 60).toString().padLeft(2, '0');
-                    final formattedTotal = '$totalMinutes:$totalSecs';
-
-                    return Text(
-                      '$formattedElapsed / $formattedTotal', // e.g., "00:12 / 02:00"
-                      style: AppTextStyle.mediumBlack16,
-                    );
-                  },
-                ),
-              ],
-            ),
+                  ),
           ),
           const SizedBox(height: 20),
-          // Cancel and Done buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () async{
-                  await voiceC.cancelRecording(); // Cancel the recording
-                  titleController.clear(); // Clear the title field
-                  Get.back();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lightRed,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                ),
-                child: Text(
-                  'Cancel',
-                  style: AppTextStyle
-                      .mediumBlack16, // Assuming white text for contrast
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (voiceC.currentRecordingPath != null &&
-                      titleController.text.isNotEmpty) {
-                    voiceC.stopRecording(titleController.text);
-                    titleController.clear();
-                    Get.back();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                ),
-                child: Text(
-                  'Done',
-                  style: AppTextStyle
-                      .mediumBlack16, // Assuming white text for contrast
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     ));
@@ -299,8 +346,8 @@ class VoiceNoteListScreen extends StatelessWidget {
                         return Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
+                              padding: EdgeInsets.only(
+                                  left: 16, bottom: 10, top: 10),
                               width: Get.width,
                               decoration: BoxDecoration(
                                 color: AppColors.cardColor,
@@ -322,7 +369,9 @@ class VoiceNoteListScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           note.title,
-                                          style: AppTextStyle.mediumBlack16.copyWith(fontWeight: FontWeight.w700),
+                                          style: AppTextStyle.mediumBlack16
+                                              .copyWith(
+                                                  fontWeight: FontWeight.w700),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                         ),
@@ -339,6 +388,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                                           ),
                                         ),
                                         child: PopupMenuButton<String>(
+                                          padding: EdgeInsets.zero,
                                           icon: Icon(Icons.more_vert,
                                               color: Color(0xffAFAFAF)),
                                           onSelected: (value) async {
@@ -348,9 +398,12 @@ class VoiceNoteListScreen extends StatelessWidget {
                                               bool? shouldDelete =
                                                   await showDialog<bool>(
                                                 context: context,
-                                                builder: (context) => AlertDialog(
-                                                  backgroundColor: AppColors.white,
-                                                  title: Text("Delete voice note",
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                  backgroundColor:
+                                                      AppColors.white,
+                                                  title: Text(
+                                                      "Delete voice note",
                                                       style: AppTextStyle
                                                           .mediumBlack16),
                                                   content: Text(
@@ -360,16 +413,16 @@ class VoiceNoteListScreen extends StatelessWidget {
                                                   actions: [
                                                     ElevatedButton(
                                                       onPressed: () =>
-                                                          Navigator.pop(context),
+                                                          Navigator.pop(
+                                                              context),
                                                       style: ElevatedButton.styleFrom(
                                                           backgroundColor:
                                                               Color(0xffF0F0F0),
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8))),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8))),
                                                       child: Text('No',
                                                           style: AppTextStyle
                                                               .mediumPrimary14),
@@ -381,12 +434,11 @@ class VoiceNoteListScreen extends StatelessWidget {
                                                       style: ElevatedButton.styleFrom(
                                                           backgroundColor:
                                                               AppColors.primary,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8))),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8))),
                                                       child: Text("Yes",
                                                           style: AppTextStyle
                                                               .mediumBlack14
@@ -434,7 +486,8 @@ class VoiceNoteListScreen extends StatelessWidget {
                                           voiceC.isPlaying.value &&
                                                   voiceC.audioPlayer.audioSource
                                                       is UriAudioSource &&
-                                                  (voiceC.audioPlayer.audioSource
+                                                  (voiceC.audioPlayer
+                                                                  .audioSource
                                                               as UriAudioSource)
                                                           .uri
                                                           .path ==
@@ -453,7 +506,8 @@ class VoiceNoteListScreen extends StatelessWidget {
                                                   note.audioPath) {
                                             voiceC.pauseVoiceNote();
                                           } else {
-                                            voiceC.playVoiceNote(note.audioPath);
+                                            voiceC
+                                                .playVoiceNote(note.audioPath);
                                           }
                                         },
                                       ),
@@ -462,7 +516,9 @@ class VoiceNoteListScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
                           ],
                         );
                       },
@@ -477,9 +533,12 @@ class VoiceNoteListScreen extends StatelessWidget {
         child: FloatingActionButton(
           onPressed: () => _showRecordingBottomSheet(context),
           backgroundColor: Colors.transparent,
-          elevation: 0,           // Resting elevation
-          highlightElevation: 0,   // Pressed elevation
-          splashColor: Colors.transparent, // Removes ripple effect
+          elevation: 0,
+          // Resting elevation
+          highlightElevation: 0,
+          // Pressed elevation
+          splashColor: Colors.transparent,
+          // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
             child: Image.asset('assets/images/ic_voicenote-1.webp'),

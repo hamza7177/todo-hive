@@ -98,7 +98,7 @@ class AddTaskScreen extends StatelessWidget {
                   SizedBox(width: 5),
                   Text(
                     projectC.selectedDate.value,
-                    style: AppTextStyle.mediumBlack16.copyWith(color: Color(0xffAFAFAF)),
+                    style: AppTextStyle.mediumBlack16
                   ),
                 ],
               )),

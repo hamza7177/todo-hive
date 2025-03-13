@@ -131,6 +131,13 @@ class TodoController extends GetxController {
     return tasks.where((task) => task.category == selectedCategory.value).toList();
   }
 
+  List<Task> getFilteredCompletedTasks() {
+    if (selectedFilter.value == "All") return completedTaskBox.values.toList();
+    return completedTaskBox.values
+        .where((task) => task.category == selectedFilter.value)
+        .toList();
+  }
+
   Map<DateTime, List<Task>> getTasksGroupedByDate() {
     final Map<DateTime, List<Task>> groupedTasks = {};
     for (var task in getFilteredTasks()) {
@@ -153,6 +160,21 @@ class TodoController extends GetxController {
       groupedTasks[normalizedDate]!.add(task);
     }
     return groupedTasks;
+  }
+
+  void uncompleteTask(Task task) {
+    task.completedAt = null;
+    int? taskKey = completedTaskBox.keys.cast<int?>().firstWhere(
+          (key) => completedTaskBox.get(key) == task,
+      orElse: () => null,
+    );
+    if (taskKey != null) {
+      completedTaskBox.delete(taskKey);
+      taskBox.add(task);
+      fetchTasks();
+      fetchCompletedTasks();
+      Get.snackbar('Success', 'Task marked as active again');
+    }
   }
 
   void updateTask(int index, String newTitle, String newCategory) {

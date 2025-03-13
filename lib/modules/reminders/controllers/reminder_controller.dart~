@@ -128,20 +128,6 @@ class ReminderController extends GetxController {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selected),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Customize the time picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null) {

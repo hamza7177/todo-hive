@@ -125,22 +125,24 @@ class TaskListScreen extends StatelessWidget {
                 color: AppColors.cardColor,
                 margin: EdgeInsets.symmetric(vertical: 8),
                 child: Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.only(left: 12,bottom: 12,top: 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            task.title,
-                            style: AppTextStyle.mediumBlack16.copyWith(
-                              fontWeight: FontWeight.w600,
-                              decoration: isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none,
-                              color: isCompleted ? Color(0xffAFAFAF) : Colors
-                                  .black,
+                          Expanded(
+                            child: Text(
+                              task.title,
+                              style: AppTextStyle.mediumBlack16.copyWith(
+                                fontWeight: FontWeight.w600,
+                                decoration: isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
+                                color: isCompleted ? Color(0xffAFAFAF) : Colors
+                                    .black,
+                              ),
                             ),
                           ),
                           Theme(
@@ -153,6 +155,7 @@ class TaskListScreen extends StatelessWidget {
                               ),
                             ),
                             child: PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
                               icon: const Icon(
                                   Icons.more_vert, color: Color(0xffAFAFAF)),
                               onSelected: (value) async {
@@ -282,21 +285,24 @@ class TaskListScreen extends StatelessWidget {
                                   0xffAFAFAF),
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Status: ${task.status}',
-                                style: AppTextStyle.mediumBlack14.copyWith(
-                                  color: task.status == 'Complete'
-                                      ? Colors.green
-                                      : task.status == 'In Progress'
-                                      ? AppColors
-                                      .orange // Yellow for "In Progress"
-                                      : Colors.red, // Red for "Pending"
+                          Padding(
+                            padding: const EdgeInsets.only(right: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Status: ${task.status}',
+                                  style: AppTextStyle.mediumBlack14.copyWith(
+                                    color: task.status == 'Complete'
+                                        ? Colors.green
+                                        : task.status == 'In Progress'
+                                        ? AppColors
+                                        .orange // Yellow for "In Progress"
+                                        : Colors.red, // Red for "Pending"
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),

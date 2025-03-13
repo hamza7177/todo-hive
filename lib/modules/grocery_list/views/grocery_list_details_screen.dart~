@@ -62,7 +62,7 @@ class GroceryListDetailScreen extends StatelessWidget {
                     ),
                     child: ListView.separated(
                       shrinkWrap: true,
-                      separatorBuilder: (context, index) => Divider(height: 2,color: Color(0xffF2F2F2),),
+                      separatorBuilder: (context, index) => Divider(height: 2,color: Color(0xffD9D9D9),),
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       itemCount: groceryC.itemQuantities.length,
                       itemBuilder: (context, index) {

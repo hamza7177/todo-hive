@@ -124,8 +124,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                           return Column(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 14),
+                                padding: EdgeInsets.only(left: 16,bottom: 14,top: 14),
                                 width: Get.width,
                                 decoration: BoxDecoration(
                                   color: AppColors.cardColor,
@@ -190,10 +189,11 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                         ),
                                       ),
                                       child: PopupMenuButton<String>(
+                                        padding: EdgeInsets.zero,
                                         icon: const Icon(Icons.more_vert,
                                             color: Color(0xffAFAFAF)),
                                         onSelected: (value) async {
-                                          if (value == "Update") {
+                                          if (value == "Edit") {
                                             Get.to(() => NoteUpdateScreen(
                                                   note: task,
                                                   index: noteC.notes
@@ -283,9 +283,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                         },
                                         itemBuilder: (context) => [
                                           PopupMenuItem(
-                                            value: "Update",
+                                            value: "Edit",
                                             child: Text(
-                                              "Update",
+                                              "Edit",
                                               style: AppTextStyle
                                                   .regularBlack16,
                                             ),

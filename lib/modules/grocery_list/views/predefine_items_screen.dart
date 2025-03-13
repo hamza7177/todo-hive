@@ -165,10 +165,18 @@ class PredefinedItemsScreen extends GetView<GroceryListController> {
                                   child: Text('$quantity added', style: AppTextStyle.regularBlack14),
                                 ),
                               if (quantity > 0)
-                                IconButton(
-                                  icon: Icon(Icons.remove, color: Colors.red),
-                                  onPressed: () => controller.removeQuantity(itemName),
+                                GestureDetector(
+                                  onTap: () => controller.removeQuantity(itemName),
+                                  child: Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(child: Icon(Icons.remove, color: Colors.white,size: 16,))),
                                 ),
+
                             ],
                           );
                         }),

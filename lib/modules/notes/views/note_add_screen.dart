@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,19 +41,23 @@ class NoteAddScreen extends StatelessWidget {
           style:
               AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
-        actions: [
-          _buildCategoryDropdown(context),
-          SizedBox(width: 10),
-        ],
+
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Edited: ${DateTime.now().toLocal()}",
-                style: AppTextStyle.regularBlack14
-                    .copyWith(color: Color(0xffC5C5C5))),
+            Row(
+              children: [
+                Text(
+                  "Edited: ${DateFormat('MM-dd-yyyy h:mm a').format(DateTime.now().toLocal())}",
+                  style: AppTextStyle.regularBlack14.copyWith(color: Color(0xffC5C5C5)),
+                ),
+                Spacer(),
+                _buildCategoryDropdown(context),
+              ],
+            ),
             SizedBox(height: 10),
             TextField(
               controller: noteController.titleController,

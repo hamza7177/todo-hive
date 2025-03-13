@@ -67,6 +67,7 @@ class CategoryBottomSheet extends StatelessWidget {
                 Align(
                   alignment: Alignment.topLeft,
                   child: TabBar(
+                    tabAlignment: TabAlignment.start,
                     labelColor: AppColors.black,
                     labelStyle: AppTextStyle.mediumBlack14,
                     unselectedLabelStyle: AppTextStyle.regularBlack14

@@ -96,93 +96,97 @@ class GroceryListScreen extends StatelessWidget {
                   final completed = progress['completed']!.toInt();
                   return Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                        width: Get.width,
-                        decoration: BoxDecoration(
-                          color: AppColors.cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      GestureDetector(
+                        onTap: () {
+                          groceryC.setCurrentList(list.id, list.name);
+                          Get.to(() => GroceryListDetailScreen(listId: list.id, listName: list.name));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          width: Get.width,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 list.name,
                                 style: AppTextStyle.mediumBlack16.copyWith(fontWeight: FontWeight.bold),
                               ),
-                              Theme(
-                                data: Theme.of(context).copyWith(
-                                  popupMenuTheme: PopupMenuThemeData(
-                                    color: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '$completed out of $total',
+                                    style: AppTextStyle.regularBlack14.copyWith(color: Colors.black54),
+                                  ),
+                                  Theme(
+                                    data: Theme.of(context).copyWith(
+                                      popupMenuTheme: PopupMenuThemeData(
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
+                                    child: PopupMenuButton<String>(
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
+                                      onSelected: (value) async {
+                                        if (value == "Starred") {
+                                          groceryC.toggleStarred(list.id);
+                                        } else if (value == "Delete") {
+                                          bool? shouldDelete = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              backgroundColor: AppColors.white,
+                                              title: Text("Delete List", style: AppTextStyle.mediumBlack16),
+                                              content: Text(
+                                                "Are you sure you want to delete this list and all its items?",
+                                                style: AppTextStyle.regularBlack14,
+                                              ),
+                                              actions: [
+                                                ElevatedButton(
+                                                  onPressed: () => Navigator.pop(context),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Color(0xffF0F0F0),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  ),
+                                                  child: Text('No', style: AppTextStyle.mediumPrimary14),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () => Navigator.of(context).pop(true),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: AppColors.primary,
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  ),
+                                                  child: Text("Yes", style: AppTextStyle.mediumBlack14.copyWith(color: AppColors.white)),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          if (shouldDelete == true) {
+                                            groceryC.deleteList(list.id);
+                                          }
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: "Starred",
+                                          child: Text("Starred", style: AppTextStyle.regularBlack16),
+                                        ),
+                                        PopupMenuItem(
+                                          value: "Delete",
+                                          child: Text("Delete", style: AppTextStyle.mediumBlack16),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                child: PopupMenuButton<String>(
-                                  icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
-                                  onSelected: (value) async {
-                                    if (value == "Starred") {
-                                      groceryC.toggleStarred(list.id);
-                                    } else if (value == "Delete") {
-                                      bool? shouldDelete = await showDialog<bool>(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          backgroundColor: AppColors.white,
-                                          title: Text("Delete List", style: AppTextStyle.mediumBlack16),
-                                          content: Text(
-                                            "Are you sure you want to delete this list and all its items?",
-                                            style: AppTextStyle.regularBlack14,
-                                          ),
-                                          actions: [
-                                            ElevatedButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Color(0xffF0F0F0),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                              ),
-                                              child: Text('No', style: AppTextStyle.mediumPrimary14),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () => Navigator.of(context).pop(true),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: AppColors.primary,
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                              ),
-                                              child: Text("Yes", style: AppTextStyle.mediumBlack14.copyWith(color: AppColors.white)),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                      if (shouldDelete == true) {
-                                        groceryC.deleteList(list.id);
-                                      }
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    PopupMenuItem(
-                                      value: "Starred",
-                                      child: Text("Starred", style: AppTextStyle.regularBlack16),
-                                    ),
-                                    PopupMenuItem(
-                                      value: "Delete",
-                                      child: Text("Delete", style: AppTextStyle.mediumBlack16),
-                                    ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 8),
-                              Text(
-                                '$completed out of $total',
-                                style: AppTextStyle.regularBlack14.copyWith(color: Colors.black54),
-                              ),
-                              SizedBox(height: 8),
+
                               LinearProgressIndicator(
                                 value: total > 0 ? completed / total : 0,
                                 backgroundColor: Colors.grey[300],
@@ -192,10 +196,6 @@ class GroceryListScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          onTap: () {
-                            groceryC.setCurrentList(list.id, list.name);
-                            Get.to(() => GroceryListDetailScreen(listId: list.id, listName: list.name));
-                          },
                         ),
                       ),
                       SizedBox(height: 10),

@@ -35,7 +35,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
         ),
         title: Text(
           'Completed Schedules',
-          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
       body: Obx(() {
@@ -72,7 +72,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
             return Column(
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding: EdgeInsets.only(left: 15,bottom: 10,top: 10),
                   decoration: BoxDecoration(
                     color: bgColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
@@ -99,6 +99,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
                               ),
                             ),
                             child: PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
                               icon: Icon(Icons.more_vert, color: bgColor),
                               onSelected: (value) async {
                                 if (value == "Delete") {
@@ -176,16 +177,12 @@ class CompletedSchedulesScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Text(
-                            formatDate(schedule.createdAt),
-                            style: AppTextStyle.regularBlack12
-                                .copyWith(color: bgColor),
-                          ),
+
                           SizedBox(width: 5),
                           schedule.isReminder
                               ? Text(
-                            '| Completed on: ${DateFormat('EEE, MMM d, hh:mm a').format(schedule.dateTime)}',
-                            style: AppTextStyle.regularBlack12
+                            'Completed on: ${DateFormat('EEE, MMM d, hh:mm a').format(schedule.dateTime)}',
+                            style: AppTextStyle.regularBlack10
                                 .copyWith(color: bgColor),
                           )
                               : SizedBox(),

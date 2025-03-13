@@ -35,7 +35,7 @@ class ReminderListScreen extends StatelessWidget {
         title: Text(
           'Reminder',
           style:
-              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+              AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w700),
         ),
         actions: [
           IconButton(
@@ -90,8 +90,10 @@ class ReminderListScreen extends StatelessWidget {
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
-          highlightElevation: 0,   // Pressed elevation
-          splashColor: Colors.transparent, // Removes ripple effect
+          highlightElevation: 0,
+          // Pressed elevation
+          splashColor: Colors.transparent,
+          // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30), // Adjust for rounded shape
             child: Image.asset('assets/images/ic_to_do.webp'),
@@ -133,7 +135,7 @@ class ReminderListScreen extends StatelessWidget {
         controller.countdowns[reminder.id] ?? Duration.zero;
     return reminder.reminderType == "interval"
         ? Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
             decoration: BoxDecoration(
               color: AppColors.cardColor,
               borderRadius: BorderRadius.circular(10),
@@ -186,6 +188,7 @@ class ReminderListScreen extends StatelessWidget {
                         ),
                       ),
                       child: PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
                         icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
                         onSelected: (value) async {
                           if (value == "Complete") {
@@ -332,7 +335,7 @@ class ReminderListScreen extends StatelessWidget {
           )
         : reminder.reminderType == "date_time"
             ? Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
                 decoration: BoxDecoration(
                   color: AppColors.cardColor,
                   borderRadius: BorderRadius.circular(10),
@@ -385,8 +388,9 @@ class ReminderListScreen extends StatelessWidget {
                             ),
                           ),
                           child: PopupMenuButton<String>(
-                            icon:
-                                Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+                            padding: EdgeInsets.zero,
+                            icon: Icon(Icons.more_horiz,
+                                color: Color(0xffAFAFAF)),
                             onSelected: (value) async {
                               if (value == "Complete") {
                                 controller.completeReminder(reminder.id);
@@ -550,7 +554,7 @@ class ReminderListScreen extends StatelessWidget {
               )
             : reminder.reminderType == "weekday"
                 ? Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
                     decoration: BoxDecoration(
                       color: AppColors.cardColor,
                       borderRadius: BorderRadius.circular(10),
@@ -606,6 +610,7 @@ class ReminderListScreen extends StatelessWidget {
                                 ),
                               ),
                               child: PopupMenuButton<String>(
+                                padding: EdgeInsets.zero,
                                 icon: Icon(Icons.more_horiz,
                                     color: Color(0xffAFAFAF)),
                                 onSelected: (value) async {

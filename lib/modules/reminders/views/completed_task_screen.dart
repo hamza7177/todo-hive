@@ -83,7 +83,7 @@ class CompletedTasksScreen extends StatelessWidget {
 
   Widget _buildCompletedTile(ReminderModel reminder, BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.only(left: 16,bottom: 10,top: 10),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(10),
@@ -106,6 +106,7 @@ class CompletedTasksScreen extends StatelessWidget {
                   ),
                 ),
                 child: PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
                   icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
                   onSelected: (value) async {
                     if (value == "Delete") {

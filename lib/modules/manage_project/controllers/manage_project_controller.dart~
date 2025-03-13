@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -32,31 +33,24 @@ class ManageProjectController extends GetxController {
   Future<void> pickDate(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final DateTime? picked = await showDatePicker(
+    DateTime? newDateTime = await showRoundedDatePicker(
       context: context,
+      theme: ThemeData(primarySwatch: Colors.red),
       initialDate: selected,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Optional: Customize the date picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
+      borderRadius: 16,
+      height: 300, // Set specific height
+      styleDatePicker: MaterialRoundedDatePickerStyle(
+        paddingDatePicker: const EdgeInsets.all(16),
 
-          child: child!,
-        );
-      },
+      ),
+      barrierDismissible: true, // Allows tapping outside to dismiss
     );
 
-    if (picked != null) {
-      selectedDateTime.value = picked;
-      selectedDate.value = DateFormat('EEE, MMM d').format(picked);
+    if (newDateTime != null) {
+      selectedDateTime.value = newDateTime;
+      selectedDate.value = DateFormat('EEE, MMM d').format(newDateTime);
     }
   }
 

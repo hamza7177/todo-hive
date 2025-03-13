@@ -141,7 +141,6 @@ class ScheduleListScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Expanded(
                                   child: Text(
@@ -229,6 +228,7 @@ class ScheduleListScreen extends StatelessWidget {
                                   ),
                                 ),
                               ],
+                              mainAxisAlignment: MainAxisAlignment.center,
                             ),
                             SizedBox(
                               width:Get.width * 0.7,
