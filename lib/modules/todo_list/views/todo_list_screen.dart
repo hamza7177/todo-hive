@@ -85,7 +85,7 @@ class TodoListScreen extends StatelessWidget {
                     hintStyle: AppTextStyle.regularBlack16
                         .copyWith(color: Color(0xffAFAFAF)),
                     filled: true,
-                    fillColor: AppColors.cardColor,
+                    fillColor: AppColors.textFieldColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
@@ -230,7 +230,7 @@ class TodoListScreen extends StatelessWidget {
                     hintStyle: AppTextStyle.regularBlack16
                         .copyWith(color: Color(0xffAFAFAF)),
                     filled: true,
-                    fillColor: AppColors.cardColor,
+                    fillColor: AppColors.textFieldColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,

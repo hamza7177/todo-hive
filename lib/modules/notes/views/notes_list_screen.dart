@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
@@ -190,84 +191,51 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                       ),
                                       child: PopupMenuButton<String>(
                                         padding: EdgeInsets.zero,
-                                        icon: const Icon(Icons.more_vert,
-                                            color: Color(0xffAFAFAF)),
+                                        icon: const Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
                                         onSelected: (value) async {
                                           if (value == "Edit") {
                                             Get.to(() => NoteUpdateScreen(
-                                                  note: task,
-                                                  index: noteC.notes
-                                                      .indexOf(task),
-                                                ));
+                                              note: task,
+                                              index: noteC.notes.indexOf(task),
+                                            ));
                                           } else if (value == "Delete") {
-                                            bool? shouldDelete =
-                                                await showDialog<bool>(
+                                            bool? shouldDelete = await showDialog<bool>(
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
-                                                  backgroundColor:
-                                                      AppColors.white,
-                                                  title: Text(
-                                                    "Delete Todo",
-                                                    style: AppTextStyle
-                                                        .mediumBlack16,
-                                                  ),
+                                                  backgroundColor: AppColors.white,
+                                                  title: Text("Delete Todo", style: AppTextStyle.mediumBlack16),
                                                   content: Text(
                                                     "Are you sure you want to delete this task?",
-                                                    style: AppTextStyle
-                                                        .regularBlack14,
+                                                    style: AppTextStyle.regularBlack14,
                                                   ),
                                                   actions: [
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.pop(
-                                                            context);
+                                                        Navigator.pop(context);
                                                       },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      8),
+                                                      style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(8),
                                                         ),
-                                                        backgroundColor:
-                                                            const Color(
-                                                                0xffF0F0F0),
+                                                        backgroundColor: const Color(0xffF0F0F0),
                                                       ),
-                                                      child: Text(
-                                                        'No',
-                                                        style: AppTextStyle
-                                                            .mediumPrimary14,
-                                                      ),
+                                                      child: Text('No', style: AppTextStyle.mediumPrimary14),
                                                     ),
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.of(
-                                                                context)
-                                                            .pop(true);
+                                                        Navigator.of(context).pop(true);
                                                       },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      8),
+                                                      style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(8),
                                                         ),
-                                                        backgroundColor:
-                                                            AppColors
-                                                                .primary,
+                                                        backgroundColor: AppColors.primary,
                                                       ),
                                                       child: Text(
                                                         "Yes",
-                                                        style: AppTextStyle
-                                                            .mediumBlack14
-                                                            .copyWith(
-                                                          color: AppColors
-                                                              .white,
+                                                        style: AppTextStyle.mediumBlack14.copyWith(
+                                                          color: AppColors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -279,24 +247,24 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                             if (shouldDelete == true) {
                                               noteC.deleteTask(task);
                                             }
+                                          } else if (value == "Share") {
+                                            String shareText =
+                                                "Task: ${task.title}\nDescription: ${task.description}\nDate: ${DateFormat('MM-dd-yyyy hh:mm a').format(task.dateTime)}";
+                                            Share.share(shareText);
                                           }
                                         },
                                         itemBuilder: (context) => [
                                           PopupMenuItem(
                                             value: "Edit",
-                                            child: Text(
-                                              "Edit",
-                                              style: AppTextStyle
-                                                  .regularBlack16,
-                                            ),
+                                            child: Text("Edit", style: AppTextStyle.regularBlack16),
                                           ),
                                           PopupMenuItem(
                                             value: "Delete",
-                                            child: Text(
-                                              "Delete",
-                                              style: AppTextStyle
-                                                  .mediumBlack16,
-                                            ),
+                                            child: Text("Delete", style: AppTextStyle.mediumBlack16),
+                                          ),
+                                          PopupMenuItem(
+                                            value: "Share",
+                                            child: Text("Share", style: AppTextStyle.mediumBlack16),
                                           ),
                                         ],
                                       ),

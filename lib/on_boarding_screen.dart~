@@ -32,7 +32,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     {
       'title': 'Project & Schedule Planner',
       'image': 'ob_third.webp',
-      'description': 'Plan and manage your projects and schedule with ease. Stay on top of deadlines and tasks to boost productivity.',
+      'description': 'Lorem ipsum, or Ipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs.',
     },
   ];
   Future<void> completeOnboarding() async {

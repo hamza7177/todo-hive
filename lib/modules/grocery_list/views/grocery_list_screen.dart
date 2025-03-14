@@ -102,7 +102,7 @@ class GroceryListScreen extends StatelessWidget {
                           Get.to(() => GroceryListDetailScreen(listId: list.id, listName: list.name));
                         },
                         child: Container(
-                          padding: EdgeInsets.all(16),
+                          padding: EdgeInsets.symmetric(horizontal: 16,vertical: 10),
                           width: Get.width,
                           decoration: BoxDecoration(
                             color: AppColors.cardColor,
@@ -116,12 +116,13 @@ class GroceryListScreen extends StatelessWidget {
                                 style: AppTextStyle.mediumBlack16.copyWith(fontWeight: FontWeight.bold),
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Text(
                                     '$completed out of $total',
                                     style: AppTextStyle.regularBlack14.copyWith(color: Colors.black54),
                                   ),
+                                  Spacer(),
                                   Theme(
                                     data: Theme.of(context).copyWith(
                                       popupMenuTheme: PopupMenuThemeData(
@@ -186,7 +187,6 @@ class GroceryListScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-
                               LinearProgressIndicator(
                                 value: total > 0 ? completed / total : 0,
                                 backgroundColor: Colors.grey[300],
@@ -260,7 +260,7 @@ class GroceryListScreen extends StatelessWidget {
                 hintText: "Add new list",
                 hintStyle: AppTextStyle.regularBlack16.copyWith(color: Color(0xffAFAFAF)),
                 filled: true,
-                fillColor: AppColors.cardColor,
+                fillColor: AppColors.textFieldColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,

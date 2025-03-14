@@ -50,19 +50,22 @@ class NoteUpdateScreen extends StatelessWidget {
           style:
               AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
-        actions: [
-          _buildCategoryDropdown(context, note),
-          SizedBox(width: 10),
-        ],
+
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Edited: ${DateTime.now().toLocal()}",
-                style: AppTextStyle.regularBlack14
-                    .copyWith(color: Color(0xffC5C5C5))),
+            Row(
+              children: [
+                Text("Edited: ${DateTime.now().toLocal()}",
+                    style: AppTextStyle.regularBlack12
+                        .copyWith(color: Color(0xffC5C5C5))),
+                Spacer(),
+                _buildCategoryDropdown(context, note),
+              ],
+            ),
             SizedBox(height: 10),
             TextField(
               controller: titleController,

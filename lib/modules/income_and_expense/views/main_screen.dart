@@ -291,16 +291,16 @@ class MainScreen extends GetView<TransactionController> {
   Widget _buildBalanceItem(String label, double value, Color color) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      height: 88,
-      width: 175,
+      height: Get.height * 0.1,
+      width: Get.width * 0.43,
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(13),
       ),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8),
-        height: 78,
-        width: 165,
+        height: Get.height * 0.08,
+        width: Get.width * 0.4,
         decoration: BoxDecoration(
           color: label == 'Expense' ? Color(0xffFFEEEE) : AppColors.lightGreen3,
           borderRadius: BorderRadius.circular(13),
@@ -310,8 +310,8 @@ class MainScreen extends GetView<TransactionController> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              height: 40,
-              width: 40,
+              height: Get.height * 0.042,
+              width: Get.width * 0.09,
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                   color: AppColors.white,
@@ -320,7 +320,7 @@ class MainScreen extends GetView<TransactionController> {
                 label == 'Expense'
                     ? 'assets/icons/ic_upward.png'
                     : 'assets/icons/ic_downward.png',
-                height: 40,
+                height: Get.height * 0.035,
               ),
             ),
             SizedBox(width: 10),
@@ -336,7 +336,7 @@ class MainScreen extends GetView<TransactionController> {
                 Text(
                   'Rs${NumberFormat('#,##0').format(value)}',
                   style: AppTextStyle.mediumBlack16
-                      .copyWith(fontWeight: FontWeight.w600),
+                      .copyWith(fontWeight: FontWeight.w600,fontSize: Get.height * 0.018),
                 ),
               ],
             ),

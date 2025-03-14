@@ -39,7 +39,7 @@ class VoiceNoteListScreen extends StatelessWidget {
               hintText: "Give a Title to your voice note",
               hintStyle: AppTextStyle.regularBlack16.copyWith(color: Color(0xffAFAFAF)),
               filled: true,
-              fillColor: AppColors.cardColor,
+              fillColor: AppColors.textFieldColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none,

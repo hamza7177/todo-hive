@@ -12,6 +12,7 @@ class AppColors {
   static const lightGrey2 = Color(0xffF7F8F9);
   static const lightYellow = Color(0xffFFF8ED);
   static const cardColor = Color(0xffF9F9F9);
+  static const textFieldColor = Color(0xffF0F0F0);
   static const black = Color.fromARGB(255, 17, 17, 17);
   static const white = Colors.white;
   static const whiteSplash = Colors.white12;

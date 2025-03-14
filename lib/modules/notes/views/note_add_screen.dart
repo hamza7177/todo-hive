@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../controllers/notes_controller.dart';
 
 class NoteAddScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class NoteAddScreen extends StatelessWidget {
     "Shopping",
   ];
 
-   NoteAddScreen({super.key});
+  NoteAddScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,6 @@ class NoteAddScreen extends StatelessWidget {
           style:
               AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
-
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -52,7 +52,8 @@ class NoteAddScreen extends StatelessWidget {
               children: [
                 Text(
                   "Edited: ${DateFormat('MM-dd-yyyy h:mm a').format(DateTime.now().toLocal())}",
-                  style: AppTextStyle.regularBlack14.copyWith(color: Color(0xffC5C5C5)),
+                  style: AppTextStyle.regularBlack12
+                      .copyWith(color: Color(0xffC5C5C5)),
                 ),
                 Spacer(),
                 _buildCategoryDropdown(context),
@@ -101,9 +102,26 @@ class NoteAddScreen extends StatelessWidget {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                if (noteController.titleController.text.isNotEmpty && noteController.noteController.text.isNotEmpty && noteController.selectedCategory.value.isNotEmpty) {
+                if (noteController.titleController.text.isEmpty) {
+                  Get.snackbar(
+                    "Error",
+                    "Please enter title",
+                  );
+                } else if (noteController.selectedCategory.value.isEmpty) {
+                  Get.snackbar(
+                    "Error",
+                    "Please select category",
+                  );
+                } else if (noteController.noteController.text.isEmpty) {
+                  Get.snackbar(
+                    "Error",
+                    "Please enter note",
+                  );
+                } else {
                   noteController.addNote(
-                      noteController.titleController.text,noteController.noteController.text, noteController.selectedCategory.value);
+                      noteController.titleController.text,
+                      noteController.noteController.text,
+                      noteController.selectedCategory.value);
                   Get.back();
                 }
               },
@@ -146,8 +164,14 @@ class NoteAddScreen extends StatelessWidget {
                       : noteController.selectedCategory.value,
                   style: AppTextStyle.regularBlack14,
                 )),
-            SizedBox(width: 5,),
-            Icon(FontAwesomeIcons.chevronDown, color: Color(0xffAFAFAF),size: 15,),
+            SizedBox(
+              width: 5,
+            ),
+            Icon(
+              FontAwesomeIcons.chevronDown,
+              color: Color(0xffAFAFAF),
+              size: 15,
+            ),
           ],
         ),
       ),
