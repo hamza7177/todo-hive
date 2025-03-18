@@ -32,7 +32,7 @@ class AppColors {
   static const lightParrot = Color(0xffEFF6F4);
 
   static const MaterialColor primarySwatch = MaterialColor(
-    0xff0F172A,
+    0xff313755,
     {
       50: Color(0xff95d0f5),
       100: Color(0xff74c2f2),

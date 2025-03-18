@@ -88,12 +88,10 @@ class CompletedSchedulesScreen extends StatelessWidget {
                             style: AppTextStyle.mediumBlack16
                                 .copyWith(fontWeight: FontWeight.w700),
                           ),
-                          SizedBox(height: 5,),
                           Text(
                             schedule.description,
                             style: AppTextStyle.regularBlack14,
                           ),
-                          SizedBox(height: 5,),
                           Row(
                             children: [
 

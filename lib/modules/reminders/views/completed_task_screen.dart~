@@ -146,7 +146,7 @@ class CompletedTasksScreen extends StatelessWidget {
             ),
             child: PopupMenuButton<String>(
               padding: EdgeInsets.zero,
-              icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+              icon: Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
               onSelected: (value) async {
                 if (value == "Delete") {
                   bool? shouldDelete = await showDialog<bool>(

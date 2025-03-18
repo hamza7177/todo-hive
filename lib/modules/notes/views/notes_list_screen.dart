@@ -76,8 +76,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                   label: category.name,
                                   isSelected: noteC.selectedFilter.value ==
                                       category.name,
-                                  onTap: () =>
-                                      noteC.setFilter(category.name),
+                                  onTap: () => noteC.setFilter(category.name),
                                 ),
                               )),
                         ],
@@ -125,7 +124,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
                           return Column(
                             children: [
                               Container(
-                                padding: EdgeInsets.only(left: 16,bottom: 14,top: 14),
+                                padding: EdgeInsets.only(
+                                    left: 16, bottom: 14, top: 14),
                                 width: Get.width,
                                 decoration: BoxDecoration(
                                   color: AppColors.cardColor,
@@ -141,8 +141,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                           width: Get.width * 0.6,
                                           child: Text(
                                             task.title,
-                                            style: AppTextStyle
-                                                .mediumBlack16
+                                            style: AppTextStyle.mediumBlack16
                                                 .copyWith(
                                                     fontWeight:
                                                         FontWeight.w700),
@@ -157,8 +156,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                           width: Get.width * 0.6,
                                           child: Text(
                                             task.description,
-                                            style:
-                                                AppTextStyle.regularBlack14,
+                                            style: AppTextStyle.regularBlack14,
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                           ),
@@ -171,14 +169,13 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                               .format(task.dateTime),
                                           style: AppTextStyle.regularBlack12
                                               .copyWith(
-                                                  color: const Color(
-                                                      0xffAEAEAE)),
+                                                  color:
+                                                      const Color(0xffAEAEAE)),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                         ),
                                       ],
                                     ),
-                                    Spacer(),
                                     Theme(
                                       data: Theme.of(context).copyWith(
                                         popupMenuTheme: PopupMenuThemeData(
@@ -191,51 +188,75 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                       ),
                                       child: PopupMenuButton<String>(
                                         padding: EdgeInsets.zero,
-                                        icon: const Icon(Icons.more_vert, color: Color(0xffAFAFAF)),
+                                        icon: const Icon(Icons.more_vert,
+                                            color: Color(0xffAFAFAF)),
                                         onSelected: (value) async {
                                           if (value == "Edit") {
                                             Get.to(() => NoteUpdateScreen(
-                                              note: task,
-                                              index: noteC.notes.indexOf(task),
-                                            ));
+                                                  note: task,
+                                                  index:
+                                                      noteC.notes.indexOf(task),
+                                                ));
                                           } else if (value == "Delete") {
-                                            bool? shouldDelete = await showDialog<bool>(
+                                            bool? shouldDelete =
+                                                await showDialog<bool>(
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
-                                                  backgroundColor: AppColors.white,
-                                                  title: Text("Delete Todo", style: AppTextStyle.mediumBlack16),
+                                                  backgroundColor:
+                                                      AppColors.white,
+                                                  title: Text("Delete Todo",
+                                                      style: AppTextStyle
+                                                          .mediumBlack16),
                                                   content: Text(
                                                     "Are you sure you want to delete this task?",
-                                                    style: AppTextStyle.regularBlack14,
+                                                    style: AppTextStyle
+                                                        .regularBlack14,
                                                   ),
                                                   actions: [
                                                     ElevatedButton(
                                                       onPressed: () {
                                                         Navigator.pop(context);
                                                       },
-                                                      style: ElevatedButton.styleFrom(
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(8),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        backgroundColor: const Color(0xffF0F0F0),
+                                                        backgroundColor:
+                                                            const Color(
+                                                                0xffF0F0F0),
                                                       ),
-                                                      child: Text('No', style: AppTextStyle.mediumPrimary14),
+                                                      child: Text('No',
+                                                          style: AppTextStyle
+                                                              .mediumPrimary14),
                                                     ),
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        Navigator.of(context).pop(true);
+                                                        Navigator.of(context)
+                                                            .pop(true);
                                                       },
-                                                      style: ElevatedButton.styleFrom(
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(8),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        backgroundColor: AppColors.primary,
+                                                        backgroundColor:
+                                                            AppColors.primary,
                                                       ),
                                                       child: Text(
                                                         "Yes",
-                                                        style: AppTextStyle.mediumBlack14.copyWith(
-                                                          color: AppColors.white,
+                                                        style: AppTextStyle
+                                                            .mediumBlack14
+                                                            .copyWith(
+                                                          color:
+                                                              AppColors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -256,20 +277,29 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                         itemBuilder: (context) => [
                                           PopupMenuItem(
                                             value: "Edit",
-                                            child: Text("Edit", style: AppTextStyle.regularBlack16),
+                                            child: Text("Edit",
+                                                style: AppTextStyle
+                                                    .regularBlack16),
                                           ),
                                           PopupMenuItem(
                                             value: "Delete",
-                                            child: Text("Delete", style: AppTextStyle.mediumBlack16),
+                                            child: Text("Delete",
+                                                style:
+                                                    AppTextStyle.mediumBlack16),
                                           ),
                                           PopupMenuItem(
                                             value: "Share",
-                                            child: Text("Share", style: AppTextStyle.mediumBlack16),
+                                            child: Text("Share",
+                                                style:
+                                                    AppTextStyle.mediumBlack16),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ],
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                 ),
                               ),
                               const SizedBox(height: 10),
@@ -301,7 +331,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
         closeButtonBuilder: DefaultFloatingActionButtonBuilder(
           child: const Icon(Icons.close),
           fabSize: ExpandableFabSize.regular,
-          foregroundColor:Colors.white,
+          foregroundColor: Colors.white,
           backgroundColor: AppColors.lightRed,
           shape: const CircleBorder(),
         ),
@@ -318,8 +348,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   // How much the shadow spreads
                   blurRadius: 5,
                   // Softness of the shadow
-                  offset: Offset(
-                      0, 3), // Vertical offset to make it appear raised
+                  offset:
+                      Offset(0, 3), // Vertical offset to make it appear raised
                 ),
               ],
             ),
@@ -328,8 +358,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
                 Get.to(() => CategoriesScreen());
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -337,8 +367,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.edit,
-                        size: 20, color: Color(0xffA19C9C)),
+                    Icon(Icons.edit, size: 20, color: Color(0xffA19C9C)),
                     const SizedBox(width: 8),
                     Text(
                       'Edit Category',
@@ -363,8 +392,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   // Shadow spread
                   blurRadius: 5,
                   // Shadow softness
-                  offset:
-                  Offset(0, 3), // Vertical offset for raised effect
+                  offset: Offset(0, 3), // Vertical offset for raised effect
                 ),
               ],
             ),
@@ -373,8 +401,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
                 Get.to(() => NoteAddScreen());
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),

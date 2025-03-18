@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:todo_hive/modules/manage_project/controllers/manage_project_controller.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
+
 import '../models/project.dart';
 import 'add_project_screen.dart';
 import 'task_list_screen.dart';
@@ -32,7 +33,8 @@ class ProjectListScreen extends StatelessWidget {
         ),
         title: Text(
           'Project Management',
-          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          style:
+          AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -110,11 +112,13 @@ class ProjectListScreen extends StatelessWidget {
                             dividerColor: Colors.transparent,
                           ),
                           child: ExpansionTile(
+                            tilePadding: EdgeInsets.zero,
                             title: Text(
                               'Project: ${project.title}',
                               style: AppTextStyle.mediumBlack18
                                   .copyWith(fontWeight: FontWeight.w600),
                             ),
+                            childrenPadding: EdgeInsets.zero,
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -138,6 +142,7 @@ class ProjectListScreen extends StatelessWidget {
                                   value: progress / 100,
                                   backgroundColor: Colors.grey[300],
                                   color: Colors.green,
+                                  minHeight: 8, // Make the progress bar slightly taller
                                 ),
                                 SizedBox(height: 5),
                                 Text(
@@ -157,15 +162,17 @@ class ProjectListScreen extends StatelessWidget {
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 4),
                                         child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              margin: EdgeInsets.only(top: 4),
-                                              width: 8,
-                                              height: 8,
-                                              decoration: BoxDecoration(
-                                                color: Colors.red,
-                                                shape: BoxShape.circle,
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 4.0),
+                                              child: Container(
+                                                margin: EdgeInsets.only(top: 4),
+                                                width: 15,
+                                                height: 15,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
                                               ),
                                             ),
                                             SizedBox(width: 8),
@@ -225,9 +232,12 @@ class ProjectListScreen extends StatelessWidget {
             Get.to(() => AddProjectScreen());
           },
           backgroundColor: Colors.transparent,
-          elevation: 0,           // Resting elevation
-          highlightElevation: 0,   // Pressed elevation
-          splashColor: Colors.transparent, // Removes ripple effect
+          elevation: 0,
+          // Resting elevation
+          highlightElevation: 0,
+          // Pressed elevation
+          splashColor: Colors.transparent,
+          // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: Image.asset('assets/icons/ic_add_project.png'),

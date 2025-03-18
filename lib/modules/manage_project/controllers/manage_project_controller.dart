@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,7 @@ import '../models/task.dart';
 class ManageProjectController extends GetxController {
   var selectedFilter = "All".obs;
   Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
-  RxString selectedDate = DateFormat('EEE, MMM d').format(DateTime.now()).obs;
+  RxString selectedDate = 'Select Date'.obs;
 
   var selectedPriority = "Low".obs;
   var taskStatus = "Pending".obs;
@@ -32,26 +33,36 @@ class ManageProjectController extends GetxController {
   Future<void> pickDate(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showRoundedDatePicker(
       context: context,
       initialDate: selected,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Optional: Customize the date picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-
-          child: child!,
-        );
-      },
+      theme: ThemeData(
+        primaryColor: AppColors.primary,
+      ),
+      // Add height constraint
+      height: MediaQuery.of(context).size.height * 0.4,
+      // 70% of screen height
+      // Customize appearance
+      styleDatePicker: MaterialRoundedDatePickerStyle(
+        // Apply your theme colors
+        textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
+        backgroundPicker: Colors.white,
+        decorationDateSelected:
+        BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        textStyleDayOnCalendarSelected: TextStyle(
+            fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
+        textStyleButtonPositive:
+        TextStyle(fontSize: 14, color: AppColors.primary),
+        textStyleButtonNegative: TextStyle(
+          fontSize: 14,
+          color: AppColors.primary,
+        ),
+        // // Add padding if needed
+      ),
     );
 
     if (picked != null) {
@@ -107,7 +118,7 @@ class ManageProjectController extends GetxController {
 
   void resetFields() {
     selectedDateTime.value = null;
-    selectedDate.value = DateFormat('EEE, MMM d').format(DateTime.now());
+    selectedDate.value = 'Select Date';
     selectedPriority.value = "Low";
     taskStatus.value = "Pending";
   }

@@ -45,7 +45,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   // Helper method to dismiss keyboard and prevent blink
   void _dismissKeyboard(BuildContext context) {
     if (taskFocusNode.hasFocus) {
-      FocusScope.of(context).requestFocus(FocusNode()); // Shift focus to a dummy node
+      FocusScope.of(context)
+          .requestFocus(FocusNode()); // Shift focus to a dummy node
       Future.delayed(Duration(milliseconds: 50), () {
         FocusScope.of(context).unfocus(); // Ensure keyboard stays dismissed
       });
@@ -56,10 +57,38 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 10),
+        child: SizedBox(
+          height: 50,
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              controller.saveReminder();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.symmetric(vertical: 14),
+            ),
+            child: Center(
+              child: Text(
+                "Set Reminder",
+                style:
+                    AppTextStyle.mediumBlack16.copyWith(color: AppColors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
       appBar: AppBar(
         title: Text(
           'Adding new reminder',
-          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          style:
+              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -70,15 +99,18 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
         ),
       ),
       body: GestureDetector(
-        onTap: () => _dismissKeyboard(context), // Dismiss keyboard on tap outside
+        onTap: () => _dismissKeyboard(context),
+        // Dismiss keyboard on tap outside
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
-                controller: taskController, // Use controller
-                focusNode: taskFocusNode, // Attach FocusNode
+                controller: taskController,
+                // Use controller
+                focusNode: taskFocusNode,
+                // Attach FocusNode
                 decoration: InputDecoration(
                   hintText: "Give a name to reminder",
                   hintStyle: AppTextStyle.regularBlack16
@@ -127,31 +159,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: colors.map((color) => _buildColorButton(color)).toList(),
-              ),
-              Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    controller.saveReminder();
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Set Reminder",
-                      style: AppTextStyle.mediumBlack16
-                          .copyWith(color: AppColors.white),
-                    ),
-                  ),
-                ),
+                children:
+                    colors.map((color) => _buildColorButton(color)).toList(),
               ),
             ],
           ),
@@ -162,26 +171,26 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
 
   Widget _buildSwitchTile(String title, RxBool value, VoidCallback onChanged) {
     return Obx(() => Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: AppTextStyle.regularBlack16,
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color: AppColors.cardColor,
+            borderRadius: BorderRadius.circular(10),
           ),
-          CupertinoSwitch(
-            value: value.value,
-            onChanged: (_) => onChanged(),
-            activeColor: Colors.green,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: AppTextStyle.regularBlack16,
+              ),
+              CupertinoSwitch(
+                value: value.value,
+                onChanged: (_) => onChanged(),
+                activeColor: Colors.green,
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
   Widget _buildColorButton(Color color) {
@@ -190,7 +199,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
           controller.selectedColor.value == '#${color.value.toRadixString(16)}';
       return GestureDetector(
         onTap: () => controller.selectedColor.value =
-        '#${color.value.toRadixString(16)}',
+            '#${color.value.toRadixString(16)}',
         child: Container(
           width: 40,
           height: 40,
@@ -200,20 +209,20 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
           ),
           child: isSelected
               ? Center(
-            child: Container(
-              width: 16,
-              height: 16,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check,
-                color: color,
-                size: 12,
-              ),
-            ),
-          )
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check,
+                      color: color,
+                      size: 12,
+                    ),
+                  ),
+                )
               : null,
         ),
       );
@@ -235,81 +244,84 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
           children: [
             Text(
               'Set Interval',
-              style: AppTextStyle.mediumBlack16.copyWith(fontWeight: FontWeight.w600),
+              style: AppTextStyle.mediumBlack16
+                  .copyWith(fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Obx(() => SizedBox(
-                  width: 80,
-                  height: 120,
-                  child: CupertinoPicker(
-                    scrollController: FixedExtentScrollController(
-                      initialItem: controller.selectedMinutes.value - 1,
-                    ),
-                    itemExtent: 40,
-                    onSelectedItemChanged: (index) {
-                      controller.selectedMinutes.value = index + 1;
-                    },
-                    children: List.generate(
-                      60,
+                      width: 80,
+                      height: 120,
+                      child: CupertinoPicker(
+                        scrollController: FixedExtentScrollController(
+                          initialItem: controller.selectedMinutes.value - 1,
+                        ),
+                        itemExtent: 40,
+                        onSelectedItemChanged: (index) {
+                          controller.selectedMinutes.value = index + 1;
+                        },
+                        children: List.generate(
+                          60,
                           (index) => Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: AppTextStyle.mediumBlack16.copyWith(
-                            color: index + 1 == controller.selectedMinutes.value
-                                ? AppColors.lightRed
-                                : Colors.black,
+                            child: Text(
+                              '${index + 1}',
+                              style: AppTextStyle.mediumBlack16.copyWith(
+                                color: index + 1 ==
+                                        controller.selectedMinutes.value
+                                    ? AppColors.lightRed
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                )),
+                    )),
                 SizedBox(width: 10),
                 Obx(() => SizedBox(
-                  width: 100,
-                  height: 120,
-                  child: CupertinoPicker(
-                    scrollController: FixedExtentScrollController(
-                      initialItem: controller.isMinutesSelected.value ? 0 : 1,
-                    ),
-                    itemExtent: 40,
-                    onSelectedItemChanged: (index) {
-                      bool isMinutes = index == 0;
-                      controller.isMinutesSelected.value = isMinutes;
-                      if (isMinutes) {
-                        controller.selectedMinutes.value *= 60;
-                      } else {
-                        controller.selectedMinutes.value =
-                            (controller.selectedMinutes.value / 60).ceil();
-                      }
-                    },
-                    children: [
-                      Center(
-                        child: Text(
-                          'Minutes',
-                          style: AppTextStyle.mediumBlack16.copyWith(
-                            color: controller.isMinutesSelected.value
-                                ? AppColors.lightRed
-                                : Colors.black,
-                          ),
+                      width: 100,
+                      height: 120,
+                      child: CupertinoPicker(
+                        scrollController: FixedExtentScrollController(
+                          initialItem:
+                              controller.isMinutesSelected.value ? 0 : 1,
                         ),
-                      ),
-                      Center(
-                        child: Text(
-                          'Hours',
-                          style: AppTextStyle.mediumBlack16.copyWith(
-                            color: !controller.isMinutesSelected.value
-                                ? AppColors.lightRed
-                                : Colors.black,
+                        itemExtent: 40,
+                        onSelectedItemChanged: (index) {
+                          bool isMinutes = index == 0;
+                          controller.isMinutesSelected.value = isMinutes;
+                          if (isMinutes) {
+                            controller.selectedMinutes.value *= 60;
+                          } else {
+                            controller.selectedMinutes.value =
+                                (controller.selectedMinutes.value / 60).ceil();
+                          }
+                        },
+                        children: [
+                          Center(
+                            child: Text(
+                              'Minutes',
+                              style: AppTextStyle.mediumBlack16.copyWith(
+                                color: controller.isMinutesSelected.value
+                                    ? AppColors.lightRed
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                        ),
+                          Center(
+                            child: Text(
+                              'Hours',
+                              style: AppTextStyle.mediumBlack16.copyWith(
+                                color: !controller.isMinutesSelected.value
+                                    ? AppColors.lightRed
+                                    : Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
+                    )),
               ],
             ),
             SizedBox(height: 20),
@@ -324,10 +336,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                 children: [
                   Text('Repeating', style: AppTextStyle.regularBlack16),
                   Obx(() => CupertinoSwitch(
-                    value: controller.isRepeating.value,
-                    onChanged: (val) => controller.isRepeating.value = val,
-                    activeColor: Colors.green,
-                  )),
+                        value: controller.isRepeating.value,
+                        onChanged: (val) => controller.isRepeating.value = val,
+                        activeColor: Colors.green,
+                      )),
                 ],
               ),
             ),
@@ -339,7 +351,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                   Get.back();
                 },
                 child: Text('Save',
-                    style: AppTextStyle.mediumBlack16.copyWith(color: AppColors.white)),
+                    style: AppTextStyle.mediumBlack16
+                        .copyWith(color: AppColors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF1E293B),
                   padding: EdgeInsets.symmetric(vertical: 15),
@@ -391,10 +404,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Obx(() => Text(
-                      controller.selectedDate.value,
-                      style: AppTextStyle.mediumBlack16
-                          .copyWith(color: AppColors.lightRed),
-                    )),
+                          controller.selectedDate.value,
+                          style: AppTextStyle.mediumBlack16
+                              .copyWith(color: AppColors.lightRed),
+                        )),
                   ),
                 ),
                 SizedBox(width: 10),
@@ -412,10 +425,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Obx(() => Text(
-                      controller.selectedTime.value,
-                      style: AppTextStyle.mediumBlack16
-                          .copyWith(color: AppColors.lightRed),
-                    )),
+                          controller.selectedTime.value,
+                          style: AppTextStyle.mediumBlack16
+                              .copyWith(color: AppColors.lightRed),
+                        )),
                   ),
                 ),
               ],
@@ -434,10 +447,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                     style: AppTextStyle.regularBlack16,
                   ),
                   Obx(() => CupertinoSwitch(
-                    value: controller.isRepeating.value,
-                    onChanged: (val) => controller.isRepeating.value = val,
-                    activeColor: Colors.green,
-                  )),
+                        value: controller.isRepeating.value,
+                        onChanged: (val) => controller.isRepeating.value = val,
+                        activeColor: Colors.green,
+                      )),
                 ],
               ),
             ),
@@ -492,28 +505,28 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               children: List.generate(7, (index) {
                 final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
                 return Obx(() => GestureDetector(
-                  onTap: () => controller.toggleWeekday(index),
-                  child: Container(
-                    width: 44,
-                    height: 49,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: controller.selectedWeekdays[index]
-                          ? AppColors.lightRed
-                          : Color.fromRGBO(255, 104, 103, 0.11),
-                    ),
-                    child: Center(
-                      child: Text(
-                        days[index],
-                        style: AppTextStyle.mediumBlack16.copyWith(
+                      onTap: () => controller.toggleWeekday(index),
+                      child: Container(
+                        width: Get.width * 0.098,
+                        height: Get.height * 0.05,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
                           color: controller.selectedWeekdays[index]
-                              ? Colors.white
-                              : AppColors.lightRed,
+                              ? AppColors.lightRed
+                              : Color.fromRGBO(255, 104, 103, 0.11),
+                        ),
+                        child: Center(
+                          child: Text(
+                            days[index],
+                            style: AppTextStyle.mediumBlack16.copyWith(
+                              color: controller.selectedWeekdays[index]
+                                  ? Colors.white
+                                  : AppColors.lightRed,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ));
+                    ));
               }),
             ),
             SizedBox(height: 20),
@@ -539,10 +552,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Obx(() => Text(
-                      controller.selectedTime.value,
-                      style: AppTextStyle.mediumBlack16
-                          .copyWith(color: AppColors.lightRed),
-                    )),
+                          controller.selectedTime.value,
+                          style: AppTextStyle.mediumBlack16
+                              .copyWith(color: AppColors.lightRed),
+                        )),
                   ),
                 ),
               ],
@@ -561,10 +574,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                     style: AppTextStyle.regularBlack16,
                   ),
                   Obx(() => CupertinoSwitch(
-                    value: controller.isRepeating.value,
-                    onChanged: (val) => controller.isRepeating.value = val,
-                    activeColor: Colors.green,
-                  )),
+                        value: controller.isRepeating.value,
+                        onChanged: (val) => controller.isRepeating.value = val,
+                        activeColor: Colors.green,
+                      )),
                 ],
               ),
             ),

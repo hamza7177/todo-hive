@@ -226,8 +226,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                   },
                   child: Container(
                     height: 51,
-                    width: 175,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    width: Get.width * 0.43,
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       color: Color(0xffF9F9F9),
                       borderRadius: BorderRadius.circular(15),
@@ -259,8 +259,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                   },
                   child: Container(
                     height: 51,
-                    width: 175,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    width: Get.width * 0.43,
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       color: Color(0xffF9F9F9),
                       borderRadius: BorderRadius.circular(15),

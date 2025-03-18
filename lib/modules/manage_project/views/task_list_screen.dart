@@ -121,8 +121,11 @@ class TaskListScreen extends StatelessWidget {
             itemBuilder: (context, taskIndex) {
               final task = project.tasks[taskIndex];
               final isCompleted = task.status == 'Complete';
-              return Card(
-                color: AppColors.cardColor,
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 margin: EdgeInsets.symmetric(vertical: 8),
                 child: Padding(
                   padding: EdgeInsets.only(left: 12,bottom: 12,top: 12),

@@ -151,37 +151,42 @@ class CategoriesScreen extends StatelessWidget {
             itemCount: noteC.categories.length,
             itemBuilder: (context, index) {
               final category = noteC.categories[index];
-              return Card(
-                color: AppColors.cardColor,
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  title: Text(category.name, style: AppTextStyle.mediumBlack16),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: () => showCategoryBottomSheet(context,
-                            categoryToUpdate: category),
-                        child: Icon(
-                          Icons.edit,
-                          color: Color(0xffAFAFAF),
-                          size: 20,
+              return Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => showCategoryBottomSheet(context,
+                              categoryToUpdate: category),
+                          child: Icon(
+                            Icons.edit,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      GestureDetector(
-                        onTap: () => confirmDeleteCategory(context, category),
-                        child: Icon(
-                          Icons.delete,
-                          color: Color(0xffAFAFAF),
-                          size: 20,
+                        Center(
+                            child: Text(category.name,
+                                style: AppTextStyle.mediumBlack16)),
+                        GestureDetector(
+                          onTap: () => confirmDeleteCategory(context, category),
+                          child: Icon(
+                            Icons.delete,
+                            color: AppColors.lightRed,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                    ],
+
+                      ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: 10),
+                ],
               );
             },
           )),

@@ -73,11 +73,10 @@ class GroceryListDetailScreen extends StatelessWidget {
                         if (quantity > 0) {
                           final item = groceryC.groceryItems
                               .firstWhereOrNull((i) => i.name == itemName);
-
                           return Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: EdgeInsets.zero,
                             height: Get.height* 0.07,
-                            child: Row(
+                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Checkbox(
                                   value: item?.isCompleted,
@@ -100,7 +99,7 @@ class GroceryListDetailScreen extends StatelessWidget {
                                       width:
                                           1.5), // Border color for unchecked state
                                 ),
-                                SizedBox(width: 5),
+
                                 Text(
                                   itemName,
                                   style: AppTextStyle.regularBlack14,
@@ -114,13 +113,12 @@ class GroceryListDetailScreen extends StatelessWidget {
                                 GestureDetector(
                                   onTap: () =>
                                       groceryC.updateQuantity(itemName, 0),
-                                  child: Icon(Icons.delete, size: 20),
+                                  child: Icon(Icons.delete, size: 20,color: AppColors.primary,),
                                 ),
                               ],
                             ),
                           );
                         }
-
                         return SizedBox.shrink();
                       },
                     ),

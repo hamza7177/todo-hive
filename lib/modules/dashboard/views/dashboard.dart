@@ -10,6 +10,7 @@ import '../../manage_project/views/project_list_screen.dart';
 import '../../notes/views/notes_list_screen.dart';
 import '../../reminders/views/reminder_list_screen.dart';
 import '../../schedule_planner/views/schedule_list_screen.dart';
+import '../../settings/views/settings_screen.dart';
 import '../../todo_list/views/todo_list_screen.dart';
 import '../../voice_notes/views/voice_note_list_screen.dart';
 
@@ -44,11 +45,16 @@ class Dashboard extends StatelessWidget {
                     .copyWith(fontSize: 21, fontWeight: FontWeight.w700),
               ),
               Spacer(),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Image.asset(
-                  'assets/images/ic_setting.webp',
-                  height: 25,
+              GestureDetector(
+                onTap: (){
+                  Get.to(()=>SettingsScreen());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Image.asset(
+                    'assets/images/ic_setting.webp',
+                    height: 25,
+                  ),
                 ),
               ),
             ]),

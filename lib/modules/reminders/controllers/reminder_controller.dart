@@ -1,22 +1,25 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_hive/utils/app_text_style.dart'; // Assuming this exists
-import 'package:workmanager/workmanager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:workmanager/workmanager.dart';
+
 import '../../../utils/app_colors.dart';
 import '../models/reminder_model.dart';
 
 class ReminderController extends GetxController {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   late Box<ReminderModel> reminderBox;
   late Box<ReminderModel> completedBox;
-  final triggeredNotifications = <String, bool>{}.obs; // Tracks if notification was triggered
+  final triggeredNotifications =
+      <String, bool>{}.obs; // Tracks if notification was triggered
   var reminders = <ReminderModel>[].obs;
 
   void loadReminders() {
@@ -82,7 +85,8 @@ class ReminderController extends GetxController {
   }
 
   void deleteReminder(String id) {
-    final reminder = reminderBox.values.firstWhere((element) => element.id == id);
+    final reminder =
+        reminderBox.values.firstWhere((element) => element.id == id);
     reminder.delete();
     loadReminders();
     countdowns.remove(id);
@@ -94,26 +98,36 @@ class ReminderController extends GetxController {
   Future<void> pickDate(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showRoundedDatePicker(
       context: context,
       initialDate: selected,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Optional: Customize the date picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-
-          child: child!,
-        );
-      },
+      theme: ThemeData(
+        primaryColor: AppColors.primary,
+      ),
+      // Add height constraint
+      height: MediaQuery.of(context).size.height * 0.4,
+      // 70% of screen height
+      // Customize appearance
+      styleDatePicker: MaterialRoundedDatePickerStyle(
+        // Apply your theme colors
+        textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
+        backgroundPicker: Colors.white,
+        decorationDateSelected:
+            BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        textStyleDayOnCalendarSelected: TextStyle(
+            fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
+        textStyleButtonPositive:
+            TextStyle(fontSize: 14, color: AppColors.primary),
+        textStyleButtonNegative: TextStyle(
+          fontSize: 14,
+          color: AppColors.primary,
+        ),
+        // // Add padding if needed
+      ),
     );
 
     if (picked != null && picked != selected) {
@@ -125,24 +139,26 @@ class ReminderController extends GetxController {
   Future<void> pickTime(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await showRoundedTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selected),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Customize the time picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
+      theme: ThemeData(
+        useMaterial3: false,
+        primaryColor: AppColors.white, // Set primary color
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary, // Apply primary color to buttons
           ),
-          child: child!,
-        );
-      },
+        ),
+        timePickerTheme: TimePickerThemeData(
+          dialHandColor: AppColors.primary,
+          hourMinuteTextColor: AppColors.primary, // Color for selected time text
+          dialTextColor: Colors.black, // Color for dial numbers
+          entryModeIconColor: AppColors.primary, // Entry mode icon color
+        ),
+      ),
     );
+
 
     if (picked != null) {
       final newTime = DateTime(
@@ -181,7 +197,12 @@ class ReminderController extends GetxController {
       dateTime = selectedDateTime.value;
     } else if (isWeekday.value) {
       reminderType = 'weekday';
-      weekdays = selectedWeekdays.asMap().entries.where((entry) => entry.value).map((entry) => entry.key).toList();
+      weekdays = selectedWeekdays
+          .asMap()
+          .entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList();
       dateTime = selectedDateTime.value;
     } else {
       Get.snackbar('Error', 'Please select a reminder type');
@@ -255,11 +276,13 @@ class ReminderController extends GetxController {
     DateTime? triggerTime = nextTriggerTimes[reminder.id];
 
     if (triggerTime == null || triggerTime.isBefore(now)) {
-      print("Notification for ${reminder.name} not scheduled: triggerTime is $triggerTime, now is $now");
+      print(
+          "Notification for ${reminder.name} not scheduled: triggerTime is $triggerTime, now is $now");
       return;
     }
 
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(triggerTime, tz.local);
+    final tz.TZDateTime scheduledTime =
+        tz.TZDateTime.from(triggerTime, tz.local);
     print("Scheduling notification for ${reminder.name} at $scheduledTime");
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -268,27 +291,33 @@ class ReminderController extends GetxController {
       'Reminder time is up!',
       scheduledTime,
       details,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 
   Future<void> initNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
-    final InitializationSettings initializationSettings = InitializationSettings(
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
 
     final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
     if (androidPlugin != null) {
-      final bool? granted = await androidPlugin.requestNotificationsPermission();
+      final bool? granted =
+          await androidPlugin.requestNotificationsPermission();
       if (granted == true) {
         print("Notification permission granted");
       } else {
@@ -296,7 +325,8 @@ class ReminderController extends GetxController {
       }
     }
 
-    bool? initialized = await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    bool? initialized = await flutterLocalNotificationsPlugin
+        .initialize(initializationSettings);
     if (initialized == true) {
       print("Notifications initialized successfully");
     } else {
@@ -357,8 +387,10 @@ class ReminderController extends GetxController {
   void updateNextTriggerTime(ReminderModel reminder) {
     DateTime now = DateTime.now();
     if (reminder.reminderType == 'interval') {
-      int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
-      DateTime initialTriggerTime = reminder.createdAt!.add(Duration(minutes: totalMinutes));
+      int totalMinutes =
+          (reminder.intervalHours * 60) + reminder.intervalMinutes;
+      DateTime initialTriggerTime =
+          reminder.createdAt!.add(Duration(minutes: totalMinutes));
 
       if (!nextTriggerTimes.containsKey(reminder.id)) {
         // Set initial trigger time when reminder is first added
@@ -367,7 +399,8 @@ class ReminderController extends GetxController {
         // For repeating reminders, update to next interval
         DateTime currentTriggerTime = nextTriggerTimes[reminder.id]!;
         while (currentTriggerTime.isBefore(now)) {
-          currentTriggerTime = currentTriggerTime.add(Duration(minutes: totalMinutes));
+          currentTriggerTime =
+              currentTriggerTime.add(Duration(minutes: totalMinutes));
         }
         nextTriggerTimes[reminder.id] = currentTriggerTime;
       }
@@ -416,7 +449,8 @@ class ReminderController extends GetxController {
 
   void completeReminder(String id) {
     try {
-      final reminder = reminderBox.values.firstWhere((element) => element.id == id);
+      final reminder =
+          reminderBox.values.firstWhere((element) => element.id == id);
       final completedReminder = ReminderModel(
         id: reminder.id,
         name: reminder.name,

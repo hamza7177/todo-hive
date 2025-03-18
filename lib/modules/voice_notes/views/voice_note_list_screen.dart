@@ -35,6 +35,8 @@ class VoiceNoteListScreen extends StatelessWidget {
           // Title field
           TextField(
             controller: titleController,
+            minLines: 1,
+            maxLines: 2,
             decoration: InputDecoration(
               hintText: "Give a Title to your voice note",
               hintStyle: AppTextStyle.regularBlack16.copyWith(color: Color(0xffAFAFAF)),
@@ -353,20 +355,22 @@ class VoiceNoteListScreen extends StatelessWidget {
                                 color: AppColors.cardColor,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    note.createdAt.toString().substring(0, 16),
-                                    style: AppTextStyle.regularBlack12
-                                        .copyWith(color: Color(0xffAEAEAE)),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
+                                      Text(
+                                        note.createdAt.toString().substring(0, 16),
+                                        style: AppTextStyle.regularBlack12
+                                            .copyWith(color: Color(0xffAEAEAE)),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      SizedBox(
+                                        width: Get.width * 0.7,
                                         child: Text(
                                           note.title,
                                           style: AppTextStyle.mediumBlack16
@@ -376,32 +380,76 @@ class VoiceNoteListScreen extends StatelessWidget {
                                           maxLines: 2,
                                         ),
                                       ),
-                                      Spacer(),
-                                      Theme(
-                                        data: Theme.of(context).copyWith(
-                                          popupMenuTheme: PopupMenuThemeData(
-                                            color: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Container(
+                                        height: 43,
+                                        width: 93,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xffEAEAEA),
+                                          borderRadius: BorderRadius.circular(66),
+                                        ),
+                                        child: Obx(
+                                          () => IconButton(
+                                            icon: Icon(
+                                              voiceC.isPlaying.value &&
+                                                      voiceC.audioPlayer.audioSource
+                                                          is UriAudioSource &&
+                                                      (voiceC.audioPlayer
+                                                                      .audioSource
+                                                                  as UriAudioSource)
+                                                              .uri
+                                                              .path ==
+                                                          note.audioPath
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
                                             ),
+                                            onPressed: () {
+                                              if (voiceC.isPlaying.value &&
+                                                  voiceC.audioPlayer.audioSource
+                                                      is UriAudioSource &&
+                                                  (voiceC.audioPlayer.audioSource
+                                                              as UriAudioSource)
+                                                          .uri
+                                                          .path ==
+                                                      note.audioPath) {
+                                                voiceC.pauseVoiceNote();
+                                              } else {
+                                                voiceC
+                                                    .playVoiceNote(note.audioPath);
+                                              }
+                                            },
                                           ),
                                         ),
-                                        child: PopupMenuButton<String>(
-                                          padding: EdgeInsets.zero,
-                                          icon: Icon(Icons.more_vert,
-                                              color: Color(0xffAFAFAF)),
-                                          onSelected: (value) async {
-                                            if (value == "Starred") {
-                                              voiceC.toggleStarred(index);
-                                            } else if (value == "Delete") {
-                                              bool? shouldDelete =
-                                                  await showDialog<bool>(
-                                                context: context,
-                                                builder: (context) =>
-                                                    AlertDialog(
+                                      ),
+                                    ],
+                                  ),
+                                  Theme(
+                                    data: Theme.of(context).copyWith(
+                                      popupMenuTheme: PopupMenuThemeData(
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
+                                    child: PopupMenuButton<String>(
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(Icons.more_vert,
+                                          color: Color(0xffAFAFAF)),
+                                      onSelected: (value) async {
+                                        if (value == "Starred") {
+                                          voiceC.toggleStarred(index);
+                                        } else if (value == "Delete") {
+                                          bool? shouldDelete =
+                                          await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) =>
+                                                AlertDialog(
                                                   backgroundColor:
-                                                      AppColors.white,
+                                                  AppColors.white,
                                                   title: Text(
                                                       "Delete voice note",
                                                       style: AppTextStyle
@@ -417,12 +465,12 @@ class VoiceNoteListScreen extends StatelessWidget {
                                                               context),
                                                       style: ElevatedButton.styleFrom(
                                                           backgroundColor:
-                                                              Color(0xffF0F0F0),
+                                                          Color(0xffF0F0F0),
                                                           shape: RoundedRectangleBorder(
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8))),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  8))),
                                                       child: Text('No',
                                                           style: AppTextStyle
                                                               .mediumPrimary14),
@@ -433,84 +481,39 @@ class VoiceNoteListScreen extends StatelessWidget {
                                                               .pop(true),
                                                       style: ElevatedButton.styleFrom(
                                                           backgroundColor:
-                                                              AppColors.primary,
+                                                          AppColors.primary,
                                                           shape: RoundedRectangleBorder(
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8))),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  8))),
                                                       child: Text("Yes",
                                                           style: AppTextStyle
                                                               .mediumBlack14
                                                               .copyWith(
-                                                                  color: AppColors
-                                                                      .white)),
+                                                              color: AppColors
+                                                                  .white)),
                                                     ),
                                                   ],
                                                 ),
-                                              );
-                                              if (shouldDelete == true) {
-                                                voiceC.deleteVoiceNote(index);
-                                              }
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                                value: "Starred",
-                                                child: Text("Starred",
-                                                    style: AppTextStyle
-                                                        .regularBlack16)),
-                                            PopupMenuItem(
-                                                value: "Delete",
-                                                child: Text("Delete",
-                                                    style: AppTextStyle
-                                                        .mediumBlack16)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    height: 43,
-                                    width: 93,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffEAEAEA),
-                                      borderRadius: BorderRadius.circular(66),
-                                    ),
-                                    child: Obx(
-                                      () => IconButton(
-                                        icon: Icon(
-                                          voiceC.isPlaying.value &&
-                                                  voiceC.audioPlayer.audioSource
-                                                      is UriAudioSource &&
-                                                  (voiceC.audioPlayer
-                                                                  .audioSource
-                                                              as UriAudioSource)
-                                                          .uri
-                                                          .path ==
-                                                      note.audioPath
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                        ),
-                                        onPressed: () {
-                                          if (voiceC.isPlaying.value &&
-                                              voiceC.audioPlayer.audioSource
-                                                  is UriAudioSource &&
-                                              (voiceC.audioPlayer.audioSource
-                                                          as UriAudioSource)
-                                                      .uri
-                                                      .path ==
-                                                  note.audioPath) {
-                                            voiceC.pauseVoiceNote();
-                                          } else {
-                                            voiceC
-                                                .playVoiceNote(note.audioPath);
+                                          );
+                                          if (shouldDelete == true) {
+                                            voiceC.deleteVoiceNote(index);
                                           }
-                                        },
-                                      ),
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                            value: "Starred",
+                                            child: Text("Starred",
+                                                style: AppTextStyle
+                                                    .regularBlack16)),
+                                        PopupMenuItem(
+                                            value: "Delete",
+                                            child: Text("Delete",
+                                                style: AppTextStyle
+                                                    .mediumBlack16)),
+                                      ],
                                     ),
                                   ),
                                 ],

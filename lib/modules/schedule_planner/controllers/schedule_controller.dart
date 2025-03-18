@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -17,8 +17,8 @@ class ScheduleController extends GetxController {
   RxBool isReminder = false.obs;
   var selectedCategory = "".obs;
   Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
-  RxString selectedDate = DateFormat('EEE, MMM d').format(DateTime.now()).obs;
-  RxString selectedTime = DateFormat('hh:mm a').format(DateTime.now()).obs;
+  RxString selectedDate = 'Select Date'.obs;
+  RxString selectedTime = 'Select Time'.obs;
   var selectedFilter = "All".obs;
   var selectedPriority = "Low".obs;
   RxList<ScheduleModel> schedules = <ScheduleModel>[].obs;
@@ -27,7 +27,7 @@ class ScheduleController extends GetxController {
   late Box<ScheduleModel> completedScheduleBox;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   Timer? _cleanupTimer; // Timer for periodic cleanup
 
@@ -65,8 +65,8 @@ class ScheduleController extends GetxController {
         if (durationSinceCompletion.inHours >= 24) {
           int? scheduleKey = completedScheduleBox.keys.cast<int?>().firstWhere(
                 (key) => completedScheduleBox.get(key) == schedule,
-            orElse: () => null,
-          );
+                orElse: () => null,
+              );
           if (scheduleKey != null) {
             schedulesToDelete.add(scheduleKey);
           }
@@ -88,9 +88,9 @@ class ScheduleController extends GetxController {
     print('Current time zone: $timeZoneName');
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initializationSettings =
-    InitializationSettings(android: initializationSettingsAndroid);
+        InitializationSettings(android: initializationSettingsAndroid);
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -101,11 +101,13 @@ class ScheduleController extends GetxController {
 
     // Request permissions for Android
     if (GetPlatform.isAndroid) {
-      final androidPlugin = flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
-      bool? grantedNotifications = await androidPlugin?.requestNotificationsPermission();
-      bool? grantedExactAlarms = await androidPlugin?.requestExactAlarmsPermission();
+      final androidPlugin =
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      bool? grantedNotifications =
+          await androidPlugin?.requestNotificationsPermission();
+      bool? grantedExactAlarms =
+          await androidPlugin?.requestExactAlarmsPermission();
 
       print('Notification permission granted: $grantedNotifications');
       print('Exact alarm permission granted: $grantedExactAlarms');
@@ -140,17 +142,21 @@ class ScheduleController extends GetxController {
         isReminder: schedule.isReminder,
         dateTime: schedule.dateTime,
         category: schedule.category,
-        createdAt: DateTime.now(), // Use current time as completion time
-        id: _generateValidId(), // Generate a new valid ID
+        createdAt: DateTime.now(),
+        // Use current time as completion time
+        id: _generateValidId(),
+        // Generate a new valid ID
         isCompleted: true,
       );
 
-      completedScheduleBox.add(completedSchedule); // Add new instance to completed box
+      completedScheduleBox
+          .add(completedSchedule); // Add new instance to completed box
       scheduleBox.deleteAt(index); // Remove from incomplete box
 
       if (schedule.isReminder) {
         flutterLocalNotificationsPlugin.cancel(schedule.id);
-        print('Notification cancelled for completed schedule ID: ${schedule.id}');
+        print(
+            'Notification cancelled for completed schedule ID: ${schedule.id}');
       }
       loadSchedules();
       loadCompletedSchedules();
@@ -162,7 +168,8 @@ class ScheduleController extends GetxController {
       final schedule = completedScheduleBox.getAt(index);
       if (schedule != null && schedule.isReminder) {
         flutterLocalNotificationsPlugin.cancel(schedule.id);
-        print('Notification cancelled for deleted completed schedule ID: ${schedule.id}');
+        print(
+            'Notification cancelled for deleted completed schedule ID: ${schedule.id}');
       }
       completedScheduleBox.deleteAt(index);
       loadCompletedSchedules();
@@ -196,7 +203,8 @@ class ScheduleController extends GetxController {
       dateTime: selectedDateTime.value ?? DateTime.now(),
       category: selectedCategory.value,
       createdAt: DateTime.now(),
-      id: _generateValidId(), // Use a valid 32-bit ID
+      id: _generateValidId(),
+      // Use a valid 32-bit ID
       isCompleted: false,
     );
 
@@ -216,9 +224,11 @@ class ScheduleController extends GetxController {
     }
 
     final tzDateTime = tz.TZDateTime.from(schedule.dateTime, tz.local);
-    print('Scheduling notification for: $tzDateTime (Local time: ${schedule.dateTime})');
+    print(
+        'Scheduling notification for: $tzDateTime (Local time: ${schedule.dateTime})');
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    await flutterLocalNotificationsPlugin
+        .zonedSchedule(
       schedule.id,
       schedule.title,
       schedule.description,
@@ -235,9 +245,11 @@ class ScheduleController extends GetxController {
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
-    ).then((_) {
-      print('Notification scheduled successfully for ID: ${schedule.id} at $tzDateTime');
+          UILocalNotificationDateInterpretation.absoluteTime,
+    )
+        .then((_) {
+      print(
+          'Notification scheduled successfully for ID: ${schedule.id} at $tzDateTime');
     }).catchError((error) {
       print('Error scheduling notification: $error');
     });
@@ -258,28 +270,37 @@ class ScheduleController extends GetxController {
   Future<void> pickDate(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showRoundedDatePicker(
       context: context,
       initialDate: selected,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Optional: Customize the date picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-
-          child: child!,
-        );
-      },
+      theme: ThemeData(
+        primaryColor: AppColors.primary,
+      ),
+      // Add height constraint
+      height: MediaQuery.of(context).size.height * 0.4,
+      // 70% of screen height
+      // Customize appearance
+      styleDatePicker: MaterialRoundedDatePickerStyle(
+        // Apply your theme colors
+        textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
+        textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
+        backgroundPicker: Colors.white,
+        decorationDateSelected:
+            BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        textStyleDayOnCalendarSelected: TextStyle(
+            fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
+        textStyleButtonPositive:
+            TextStyle(fontSize: 14, color: AppColors.primary),
+        textStyleButtonNegative: TextStyle(
+          fontSize: 14,
+          color: AppColors.primary,
+        ),
+        // // Add padding if needed
+      ),
     );
-
     if (picked != null && picked != selected) {
       selectedDateTime.value = picked;
       selectedDate.value = DateFormat('EEE, MMM d').format(picked);
@@ -289,23 +310,13 @@ class ScheduleController extends GetxController {
   Future<void> pickTime(BuildContext context) async {
     DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await showRoundedTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selected),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            // Customize the time picker theme
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary, // header background color
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black, // body text color
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-          child: child!,
-        );
-      },
+      theme: ThemeData(
+        primaryColor: AppColors.white,
+        useMaterial3: false,
+      ),
     );
 
     if (picked != null) {
@@ -325,6 +336,8 @@ class ScheduleController extends GetxController {
     selectedColor.value = '#2ECC71';
     isReminder.value = false;
     selectedCategory.value = "";
+    selectedDate.value = "Select Date";
+    selectedTime.value = "Select Time";
     selectedDateTime.value = null;
     selectedDate.value = DateFormat('EEE, MMM d').format(DateTime.now());
     selectedTime.value = DateFormat('hh:mm a').format(DateTime.now());

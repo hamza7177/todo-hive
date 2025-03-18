@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../utils/app_colors.dart';
@@ -16,7 +17,7 @@ class NewTransactionScreen extends StatefulWidget {
 }
 
 class _NewTransactionScreenState extends State<NewTransactionScreen> {
-  String selectedTab = 'Income';
+  String selectedTab = 'Expense';
   double amount = 0.0;
   String? selectedCategory;
   String? selectedPaymentMethod;
@@ -322,24 +323,36 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                   ),
                   onTap: () async {
                     _dismissKeyboard(context); // Dismiss keyboard before picker
-                    final DateTime? picked = await showDatePicker(
+                    final DateTime? picked = await showRoundedDatePicker(
                       context: context,
                       initialDate: selectedDate,
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
-                      builder: (context, child) {
-                        return Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: ColorScheme.light(
-                              primary: AppColors.primary,
-                              onPrimary: Colors.white,
-                              onSurface: Colors.black,
-                            ),
-                            dialogBackgroundColor: Colors.white,
-                          ),
-                          child: child!,
-                        );
-                      },
+                      theme: ThemeData(
+                        primaryColor: AppColors.primary,
+                      ),
+                      // Add height constraint
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      // 70% of screen height
+                      // Customize appearance
+                      styleDatePicker: MaterialRoundedDatePickerStyle(
+                        // Apply your theme colors
+                        textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
+                        textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
+                        textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
+                        backgroundPicker: Colors.white,
+                        decorationDateSelected:
+                        BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                        textStyleDayOnCalendarSelected: TextStyle(
+                            fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
+                        textStyleButtonPositive:
+                        TextStyle(fontSize: 14, color: AppColors.primary),
+                        textStyleButtonNegative: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                        ),
+                        // // Add padding if needed
+                      ),
                     );
                     if (picked != null && picked != selectedDate) {
                       setState(() {

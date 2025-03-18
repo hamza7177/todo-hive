@@ -34,7 +34,7 @@ void main() async {
   tz.initializeTimeZones();
   final prefs = await SharedPreferences.getInstance();
   final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
-  await _requestNotificationPermission();
+  // await _requestNotificationPermission();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -74,92 +74,92 @@ void main() async {
   await Hive.openBox<GroceryList>('groceryLists');
   await Hive.openBox<GroceryItem>('groceryItems');
   await Hive.openBox<Project>('projects');
-   Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+   // Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
   runApp(MyApp(
     isFirstTime: isFirstTime,
   ));
 }
 
+//
+// @pragma('vm:entry-point')
+// void callbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) async {
+//     try {
+//       // Initialize Hive in the background isolate
+//       final dir = await getApplicationDocumentsDirectory();
+//       Hive.init(dir.path);
+//       Hive.registerAdapter(ReminderModelAdapter());
+//       final reminderBox = await Hive.openBox<ReminderModel>('reminders');
+//       final completedBox = await Hive.openBox<ReminderModel>('completed_reminders');
+//
+//       // Background task logic
+//       final reminders = reminderBox.values.toList();
+//       final now = DateTime.now();
+//       for (var reminder in reminders) {
+//         DateTime? nextTime = calculateNextTriggerTime(reminder, now);
+//         if (nextTime != null && nextTime.isBefore(now)) {
+//           print("Background: Reminder ${reminder.name} time is up");
+//           // Note: Notifications can't be triggered here directly without additional setup
+//           if (reminder.isRepeating) {
+//             // Update next trigger time for repeating reminders
+//             DateTime newNextTime = calculateNextTriggerTime(reminder, now.add(const Duration(minutes: 1)))!;
+//             reminderBox.put(reminder.key, reminder); // Update in Hive if needed
+//           }
+//         }
+//       }
+//       await reminderBox.close();
+//       await completedBox.close();
+//       return Future.value(true);
+//     } catch (e) {
+//       print("Background task error: $e");
+//       return Future.value(false);
+//     }
+//   });
+// }
 
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      // Initialize Hive in the background isolate
-      final dir = await getApplicationDocumentsDirectory();
-      Hive.init(dir.path);
-      Hive.registerAdapter(ReminderModelAdapter());
-      final reminderBox = await Hive.openBox<ReminderModel>('reminders');
-      final completedBox = await Hive.openBox<ReminderModel>('completed_reminders');
-
-      // Background task logic
-      final reminders = reminderBox.values.toList();
-      final now = DateTime.now();
-      for (var reminder in reminders) {
-        DateTime? nextTime = calculateNextTriggerTime(reminder, now);
-        if (nextTime != null && nextTime.isBefore(now)) {
-          print("Background: Reminder ${reminder.name} time is up");
-          // Note: Notifications can't be triggered here directly without additional setup
-          if (reminder.isRepeating) {
-            // Update next trigger time for repeating reminders
-            DateTime newNextTime = calculateNextTriggerTime(reminder, now.add(const Duration(minutes: 1)))!;
-            reminderBox.put(reminder.key, reminder); // Update in Hive if needed
-          }
-        }
-      }
-      await reminderBox.close();
-      await completedBox.close();
-      return Future.value(true);
-    } catch (e) {
-      print("Background task error: $e");
-      return Future.value(false);
-    }
-  });
-}
-
-DateTime? calculateNextTriggerTime(ReminderModel reminder, DateTime now) {
-  if (reminder.reminderType == 'interval') {
-    int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
-    DateTime initialTriggerTime = reminder.createdAt!.add(Duration(minutes: totalMinutes));
-    if (!reminder.isRepeating) {
-      return initialTriggerTime;
-    }
-    DateTime nextTime = initialTriggerTime;
-    while (nextTime.isBefore(now)) {
-      nextTime = nextTime.add(Duration(minutes: totalMinutes));
-    }
-    return nextTime;
-  } else if (reminder.reminderType == 'date_time') {
-    if (reminder.dateTime!.isAfter(now)) return reminder.dateTime!;
-    if (reminder.isRepeating) {
-      DateTime nextTime = reminder.dateTime!;
-      while (nextTime.isBefore(now)) {
-        nextTime = nextTime.add(const Duration(days: 1));
-      }
-      return nextTime;
-    }
-    return reminder.dateTime!;
-  } else if (reminder.reminderType == 'weekday') {
-    int targetHour = reminder.dateTime!.hour;
-    int targetMinute = reminder.dateTime!.minute;
-    for (int i = 0; i < 7; i++) {
-      int checkDay = (now.weekday + i - 1) % 7;
-      if (reminder.weekdays.contains(checkDay)) {
-        DateTime candidate = DateTime(now.year, now.month, now.day, targetHour, targetMinute).add(Duration(days: i));
-        if (candidate.isAfter(now)) return candidate;
-      }
-    }
-  }
-  return null;
-}
-Future<void> _requestNotificationPermission() async {
-  PermissionStatus status = await Permission.notification.request();
-  if (status.isDenied || status.isPermanentlyDenied) {
-    // Show a dialog or message prompting the user to enable notifications
-    print("Notification permission denied.");
-  }
-}
+// DateTime? calculateNextTriggerTime(ReminderModel reminder, DateTime now) {
+//   if (reminder.reminderType == 'interval') {
+//     int totalMinutes = (reminder.intervalHours * 60) + reminder.intervalMinutes;
+//     DateTime initialTriggerTime = reminder.createdAt!.add(Duration(minutes: totalMinutes));
+//     if (!reminder.isRepeating) {
+//       return initialTriggerTime;
+//     }
+//     DateTime nextTime = initialTriggerTime;
+//     while (nextTime.isBefore(now)) {
+//       nextTime = nextTime.add(Duration(minutes: totalMinutes));
+//     }
+//     return nextTime;
+//   } else if (reminder.reminderType == 'date_time') {
+//     if (reminder.dateTime!.isAfter(now)) return reminder.dateTime!;
+//     if (reminder.isRepeating) {
+//       DateTime nextTime = reminder.dateTime!;
+//       while (nextTime.isBefore(now)) {
+//         nextTime = nextTime.add(const Duration(days: 1));
+//       }
+//       return nextTime;
+//     }
+//     return reminder.dateTime!;
+//   } else if (reminder.reminderType == 'weekday') {
+//     int targetHour = reminder.dateTime!.hour;
+//     int targetMinute = reminder.dateTime!.minute;
+//     for (int i = 0; i < 7; i++) {
+//       int checkDay = (now.weekday + i - 1) % 7;
+//       if (reminder.weekdays.contains(checkDay)) {
+//         DateTime candidate = DateTime(now.year, now.month, now.day, targetHour, targetMinute).add(Duration(days: i));
+//         if (candidate.isAfter(now)) return candidate;
+//       }
+//     }
+//   }
+//   return null;
+// }
+// Future<void> _requestNotificationPermission() async {
+//   PermissionStatus status = await Permission.notification.request();
+//   if (status.isDenied || status.isPermanentlyDenied) {
+//     // Show a dialog or message prompting the user to enable notifications
+//     print("Notification permission denied.");
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   final bool isFirstTime;

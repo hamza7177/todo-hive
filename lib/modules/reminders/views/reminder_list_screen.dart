@@ -140,12 +140,14 @@ class ReminderListScreen extends StatelessWidget {
               color: AppColors.cardColor,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Countdown Timer
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Countdown Timer
                     Obx(() {
                       Duration? timeRemaining =
                           controller.countdowns[reminder.id];
@@ -175,7 +177,287 @@ class ReminderListScreen extends StatelessWidget {
                         ),
                       );
                     }),
-                    Spacer(),
+                    SizedBox(height: 5),
+                    // Reminder Title
+                    SizedBox(
+                      width: Get.width * 0.7,
+                      child: Text(
+                        reminder.name,
+                        style: AppTextStyle.mediumBlack16.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 21),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    // Reminder Details (Days and Time)
+                    Row(
+                      children: [
+                        reminder.isRepeating == true
+                            ? Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 16),
+                                decoration: BoxDecoration(
+                                    color: Color(int.parse(reminder.color
+                                            .replaceFirst('#', '0xff')))
+                                        .withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(66)),
+                                child: Icon(
+                                  Icons.repeat_rounded,
+                                  color: Color(int.parse(reminder.color
+                                      .replaceFirst('#', '0xff'))),
+                                  size: 12,
+                                ),
+                              )
+                            : SizedBox.shrink(),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Color(int.parse(
+                                    reminder.color.replaceFirst('#', '0xff')))
+                                .withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(66),
+                          ),
+                          child: Text(
+                            '${reminder.intervalHours > 0 ? '${reminder.intervalHours}hours ' : ''}'
+                            '${reminder.intervalMinutes > 0 ? '${reminder.intervalMinutes} minutes' : ''}',
+                            style: AppTextStyle.regularBlack12.copyWith(
+                              color: Color(int.parse(
+                                reminder.color.replaceFirst('#', '0xff'),
+                              )),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                      ],
+                    ),
+                  ],
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    popupMenuTheme: PopupMenuThemeData(
+                      color: Colors.white,
+                      // Set background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12), // Apply border radius
+                      ),
+                    ),
+                  ),
+                  child: PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+                    onSelected: (value) async {
+                      if (value == "Complete") {
+                        controller.completeReminder(reminder.id);
+                      } else if (value == "Delete") {
+                        bool? shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              child: AlertDialog(
+                                backgroundColor: AppColors.white,
+                                title: Text(
+                                  "Delete Reminder",
+                                  style: AppTextStyle.mediumBlack16,
+                                ),
+                                content: Text(
+                                  "Are you sure you want to delete this reminder?",
+                                  style: AppTextStyle.regularBlack14,
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      backgroundColor: Color(0xffF0F0F0),
+                                    ),
+                                    child: Text(
+                                      'No',
+                                      style: AppTextStyle.mediumPrimary14,
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      backgroundColor: AppColors.primary,
+                                    ),
+                                    child: Text(
+                                      "Yes",
+                                      style:
+                                          AppTextStyle.mediumBlack14.copyWith(
+                                        color: AppColors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+
+                        if (shouldDelete == true) {
+                          controller.deleteReminder(reminder.id);
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: "Complete",
+                        child: Text(
+                          "Complete",
+                          style: AppTextStyle.regularBlack16,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: "Delete",
+                        child: Text(
+                          "Delete",
+                          style: AppTextStyle.mediumBlack16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        : reminder.reminderType == "date_time"
+            ? Container(
+                padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.cardColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Countdown Timer
+                        Obx(() {
+                          Duration? timeRemaining =
+                              controller.countdowns[reminder.id];
+                          if (timeRemaining == null) {
+                            return Text(
+                              "Calculating...",
+                              style: AppTextStyle.regularBlack14
+                                  .copyWith(color: Color(0xffCCCCCC)),
+                            );
+                          }
+
+                          String timeString;
+                          if (timeRemaining.inSeconds <= 0) {
+                            timeString = "Time is up!";
+                          } else {
+                            int hours = timeRemaining.inHours;
+                            int minutes = timeRemaining.inMinutes.remainder(60);
+                            int seconds = timeRemaining.inSeconds.remainder(60);
+                            timeString = '${hours}h ${minutes}m ${seconds}s';
+                          }
+                          return Text(
+                            timeString,
+                            style: AppTextStyle.regularBlack14.copyWith(
+                              color: timeRemaining.inSeconds <= 0
+                                  ? Colors.red
+                                  : Color(0xffCCCCCC),
+                            ),
+                          );
+                        }),
+                        SizedBox(height: 5),
+                        // Reminder Title
+                        SizedBox(
+                          width: Get.width * 0.7,
+                          child: Text(
+                            reminder.name,
+                            style: AppTextStyle.mediumBlack16.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 21),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        // Reminder Details (Days and Time)
+                        Row(
+                          children: [
+                            reminder.isRepeating == true
+                                ? Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                        color: Color(int.parse(reminder.color
+                                                .replaceFirst('#', '0xff')))
+                                            .withOpacity(0.2),
+                                        borderRadius:
+                                            BorderRadius.circular(66)),
+                                    child: Icon(
+                                      Icons.repeat_rounded,
+                                      color: Color(int.parse(reminder.color
+                                          .replaceFirst('#', '0xff'))),
+                                      size: 12,
+                                    ),
+                                  )
+                                : SizedBox(),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: Color(int.parse(reminder.color
+                                        .replaceFirst('#', '0xff')))
+                                    .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(66),
+                              ),
+                              child: Text(
+                                DateFormat('EEE, MMM d')
+                                    .format(reminder.dateTime!),
+                                style: AppTextStyle.regularBlack12.copyWith(
+                                  color: Color(int.parse(reminder.color
+                                      .replaceFirst('#', '0xff'))),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 6, horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: Color(int.parse(reminder.color
+                                        .replaceFirst('#', '0xff')))
+                                    .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(66),
+                              ),
+                              child: Text(
+                                DateFormat('h:mm a').format(reminder.dateTime!),
+                                style: AppTextStyle.regularBlack12.copyWith(
+                                  color: Color(int.parse(reminder.color
+                                      .replaceFirst('#', '0xff'))),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                     Theme(
                       data: Theme.of(context).copyWith(
                         popupMenuTheme: PopupMenuThemeData(
@@ -275,107 +557,133 @@ class ReminderListScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 2),
-                // Reminder Title
-                Text(
-                  reminder.name,
-                  style: AppTextStyle.mediumBlack16.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 21),
-                ),
-                SizedBox(height: 8),
-                // Reminder Details (Days and Time)
-                Row(
-                  children: [
-                    reminder.isRepeating == true
-                        ? Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 16),
-                            decoration: BoxDecoration(
-                                color: Color(int.parse(reminder.color
-                                        .replaceFirst('#', '0xff')))
-                                    .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(66)),
-                            child: Icon(
-                              Icons.repeat_rounded,
-                              color: Color(int.parse(
-                                  reminder.color.replaceFirst('#', '0xff'))),
-                              size: 12,
-                            ),
-                          )
-                        : SizedBox(),
-                    SizedBox(
-                      width: 10,
+              )
+            : reminder.reminderType == "weekday"
+                ? Container(
+                    padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardColor,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Color(int.parse(
-                                reminder.color.replaceFirst('#', '0xff')))
-                            .withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(66),
-                      ),
-                      child: Text(
-                        '${reminder.intervalHours > 0 ? '${reminder.intervalHours}hours ' : ''}'
-                        '${reminder.intervalMinutes > 0 ? '${reminder.intervalMinutes} minutes' : ''}',
-                        style: AppTextStyle.regularBlack12.copyWith(
-                          color: Color(int.parse(
-                            reminder.color.replaceFirst('#', '0xff'),
-                          )),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                  ],
-                ),
-              ],
-            ),
-          )
-        : reminder.reminderType == "date_time"
-            ? Container(
-                padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.cardColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Countdown Timer
-                    Row(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Obx(() {
-                          Duration? timeRemaining =
-                              controller.countdowns[reminder.id];
-                          if (timeRemaining == null) {
-                            return Text(
-                              "Calculating...",
-                              style: AppTextStyle.regularBlack14
-                                  .copyWith(color: Color(0xffCCCCCC)),
-                            );
-                          }
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Countdown Timer
+                            Obx(() {
+                              Duration? timeRemaining =
+                                  controller.countdowns[reminder.id];
+                              if (timeRemaining == null) {
+                                return Text(
+                                  "Calculating...",
+                                  style: AppTextStyle.regularBlack14
+                                      .copyWith(color: Color(0xffCCCCCC)),
+                                );
+                              }
 
-                          String timeString;
-                          if (timeRemaining.inSeconds <= 0) {
-                            timeString = "Time is up!";
-                          } else {
-                            int hours = timeRemaining.inHours;
-                            int minutes = timeRemaining.inMinutes.remainder(60);
-                            int seconds = timeRemaining.inSeconds.remainder(60);
-                            timeString = '${hours}h ${minutes}m ${seconds}s';
-                          }
-                          return Text(
-                            timeString,
-                            style: AppTextStyle.regularBlack14.copyWith(
-                              color: timeRemaining.inSeconds <= 0
-                                  ? Colors.red
-                                  : Color(0xffCCCCCC),
+                              String timeString;
+                              if (timeRemaining.inSeconds <= 0) {
+                                timeString = "Time is up!";
+                              } else {
+                                int hours = timeRemaining.inHours;
+                                int minutes =
+                                    timeRemaining.inMinutes.remainder(60);
+                                int seconds =
+                                    timeRemaining.inSeconds.remainder(60);
+                                timeString =
+                                    '${hours}h ${minutes}m ${seconds}s';
+                              }
+                              return Text(
+                                timeString,
+                                style: AppTextStyle.regularBlack14.copyWith(
+                                  color: timeRemaining.inSeconds <= 0
+                                      ? Colors.red
+                                      : Color(0xffCCCCCC),
+                                ),
+                              );
+                            }),
+                            SizedBox(height: 5),
+                            // Reminder Title
+                            SizedBox(
+                              width: Get.width * 0.7,
+                              child: Text(
+                                reminder.name,
+                                style: AppTextStyle.mediumBlack16.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 21),
+                              ),
                             ),
-                          );
-                        }),
-                        Spacer(),
+                            SizedBox(height: 5),
+                            // Reminder Details (Days and Time)
+                            Row(
+                              children: [
+                                reminder.isRepeating == true
+                                    ? Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 6, horizontal: 12),
+                                        decoration: BoxDecoration(
+                                            color: Color(int.parse(reminder
+                                                    .color
+                                                    .replaceFirst('#', '0xff')))
+                                                .withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(66)),
+                                        child: Icon(
+                                          Icons.repeat_rounded,
+                                          color: Color(int.parse(reminder.color
+                                              .replaceFirst('#', '0xff'))),
+                                          size: 12,
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 6, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: Color(int.parse(reminder.color
+                                            .replaceFirst('#', '0xff')))
+                                        .withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(66),
+                                  ),
+                                  child: Text(
+                                    '${reminder.weekdays.map((d) => _getWeekdayName(d)).join(", ")}',
+                                    style: AppTextStyle.regularBlack12.copyWith(
+                                      color: Color(int.parse(reminder.color
+                                          .replaceFirst('#', '0xff'))),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 6, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: Color(int.parse(reminder.color
+                                            .replaceFirst('#', '0xff')))
+                                        .withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(66),
+                                  ),
+                                  child: Text(
+                                    DateFormat('h:mm a')
+                                        .format(reminder.dateTime!),
+                                    style: AppTextStyle.regularBlack12.copyWith(
+                                      color: Color(int.parse(reminder.color
+                                          .replaceFirst('#', '0xff'))),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                         Theme(
                           data: Theme.of(context).copyWith(
                             popupMenuTheme: PopupMenuThemeData(
@@ -476,306 +784,6 @@ class ReminderListScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2),
-                    // Reminder Title
-                    Text(
-                      reminder.name,
-                      style: AppTextStyle.mediumBlack16.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 21),
-                    ),
-                    SizedBox(height: 8),
-                    // Reminder Details (Days and Time)
-                    Row(
-                      children: [
-                        reminder.isRepeating == true
-                            ? Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 16),
-                                decoration: BoxDecoration(
-                                    color: Color(int.parse(reminder.color
-                                            .replaceFirst('#', '0xff')))
-                                        .withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(66)),
-                                child: Icon(
-                                  Icons.repeat_rounded,
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
-                                  size: 12,
-                                ),
-                              )
-                            : SizedBox(),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Color(int.parse(
-                                    reminder.color.replaceFirst('#', '0xff')))
-                                .withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(66),
-                          ),
-                          child: Text(
-                            DateFormat('EEE, MMM d').format(reminder.dateTime!),
-                            style: AppTextStyle.regularBlack12.copyWith(
-                              color: Color(int.parse(
-                                  reminder.color.replaceFirst('#', '0xff'))),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Color(int.parse(
-                                    reminder.color.replaceFirst('#', '0xff')))
-                                .withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(66),
-                          ),
-                          child: Text(
-                            DateFormat('h:mm a').format(reminder.dateTime!),
-                            style: AppTextStyle.regularBlack12.copyWith(
-                              color: Color(int.parse(
-                                  reminder.color.replaceFirst('#', '0xff'))),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            : reminder.reminderType == "weekday"
-                ? Container(
-                    padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Countdown Timer
-                        Row(
-                          children: [
-                            Obx(() {
-                              Duration? timeRemaining =
-                                  controller.countdowns[reminder.id];
-                              if (timeRemaining == null) {
-                                return Text(
-                                  "Calculating...",
-                                  style: AppTextStyle.regularBlack14
-                                      .copyWith(color: Color(0xffCCCCCC)),
-                                );
-                              }
-
-                              String timeString;
-                              if (timeRemaining.inSeconds <= 0) {
-                                timeString = "Time is up!";
-                              } else {
-                                int hours = timeRemaining.inHours;
-                                int minutes =
-                                    timeRemaining.inMinutes.remainder(60);
-                                int seconds =
-                                    timeRemaining.inSeconds.remainder(60);
-                                timeString =
-                                    '${hours}h ${minutes}m ${seconds}s';
-                              }
-                              return Text(
-                                timeString,
-                                style: AppTextStyle.regularBlack14.copyWith(
-                                  color: timeRemaining.inSeconds <= 0
-                                      ? Colors.red
-                                      : Color(0xffCCCCCC),
-                                ),
-                              );
-                            }),
-                            Spacer(),
-                            Theme(
-                              data: Theme.of(context).copyWith(
-                                popupMenuTheme: PopupMenuThemeData(
-                                  color: Colors.white,
-                                  // Set background color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        12), // Apply border radius
-                                  ),
-                                ),
-                              ),
-                              child: PopupMenuButton<String>(
-                                padding: EdgeInsets.zero,
-                                icon: Icon(Icons.more_horiz,
-                                    color: Color(0xffAFAFAF)),
-                                onSelected: (value) async {
-                                  if (value == "Complete") {
-                                    controller.completeReminder(reminder.id);
-                                  } else if (value == "Delete") {
-                                    bool? shouldDelete = await showDialog<bool>(
-                                      context: context,
-                                      builder: (context) {
-                                        return Container(
-                                          child: AlertDialog(
-                                            backgroundColor: AppColors.white,
-                                            title: Text(
-                                              "Delete Reminder",
-                                              style: AppTextStyle.mediumBlack16,
-                                            ),
-                                            content: Text(
-                                              "Are you sure you want to delete this reminder?",
-                                              style:
-                                                  AppTextStyle.regularBlack14,
-                                            ),
-                                            actions: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  backgroundColor:
-                                                      Color(0xffF0F0F0),
-                                                ),
-                                                child: Text(
-                                                  'No',
-                                                  style: AppTextStyle
-                                                      .mediumPrimary14,
-                                                ),
-                                              ),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(true);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  backgroundColor:
-                                                      AppColors.primary,
-                                                ),
-                                                child: Text(
-                                                  "Yes",
-                                                  style: AppTextStyle
-                                                      .mediumBlack14
-                                                      .copyWith(
-                                                    color: AppColors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
-
-                                    if (shouldDelete == true) {
-                                      controller.deleteReminder(reminder.id);
-                                    }
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: "Complete",
-                                    child: Text(
-                                      "Complete",
-                                      style: AppTextStyle.regularBlack16,
-                                    ),
-                                  ),
-                                  PopupMenuItem(
-                                    value: "Delete",
-                                    child: Text(
-                                      "Delete",
-                                      style: AppTextStyle.mediumBlack16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        // Reminder Title
-                        Text(
-                          reminder.name,
-                          style: AppTextStyle.mediumBlack16.copyWith(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 21),
-                        ),
-                        SizedBox(height: 8),
-                        // Reminder Details (Days and Time)
-                        Row(
-                          children: [
-                            reminder.isRepeating == true
-                                ? Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 6, horizontal: 12),
-                                    decoration: BoxDecoration(
-                                        color: Color(int.parse(reminder.color
-                                                .replaceFirst('#', '0xff')))
-                                            .withOpacity(0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(66)),
-                                    child: Icon(
-                                      Icons.repeat_rounded,
-                                      color: Color(int.parse(reminder.color
-                                          .replaceFirst('#', '0xff'))),
-                                      size: 12,
-                                    ),
-                                  )
-                                : SizedBox(),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: Color(int.parse(reminder.color
-                                        .replaceFirst('#', '0xff')))
-                                    .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(66),
-                              ),
-                              child: Text(
-                                '${reminder.weekdays.map((d) => _getWeekdayName(d)).join(", ")}',
-                                style: AppTextStyle.regularBlack12.copyWith(
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: Color(int.parse(reminder.color
-                                        .replaceFirst('#', '0xff')))
-                                    .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(66),
-                              ),
-                              child: Text(
-                                DateFormat('h:mm a').format(reminder.dateTime!),
-                                style: AppTextStyle.regularBlack12.copyWith(
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),

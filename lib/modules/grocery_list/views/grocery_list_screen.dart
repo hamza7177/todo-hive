@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:todo_hive/modules/grocery_list/controllers/grocery_list_controller.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
+import '../widgets/bottomsheet.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
 import 'grocery_list_details_screen.dart';
 
@@ -102,7 +103,7 @@ class GroceryListScreen extends StatelessWidget {
                           Get.to(() => GroceryListDetailScreen(listId: list.id, listName: list.name));
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+                          padding: EdgeInsets.only(left: 16,top: 10,bottom: 10),
                           width: Get.width,
                           decoration: BoxDecoration(
                             color: AppColors.cardColor,
@@ -187,12 +188,15 @@ class GroceryListScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              LinearProgressIndicator(
-                                value: total > 0 ? completed / total : 0,
-                                backgroundColor: Colors.grey[300],
-                                color: Colors.green,
-                                minHeight: 8,
-                                borderRadius: BorderRadius.circular(10),
+                              SizedBox(
+                                width: Get.width * 0.868,
+                                child: LinearProgressIndicator(
+                                  value: total > 0 ? completed / total : 0,
+                                  backgroundColor: Colors.grey[300],
+                                  color: Colors.green,
+                                  minHeight: 8,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
                             ],
                           ),
@@ -211,7 +215,14 @@ class GroceryListScreen extends StatelessWidget {
         width: 70,
         height: 70,
         child: FloatingActionButton(
-          onPressed: () => _showCreateListBottomSheet(context),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: false,
+              backgroundColor: Colors.transparent,
+              builder: (context) =>  TodoListBottomSheet(),
+            );
+          },
           backgroundColor: Colors.transparent,
           elevation: 0,           // Resting elevation
           highlightElevation: 0,   // Pressed elevation

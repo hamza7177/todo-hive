@@ -487,7 +487,7 @@ class TodoListScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 20),
+                                  SizedBox(width: 15),
                                   SizedBox(
                                     width: Get.width * 0.6,
                                     child: Text(
@@ -608,7 +608,7 @@ class TodoListScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 20),
+                                  SizedBox(width: 15),
                                   SizedBox(
                                     width: Get.width * 0.6,
                                     child: Text(
