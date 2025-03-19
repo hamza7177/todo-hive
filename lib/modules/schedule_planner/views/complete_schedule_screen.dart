@@ -77,7 +77,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
                     color: bgColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
@@ -100,7 +100,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
                               SizedBox(width: 5),
                               schedule.isReminder
                                   ? Text(
-                                'Completed on: ${DateFormat('EEE, MMM d, hh:mm a').format(schedule.dateTime)}',
+                                'Completed on: ${DateFormat('EEE, MMM d, hh:mm a').format(schedule.createdAt)}',
                                 style: AppTextStyle.regularBlack10
                                     .copyWith(color: bgColor),
                               )
@@ -120,7 +120,7 @@ class CompletedSchedulesScreen extends StatelessWidget {
                         ),
                         child: PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.more_vert, color: bgColor),
+                          icon: Icon(Icons.more_vert, color: bgColor,size: 30),
                           onSelected: (value) async {
                             if (value == "Delete") {
                               bool? shouldDelete = await showDialog<bool>(
@@ -128,9 +128,12 @@ class CompletedSchedulesScreen extends StatelessWidget {
                                 builder: (context) {
                                   return AlertDialog(
                                     backgroundColor: AppColors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                     title: Text(
                                       "Delete Completed Schedule",
-                                      style: AppTextStyle.mediumBlack16,
+                                      style: AppTextStyle.mediumBlack18,
                                     ),
                                     content: Text(
                                       "Are you sure you want to delete this completed schedule?",
@@ -146,6 +149,10 @@ class CompletedSchedulesScreen extends StatelessWidget {
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           backgroundColor: Color(0xffF0F0F0),
+                                            minimumSize:
+                                            Size(100, 40),
+                                            elevation:
+                                            0
                                         ),
                                         child: Text(
                                           'No',
@@ -161,6 +168,10 @@ class CompletedSchedulesScreen extends StatelessWidget {
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           backgroundColor: AppColors.primary,
+                                            minimumSize:
+                                            Size(100, 40),
+                                            elevation:
+                                            0
                                         ),
                                         child: Text(
                                           "Yes",

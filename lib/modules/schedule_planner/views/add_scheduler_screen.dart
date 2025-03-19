@@ -218,16 +218,16 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    _dismissKeyboard(context); // Dismiss before dialog
+                    _dismissKeyboard(context); // Dismiss keyboard before picker
                     await controller.pickDate(context);
                     // Small delay to prevent focus flicker
                     await Future.delayed(Duration(milliseconds: 50));
-                    _dismissKeyboard(context); // Ensure no refocus
+                    _dismissKeyboard(context); // Ensure no refocus after picker
                   },
                   child: Container(
                     height: 51,
                     width: Get.width * 0.43,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: Color(0xffF9F9F9),
                       borderRadius: BorderRadius.circular(15),
@@ -240,9 +240,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          controller.selectedDate.value,
-                          style: AppTextStyle.mediumBlack16
-                              .copyWith(color: Color(0xffAFAFAF)),
+                          controller.selectedDateStr.value, // This should now update correctly
+                          style: AppTextStyle.regularBlack16,
                         ),
                       ],
                     )),
@@ -274,9 +273,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                           ),
                           SizedBox(width: 5),
                           Text(
-                            controller.selectedTime.value,
-                            style: AppTextStyle.mediumBlack16
-                                .copyWith(color: Color(0xffAFAFAF)),
+                            controller.selectedTimeStr.value,
+                            style: AppTextStyle.regularBlack16,
                           ),
                         ],
                       ),

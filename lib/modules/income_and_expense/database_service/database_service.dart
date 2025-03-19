@@ -3,11 +3,13 @@ import '../models/transaction.dart';
 
 class DatabaseService {
   static const String boxName = 'transactions';
+  static const String settingsBoxName = 'settings';
 
   Future<void> init() async {
     await Hive.initFlutter();
     Hive.registerAdapter(TransactionAdapter());
     await Hive.openBox<Transaction>(boxName);
+    await Hive.openBox(settingsBoxName);
   }
 
   Box<Transaction> get _transactionBox => Hive.box<Transaction>(boxName);

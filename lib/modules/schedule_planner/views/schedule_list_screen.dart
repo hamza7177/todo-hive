@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_hive/modules/schedule_planner/views/add_scheduler_screen.dart';
-
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
 import '../../todo_list/widgets/todo_list_filter.dart';
@@ -143,7 +142,7 @@ class ScheduleListScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -202,7 +201,7 @@ class ScheduleListScreen extends StatelessWidget {
                                     child: PopupMenuButton<String>(
                                       padding: EdgeInsets.zero,
                                       icon:
-                                          Icon(Icons.more_vert, color: bgColor),
+                                          Icon(Icons.more_vert, color: bgColor,size: 30,),
                                       onSelected: (value) async {
                                         if (value == "Complete") {
                                           scheduleC.completeSchedule(index);
@@ -214,9 +213,12 @@ class ScheduleListScreen extends StatelessWidget {
                                               return AlertDialog(
                                                 backgroundColor:
                                                     AppColors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
                                                 title: Text("Delete Schedule",
                                                     style: AppTextStyle
-                                                        .mediumBlack16),
+                                                        .mediumBlack18),
                                                 content: Text(
                                                   "Are you sure you want to delete this schedule?",
                                                   style: AppTextStyle
@@ -236,6 +238,10 @@ class ScheduleListScreen extends StatelessWidget {
                                                       ),
                                                       backgroundColor:
                                                           Color(0xffF0F0F0),
+                                                        minimumSize:
+                                                        Size(100, 40),
+                                                        elevation:
+                                                        0
                                                     ),
                                                     child: Text('No',
                                                         style: AppTextStyle
@@ -255,6 +261,10 @@ class ScheduleListScreen extends StatelessWidget {
                                                       ),
                                                       backgroundColor:
                                                           AppColors.primary,
+                                                        minimumSize:
+                                                        Size(100, 40),
+                                                        elevation:
+                                                        0
                                                     ),
                                                     child: Text(
                                                       "Yes",

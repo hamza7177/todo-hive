@@ -372,7 +372,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                                             .copyWith(color: Color(0xffAEAEAE)),
                                       ),
                                       SizedBox(
-                                        height: 5,
+                                        height: 8,
                                       ),
                                       SizedBox(
                                         width: Get.width * 0.7,
@@ -386,7 +386,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: 5,
+                                        height: 8,
                                       ),
                                       Container(
                                         height: 43,

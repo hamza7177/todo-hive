@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../database_service/database_service.dart';
 import '../models/transaction.dart';
@@ -9,12 +10,19 @@ class TransactionController extends GetxController {
   RxDouble totalIncome = 0.0.obs;
   RxDouble totalExpense = 0.0.obs;
   RxString filter = 'Daily'.obs;
+  RxString selectedCurrency = 'Rs'.obs; // Default currency sign
 
   @override
   void onInit() {
     super.onInit();
+
+    final savedCurrency = Hive.box('settings').get('selectedCurrency');
+    if (savedCurrency != null) {
+      selectedCurrency.value = savedCurrency;
+    }
     loadTransactions();
   }
+
 
   void loadTransactions() {
     transactions.value = _db.getAllTransactions();
@@ -60,9 +68,12 @@ class TransactionController extends GetxController {
     return grouped;
   }
 
-
   void updateFilter(String newFilter) {
     filter.value = newFilter;
     // Add logic to filter transactions based on Daily/Weekly/Monthly/Yearly
+  }
+
+  void updateCurrency(String newCurrency) {
+    selectedCurrency.value = newCurrency;
   }
 }

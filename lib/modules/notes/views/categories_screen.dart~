@@ -93,10 +93,7 @@ class CategoriesScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        title: Text("Delete Category", style: AppTextStyle.mediumBlack18),
+        title: Text("Delete Category", style: AppTextStyle.mediumBlack16),
         content: Text(
           "Are you sure you want to delete '${category.name}'? Notes with this category will be set to 'Untitled'.",
           style: AppTextStyle.regularBlack14,
@@ -108,10 +105,6 @@ class CategoriesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
               backgroundColor: const Color(0xffF0F0F0),
-                minimumSize:
-                Size(100, 40),
-                elevation:
-                0
             ),
             child: Text('No', style: AppTextStyle.mediumPrimary14),
           ),
@@ -121,10 +114,6 @@ class CategoriesScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
               backgroundColor: AppColors.primary,
-                minimumSize:
-                Size(100, 40),
-                elevation:
-                0
             ),
             child: Text(
               "Yes",

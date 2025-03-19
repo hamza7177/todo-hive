@@ -16,10 +16,12 @@ class ScheduleController extends GetxController {
   RxString selectedColor = '#2ECC71'.obs;
   RxBool isReminder = false.obs;
   var selectedCategory = "".obs;
-  Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
-  RxString selectedDate = 'Select Date'.obs;
-  RxString selectedTime = 'Select Time'.obs;
+  Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
+  Rx<DateTime?> selectedTime = Rx<DateTime?>(DateTime.now());
+  RxString selectedDateStr = DateFormat('EEE, MMM d').format(DateTime.now()).obs;
+  RxString selectedTimeStr = DateFormat('hh:mm a').format(DateTime.now()).obs;
   var selectedFilter = "All".obs;
+
   var selectedPriority = "Low".obs;
   RxList<ScheduleModel> schedules = <ScheduleModel>[].obs;
   RxList<ScheduleModel> completedSchedules = <ScheduleModel>[].obs;
@@ -61,7 +63,7 @@ class ScheduleController extends GetxController {
 
     for (var schedule in completedScheduleBox.values) {
       if (schedule.isCompleted && schedule.createdAt != null) {
-        final durationSinceCompletion = now.difference(schedule.createdAt!);
+        final durationSinceCompletion = now.difference(schedule.createdAt);
         if (durationSinceCompletion.inHours >= 24) {
           int? scheduleKey = completedScheduleBox.keys.cast<int?>().firstWhere(
                 (key) => completedScheduleBox.get(key) == schedule,
@@ -194,17 +196,25 @@ class ScheduleController extends GetxController {
     required String title,
     required String description,
   }) {
+    // Combine date and time when creating the schedule
+    final combinedDateTime = DateTime(
+      selectedDate.value!.year,
+      selectedDate.value!.month,
+      selectedDate.value!.day,
+      selectedTime.value!.hour,
+      selectedTime.value!.minute,
+    );
+
     final schedule = ScheduleModel(
       title: title,
       color: selectedColor.value,
       description: description,
       priority: selectedPriority.value,
       isReminder: isReminder.value,
-      dateTime: selectedDateTime.value ?? DateTime.now(),
+      dateTime: combinedDateTime,
       category: selectedCategory.value,
       createdAt: DateTime.now(),
       id: _generateValidId(),
-      // Use a valid 32-bit ID
       isCompleted: false,
     );
 
@@ -268,67 +278,110 @@ class ScheduleController extends GetxController {
   }
 
   Future<void> pickDate(BuildContext context) async {
-    DateTime selected = selectedDateTime.value ?? DateTime.now();
+    DateTime initialDate = selectedDate.value ?? DateTime.now();
 
     final DateTime? picked = await showRoundedDatePicker(
       context: context,
-      initialDate: selected,
+      initialDate: initialDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       theme: ThemeData(
         primaryColor: AppColors.primary,
       ),
-      // Add height constraint
       height: MediaQuery.of(context).size.height * 0.4,
-      // 70% of screen height
-      // Customize appearance
       styleDatePicker: MaterialRoundedDatePickerStyle(
-        // Apply your theme colors
         textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
         textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
         textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
         backgroundPicker: Colors.white,
         decorationDateSelected:
-            BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
         textStyleDayOnCalendarSelected: TextStyle(
             fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
         textStyleButtonPositive:
-            TextStyle(fontSize: 14, color: AppColors.primary),
+        TextStyle(fontSize: 14, color: AppColors.primary),
         textStyleButtonNegative: TextStyle(
           fontSize: 14,
           color: AppColors.primary,
         ),
-        // // Add padding if needed
       ),
     );
-    if (picked != null && picked != selected) {
-      selectedDateTime.value = picked;
-      selectedDate.value = DateFormat('EEE, MMM d').format(picked);
+
+    if (picked != null && picked != initialDate) {
+      selectedDate.value = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        selectedTime.value?.hour ?? 0,
+        selectedTime.value?.minute ?? 0,
+      );
+      selectedDateStr.value = DateFormat('EEE, MMM d').format(picked);
     }
   }
 
   Future<void> pickTime(BuildContext context) async {
-    DateTime selected = selectedDateTime.value ?? DateTime.now();
+    DateTime initialTime = selectedTime.value ?? DateTime.now();
 
-    final TimeOfDay? picked = await showRoundedTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selected),
-      theme: ThemeData(
-        primaryColor: AppColors.white,
-        useMaterial3: false,
-      ),
+      initialTime: TimeOfDay.fromDateTime(initialTime),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            size: Size(200, 300),
+          ),
+          child: Theme(
+            data: ThemeData.light().copyWith(
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.white,
+                hourMinuteColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? AppColors.primary
+                      : Colors.white,
+                ),
+                hourMinuteTextColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? AppColors.white
+                      : AppColors.primary,
+                ),
+                dialHandColor: AppColors.primary,
+                dialBackgroundColor: Colors.white,
+                dialTextColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                entryModeIconColor: Colors.black,
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateColor.resolveWith(
+                        (states) => Colors.white,
+                  ),
+                  foregroundColor: WidgetStateColor.resolveWith(
+                        (states) => AppColors.primary,
+                  ),
+                  overlayColor: WidgetStateColor.resolveWith(
+                        (states) => AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+            child: child!,
+          ),
+        );
+      },
     );
 
     if (picked != null) {
-      final newTime = DateTime(
-        selected.year,
-        selected.month,
-        selected.day,
+      selectedTime.value = DateTime(
+        selectedDate.value?.year ?? DateTime.now().year,
+        selectedDate.value?.month ?? DateTime.now().month,
+        selectedDate.value?.day ?? DateTime.now().day,
         picked.hour,
         picked.minute,
       );
-      selectedDateTime.value = newTime;
-      selectedTime.value = DateFormat('hh:mm a').format(newTime);
+      selectedTimeStr.value = DateFormat('hh:mm a').format(selectedTime.value!);
     }
   }
 
@@ -336,11 +389,10 @@ class ScheduleController extends GetxController {
     selectedColor.value = '#2ECC71';
     isReminder.value = false;
     selectedCategory.value = "";
-    selectedDate.value = "Select Date";
-    selectedTime.value = "Select Time";
-    selectedDateTime.value = null;
-    selectedDate.value = DateFormat('EEE, MMM d').format(DateTime.now());
-    selectedTime.value = DateFormat('hh:mm a').format(DateTime.now());
+    selectedDate.value = DateTime.now();
+    selectedTime.value = DateTime.now();
+    selectedDateStr.value = DateFormat('EEE, MMM d').format(DateTime.now());
+    selectedTimeStr.value = DateFormat('hh:mm a').format(DateTime.now());
     selectedPriority.value = "Low";
   }
 }

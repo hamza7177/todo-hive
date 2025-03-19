@@ -404,7 +404,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Obx(() => Text(
-                          controller.selectedDate.value,
+                          controller.selectedDateStr.value,
                           style: AppTextStyle.mediumBlack16
                               .copyWith(color: AppColors.lightRed),
                         )),
@@ -425,7 +425,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Obx(() => Text(
-                          controller.selectedTime.value,
+                          controller.selectedTimeStr.value,
                           style: AppTextStyle.mediumBlack16
                               .copyWith(color: AppColors.lightRed),
                         )),
@@ -552,7 +552,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Obx(() => Text(
-                          controller.selectedTime.value,
+                          controller.selectedTimeStr.value,
                           style: AppTextStyle.mediumBlack16
                               .copyWith(color: AppColors.lightRed),
                         )),

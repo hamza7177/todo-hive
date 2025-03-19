@@ -29,8 +29,15 @@ class ReminderController extends GetxController {
   var completedReminders = <ReminderModel>[].obs;
   RxInt intervalHours = 5.obs;
   RxBool isRepeating = false.obs;
-  RxString selectedDate = DateFormat('EEE, MMM d').format(DateTime.now()).obs;
-  RxString selectedTime = DateFormat('hh:mm a').format(DateTime.now()).obs;
+  Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
+  Rx<DateTime?> selectedTime = Rx<DateTime?>(DateTime.now());
+
+  // Remove the old selectedDateTime
+  // Rx<DateTime?> selectedDateTime = Rx<DateTime?>(DateTime.now());
+
+  // Update the displayed strings to use the separate variables
+  RxString selectedDateStr = DateFormat('EEE, MMM d').format(DateTime.now()).obs;
+  RxString selectedTimeStr = DateFormat('hh:mm a').format(DateTime.now()).obs;
 
   void loadCompletedReminders() {
     completedReminders.value = completedBox.values.toList();
@@ -43,7 +50,8 @@ class ReminderController extends GetxController {
   RxBool isWeekday = false.obs;
   RxString selectedColor = '#2ECC71'.obs;
   RxString reminderName = ''.obs;
-  Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
+  Rx<DateTime?> selectedDateTime = Rx<DateTime?>(DateTime.now());
+
   RxList<bool> selectedWeekdays = List.generate(7, (index) => false).obs;
   RxInt intervalMinutes = 0.obs;
   final countdowns = <String, Duration>{}.obs;
@@ -79,9 +87,12 @@ class ReminderController extends GetxController {
     isInterval.value = false;
     isDateTime.value = false;
     isWeekday.value = false;
-    selectedDateTime.value = null;
+    selectedDate.value = DateTime.now();
+    selectedTime.value = DateTime.now();
     selectedWeekdays.value = List.generate(7, (index) => false);
     intervalMinutes.value = 0;
+    selectedDateStr.value = DateFormat('EEE, MMM d').format(DateTime.now());
+    selectedTimeStr.value = DateFormat('hh:mm a').format(DateTime.now());
   }
 
   void deleteReminder(String id) {
@@ -96,80 +107,112 @@ class ReminderController extends GetxController {
   }
 
   Future<void> pickDate(BuildContext context) async {
-    DateTime selected = selectedDateTime.value ?? DateTime.now();
+    DateTime initialDate = selectedDate.value ?? DateTime.now();
 
     final DateTime? picked = await showRoundedDatePicker(
       context: context,
-      initialDate: selected,
+      initialDate: initialDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       theme: ThemeData(
         primaryColor: AppColors.primary,
       ),
-      // Add height constraint
       height: MediaQuery.of(context).size.height * 0.4,
-      // 70% of screen height
-      // Customize appearance
       styleDatePicker: MaterialRoundedDatePickerStyle(
-        // Apply your theme colors
         textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
         textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
         textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
         backgroundPicker: Colors.white,
         decorationDateSelected:
-            BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
         textStyleDayOnCalendarSelected: TextStyle(
             fontSize: 14, color: AppColors.white, fontWeight: FontWeight.bold),
         textStyleButtonPositive:
-            TextStyle(fontSize: 14, color: AppColors.primary),
+        TextStyle(fontSize: 14, color: AppColors.primary),
         textStyleButtonNegative: TextStyle(
           fontSize: 14,
           color: AppColors.primary,
         ),
-        // // Add padding if needed
       ),
     );
 
-    if (picked != null && picked != selected) {
-      selectedDateTime.value = picked;
-      selectedDate.value = DateFormat('EEE, MMM d').format(picked);
+    if (picked != null && picked != initialDate) {
+      selectedDate.value = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        selectedTime.value?.hour ?? 0,
+        selectedTime.value?.minute ?? 0,
+      );
+      selectedDateStr.value = DateFormat('EEE, MMM d').format(picked);
     }
   }
 
-  Future<void> pickTime(BuildContext context) async {
-    DateTime selected = selectedDateTime.value ?? DateTime.now();
 
-    final TimeOfDay? picked = await showRoundedTimePicker(
+
+  Future<void> pickTime(BuildContext context) async {
+    DateTime initialTime = selectedTime.value ?? DateTime.now();
+
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selected),
-      theme: ThemeData(
-        useMaterial3: false,
-        primaryColor: AppColors.white, // Set primary color
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.primary, // Apply primary color to buttons
+      initialTime: TimeOfDay.fromDateTime(initialTime),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            size: Size(200, 300),
           ),
-        ),
-        timePickerTheme: TimePickerThemeData(
-          dialHandColor: AppColors.primary,
-          hourMinuteTextColor: AppColors.primary, // Color for selected time text
-          dialTextColor: Colors.black, // Color for dial numbers
-          entryModeIconColor: AppColors.primary, // Entry mode icon color
-        ),
-      ),
+          child: Theme(
+            data: ThemeData.light().copyWith(
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.white,
+                hourMinuteColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? AppColors.primary
+                      : Colors.white,
+                ),
+                hourMinuteTextColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? AppColors.white
+                      : AppColors.primary,
+                ),
+                dialHandColor: AppColors.primary,
+                dialBackgroundColor: Colors.white,
+                dialTextColor: WidgetStateColor.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                entryModeIconColor: Colors.black,
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateColor.resolveWith(
+                        (states) => Colors.white,
+                  ),
+                  foregroundColor: WidgetStateColor.resolveWith(
+                        (states) => AppColors.primary,
+                  ),
+                  overlayColor: WidgetStateColor.resolveWith(
+                        (states) => AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+            child: child!,
+          ),
+        );
+      },
     );
 
-
     if (picked != null) {
-      final newTime = DateTime(
-        selected.year,
-        selected.month,
-        selected.day,
+      selectedTime.value = DateTime(
+        selectedDate.value?.year ?? DateTime.now().year,
+        selectedDate.value?.month ?? DateTime.now().month,
+        selectedDate.value?.day ?? DateTime.now().day,
         picked.hour,
         picked.minute,
       );
-      selectedDateTime.value = newTime;
-      selectedTime.value = DateFormat('hh:mm a').format(newTime);
+      selectedTimeStr.value = DateFormat('hh:mm a').format(selectedTime.value!);
     }
   }
 
@@ -194,7 +237,14 @@ class ReminderController extends GetxController {
       }
     } else if (isDateTime.value) {
       reminderType = 'date_time';
-      dateTime = selectedDateTime.value;
+      // Combine date and time when saving
+      dateTime = DateTime(
+        selectedDate.value!.year,
+        selectedDate.value!.month,
+        selectedDate.value!.day,
+        selectedTime.value!.hour,
+        selectedTime.value!.minute,
+      );
     } else if (isWeekday.value) {
       reminderType = 'weekday';
       weekdays = selectedWeekdays
@@ -203,7 +253,14 @@ class ReminderController extends GetxController {
           .where((entry) => entry.value)
           .map((entry) => entry.key)
           .toList();
-      dateTime = selectedDateTime.value;
+      // Combine date and time for weekday reminder
+      dateTime = DateTime(
+        selectedDate.value!.year,
+        selectedDate.value!.month,
+        selectedDate.value!.day,
+        selectedTime.value!.hour,
+        selectedTime.value!.minute,
+      );
     } else {
       Get.snackbar('Error', 'Please select a reminder type');
       return;
@@ -390,13 +447,11 @@ class ReminderController extends GetxController {
       int totalMinutes =
           (reminder.intervalHours * 60) + reminder.intervalMinutes;
       DateTime initialTriggerTime =
-          reminder.createdAt!.add(Duration(minutes: totalMinutes));
+      reminder.createdAt!.add(Duration(minutes: totalMinutes));
 
       if (!nextTriggerTimes.containsKey(reminder.id)) {
-        // Set initial trigger time when reminder is first added
         nextTriggerTimes[reminder.id] = initialTriggerTime;
       } else if (reminder.isRepeating) {
-        // For repeating reminders, update to next interval
         DateTime currentTriggerTime = nextTriggerTimes[reminder.id]!;
         while (currentTriggerTime.isBefore(now)) {
           currentTriggerTime =
@@ -404,7 +459,6 @@ class ReminderController extends GetxController {
         }
         nextTriggerTimes[reminder.id] = currentTriggerTime;
       }
-      // Non-repeating: Do nothing if time is up, keep initialTriggerTime
     } else if (reminder.reminderType == 'weekday') {
       nextTriggerTimes[reminder.id] = _getNextWeekdayTime(reminder);
     } else if (reminder.reminderType == 'date_time') {

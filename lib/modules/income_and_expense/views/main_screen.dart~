@@ -19,7 +19,9 @@ class MainScreen extends GetView<TransactionController> {
       appBar: AppBar(
         backgroundColor: AppColors.lightGreen3,
         elevation: 0,
+        // Removes the shadow when not scrolled
         scrolledUnderElevation: 0,
+        // Prevents shadow on scroll with Material 3
         surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => Get.back(),
@@ -27,11 +29,13 @@ class MainScreen extends GetView<TransactionController> {
         ),
         title: Text(
           'Income & Expense Manager',
-          style: AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w700),
+          style:
+              AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
         children: [
+          // Balance Summary
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -47,8 +51,8 @@ class MainScreen extends GetView<TransactionController> {
                 ),
                 SizedBox(height: 8),
                 Obx(
-                      () => Text(
-                    '${controller.selectedCurrency.value} ${formatCurrency(controller.totalIncome.value - controller.totalExpense.value)}',
+                  () => Text(
+                    'Rs ${formatCurrency(controller.totalIncome.value - controller.totalExpense.value)}',
                     style: AppTextStyle.mediumBlack28
                         .copyWith(fontWeight: FontWeight.w600),
                   ),
@@ -64,7 +68,8 @@ class MainScreen extends GetView<TransactionController> {
               ],
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 10,),
+          // Transactions List
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -74,36 +79,50 @@ class MainScreen extends GetView<TransactionController> {
                   'Transactions',
                   style: AppTextStyle.mediumBlack16,
                 ),
+                // Obx(() => DropdownButton<String>(
+                //       value: controller.filter.value,
+                //       items: ['Daily', 'Weekly', 'Monthly', 'Yearly']
+                //           .map((String value) => DropdownMenuItem<String>(
+                //                 value: value,
+                //                 child: Text(value),
+                //               ))
+                //           .toList(),
+                //       onChanged: (value) {
+                //         if (value != null) controller.updateFilter(value);
+                //       },
+                //     )),
               ],
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 10,),
           Expanded(
             child: Obx(
-                  () => controller.transactions.isEmpty
+              () => controller.transactions.isEmpty
                   ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/icons/ic_income-1.webp', height: 140),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Your transaction history is empty.',
-                      style: AppTextStyle.mediumBlack18
-                          .copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 10),
-                    Text('Start managing your journey now!',
-                        style: AppTextStyle.regularBlack16),
-                  ],
-                ),
-              )
-                  : ListView.builder(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/icons/ic_income-1.webp',
+                              height: 140),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Your transaction history is empty.',
+                            style: AppTextStyle.mediumBlack18
+                                .copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 10),
+                          Text('Start managing your journey now!',
+                              style: AppTextStyle.regularBlack16),
+                        ],
+                      ),
+                    )
+                  :ListView.builder(
                 itemCount: controller.groupedTransactions.length,
                 itemBuilder: (context, index) {
                   String date = controller.groupedTransactions.keys.elementAt(index);
                   List<Transaction> transactions = List<Transaction>.from(controller.groupedTransactions[date]!['transactions']);
 
+                  // Calculate total income and total expenses
                   double totalIncome = transactions
                       .where((t) => t.type == 'income')
                       .fold(0.0, (sum, t) => sum + t.amount);
@@ -112,14 +131,15 @@ class MainScreen extends GetView<TransactionController> {
                       .where((t) => t.type == 'expense')
                       .fold(0.0, (sum, t) => sum + t.amount);
 
-                  double dayTotal = totalIncome - totalExpenses;
+                  double dayTotal = totalIncome - totalExpenses; // Net total for the day
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Date Header with Correctly Formatted Daily Total
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
-                        height: 35,
+                       height: 35,
                         decoration: BoxDecoration(
                           color: AppColors.cardColor,
                         ),
@@ -131,7 +151,7 @@ class MainScreen extends GetView<TransactionController> {
                               style: AppTextStyle.regularBlack14.copyWith(color: Color(0xff8A8A8a)),
                             ),
                             Text(
-                              "${controller.selectedCurrency.value} ${formatCurrency(dayTotal)}",
+                              "Rs ${formatCurrency(dayTotal)}", // Show positive/negative correctly
                               style: AppTextStyle.regularBlack14.copyWith(
                                 color: Color(0xff8A8A8a),
                               ),
@@ -139,10 +159,12 @@ class MainScreen extends GetView<TransactionController> {
                           ],
                         ),
                       ),
+
+                      // List of Transactions for that Date
                       ...transactions.map((transaction) {
                         return Dismissible(
-                          key: Key(transaction.id.toString()),
-                          direction: DismissDirection.endToStart,
+                          key: Key(transaction.id.toString()), // Unique key for each transaction
+                          direction: DismissDirection.endToStart, // Swipe from right to left
                           background: Container(
                             alignment: Alignment.centerRight,
                             padding: EdgeInsets.only(right: 20),
@@ -229,7 +251,7 @@ class MainScreen extends GetView<TransactionController> {
                             )
                                 : null,
                             trailing: Text(
-                              '${transaction.type == 'income' ? '+' : '-'}${controller.selectedCurrency.value}${formatCurrency(transaction.amount)}',
+                              '${transaction.type == 'income' ? '+' : '-'}Rs${formatCurrency(transaction.amount)}',
                               style: AppTextStyle.regularBlack14.copyWith(
                                 color: transaction.type == 'income' ? Colors.green : Color(0xffED1C24),
                               ),
@@ -252,8 +274,11 @@ class MainScreen extends GetView<TransactionController> {
           onPressed: () => Get.to(() => NewTransactionScreen()),
           backgroundColor: Colors.transparent,
           elevation: 0,
+          // Resting elevation
           highlightElevation: 0,
+          // Pressed elevation
           splashColor: Colors.transparent,
+          // Removes ripple effect
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: Image.asset('assets/icons/ic_add_income.webp'),
@@ -308,11 +333,11 @@ class MainScreen extends GetView<TransactionController> {
                   style: AppTextStyle.regularBlack14
                       .copyWith(color: Color(0xff8A8A8A)),
                 ),
-                Obx(() => Text(
-                  '${controller.selectedCurrency.value}${NumberFormat('#,##0').format(value)}',
+                Text(
+                  'Rs${NumberFormat('#,##0').format(value)}',
                   style: AppTextStyle.mediumBlack16
-                      .copyWith(fontWeight: FontWeight.w600, fontSize: Get.height * 0.018),
-                )),
+                      .copyWith(fontWeight: FontWeight.w600,fontSize: Get.height * 0.018),
+                ),
               ],
             ),
           ],

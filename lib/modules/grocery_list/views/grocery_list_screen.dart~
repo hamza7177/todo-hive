@@ -212,7 +212,6 @@ class GroceryListScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              SizedBox(height: 8,),
                             ],
                           ),
                         ),

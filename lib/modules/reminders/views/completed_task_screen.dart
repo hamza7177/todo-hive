@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
+
 import '../../../utils/app_colors.dart';
 import '../controllers/reminder_controller.dart';
 import '../models/reminder_model.dart';
@@ -24,7 +25,8 @@ class CompletedTasksScreen extends StatelessWidget {
         ),
         title: Text(
           'Completed Tasks',
-          style: AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
+          style:
+              AppTextStyle.mediumBlack20.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -39,7 +41,8 @@ class CompletedTasksScreen extends StatelessWidget {
           ),
           Expanded(
             child: Obx(() {
-              print('Completed reminders count: ${controller.completedReminders.length}');
+              print(
+                  'Completed reminders count: ${controller.completedReminders.length}');
               if (controller.completedReminders.isEmpty) {
                 return _buildEmptyState();
               }
@@ -72,10 +75,12 @@ class CompletedTasksScreen extends StatelessWidget {
           SizedBox(height: 10),
           Text(
             'No completed tasks yet!',
-            style: AppTextStyle.mediumBlack18.copyWith(fontWeight: FontWeight.w600),
+            style: AppTextStyle.mediumBlack18
+                .copyWith(fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 10),
-          Text('Complete some reminders to see them here', style: AppTextStyle.regularBlack16),
+          Text('Complete some reminders to see them here',
+              style: AppTextStyle.regularBlack16),
         ],
       ),
     );
@@ -83,12 +88,13 @@ class CompletedTasksScreen extends StatelessWidget {
 
   Widget _buildCompletedTile(ReminderModel reminder, BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 16,bottom: 10,top: 10),
+      padding: EdgeInsets.only(left: 16, bottom: 10, top: 10),
       decoration: BoxDecoration(
         color: AppColors.cardColor,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
@@ -96,26 +102,34 @@ class CompletedTasksScreen extends StatelessWidget {
             children: [
               Text(
                 'Completed: ${DateFormat('EEE, MMM d, h:mm a').format(reminder.completedAt!)}',
-                style: AppTextStyle.regularBlack14.copyWith(color: Color(0xffCCCCCC)),
+                style: AppTextStyle.regularBlack14
+                    .copyWith(color: Color(0xffCCCCCC)),
               ),
               SizedBox(height: 5),
               Text(
                 reminder.name,
-                style: AppTextStyle.mediumBlack16.copyWith(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 21),
+                style: AppTextStyle.mediumBlack16.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 21),
               ),
               SizedBox(height: 5),
               Row(
                 children: [
                   if (reminder.isRepeating)
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))).withOpacity(0.2),
+                        color: Color(int.parse(
+                                reminder.color.replaceFirst('#', '0xff')))
+                            .withOpacity(0.2),
                         borderRadius: BorderRadius.circular(66),
                       ),
                       child: Icon(
                         Icons.repeat_rounded,
-                        color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
+                        color: Color(int.parse(
+                            reminder.color.replaceFirst('#', '0xff'))),
                         size: 12,
                       ),
                     ),
@@ -123,13 +137,16 @@ class CompletedTasksScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))).withOpacity(0.2),
+                      color: Color(int.parse(
+                              reminder.color.replaceFirst('#', '0xff')))
+                          .withOpacity(0.2),
                       borderRadius: BorderRadius.circular(66),
                     ),
                     child: Text(
                       _getReminderDetails(reminder),
                       style: AppTextStyle.regularBlack12.copyWith(
-                        color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
+                        color: Color(int.parse(
+                            reminder.color.replaceFirst('#', '0xff'))),
                       ),
                     ),
                   ),
@@ -141,36 +158,54 @@ class CompletedTasksScreen extends StatelessWidget {
             data: Theme.of(context).copyWith(
               popupMenuTheme: PopupMenuThemeData(
                 color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             child: PopupMenuButton<String>(
               padding: EdgeInsets.zero,
-              icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+              icon: Icon(
+                Icons.more_horiz,
+                color: Color(0xffAFAFAF),
+                size: 30,
+              ),
               onSelected: (value) async {
                 if (value == "Delete") {
                   bool? shouldDelete = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
                       backgroundColor: AppColors.white,
-                      title: Text("Delete Completed Task", style: AppTextStyle.mediumBlack16),
-                      content: Text("Are you sure you want to delete this completed task?", style: AppTextStyle.regularBlack14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      title: Text("Delete Completed Task",
+                          style: AppTextStyle.mediumBlack18),
+                      content: Text(
+                          "Are you sure you want to delete this completed task?",
+                          style: AppTextStyle.regularBlack14),
                       actions: [
                         ElevatedButton(
                           onPressed: () => Navigator.pop(context),
                           style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            backgroundColor: Color(0xffF0F0F0),
-                          ),
-                          child: Text('No', style: AppTextStyle.mediumPrimary14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              backgroundColor: Color(0xffF0F0F0),
+                              minimumSize: Size(100, 40),
+                              elevation: 0),
+                          child:
+                              Text('No', style: AppTextStyle.mediumPrimary14),
                         ),
                         ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            backgroundColor: AppColors.primary,
-                          ),
-                          child: Text("Yes", style: AppTextStyle.mediumBlack14.copyWith(color: AppColors.white)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              backgroundColor: AppColors.primary,
+                              minimumSize: Size(100, 40),
+                              elevation: 0),
+                          child: Text("Yes",
+                              style: AppTextStyle.mediumBlack14
+                                  .copyWith(color: AppColors.white)),
                         ),
                       ],
                     ),
@@ -183,7 +218,9 @@ class CompletedTasksScreen extends StatelessWidget {
                 }
               },
               itemBuilder: (context) => [
-                PopupMenuItem(value: "Delete", child: Text("Delete", style: AppTextStyle.mediumBlack16)),
+                PopupMenuItem(
+                    value: "Delete",
+                    child: Text("Delete", style: AppTextStyle.mediumBlack16)),
               ],
             ),
           ),

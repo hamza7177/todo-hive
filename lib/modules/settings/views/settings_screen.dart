@@ -73,13 +73,13 @@ class SettingsScreen extends StatelessWidget {
                   Container(
                     height: 42,
                     width: 42,
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         color: AppColors.white,
                         borderRadius: BorderRadius.circular(11)),
                     child: Image.asset(
                       item.image,
-                      height: 30,
+                      height: 20,
                     ),
                   ),
                   SizedBox(
@@ -89,7 +89,7 @@ class SettingsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(item.title,
-                          style: AppTextStyle.mediumBlack18
+                          style: AppTextStyle.mediumBlack16
                               .copyWith(fontWeight: FontWeight.w600)),
                       SizedBox(
                         height: 5,

@@ -142,7 +142,7 @@ class ReminderListScreen extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +251,7 @@ class ReminderListScreen extends StatelessWidget {
                   ),
                   child: PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
-                    icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+                    icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF),size: 30,),
                     onSelected: (value) async {
                       if (value == "Complete") {
                         controller.completeReminder(reminder.id);
@@ -262,9 +262,12 @@ class ReminderListScreen extends StatelessWidget {
                             return Container(
                               child: AlertDialog(
                                 backgroundColor: AppColors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 title: Text(
                                   "Delete Reminder",
-                                  style: AppTextStyle.mediumBlack16,
+                                  style: AppTextStyle.mediumBlack18,
                                 ),
                                 content: Text(
                                   "Are you sure you want to delete this reminder?",
@@ -280,6 +283,10 @@ class ReminderListScreen extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       backgroundColor: Color(0xffF0F0F0),
+                                        minimumSize:
+                                        Size(100, 40),
+                                        elevation:
+                                        0
                                     ),
                                     child: Text(
                                       'No',
@@ -295,6 +302,10 @@ class ReminderListScreen extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       backgroundColor: AppColors.primary,
+                                        minimumSize:
+                                        Size(100, 40),
+                                        elevation:
+                                        0
                                     ),
                                     child: Text(
                                       "Yes",
@@ -345,7 +356,7 @@ class ReminderListScreen extends StatelessWidget {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,7 +482,7 @@ class ReminderListScreen extends StatelessWidget {
                       ),
                       child: PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
-                        icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF)),
+                        icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF),size: 30,),
                         onSelected: (value) async {
                           if (value == "Complete") {
                             controller.completeReminder(reminder.id);
@@ -482,9 +493,12 @@ class ReminderListScreen extends StatelessWidget {
                                 return Container(
                                   child: AlertDialog(
                                     backgroundColor: AppColors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                     title: Text(
                                       "Delete Reminder",
-                                      style: AppTextStyle.mediumBlack16,
+                                      style: AppTextStyle.mediumBlack18,
                                     ),
                                     content: Text(
                                       "Are you sure you want to delete this reminder?",
@@ -501,6 +515,10 @@ class ReminderListScreen extends StatelessWidget {
                                                 BorderRadius.circular(8),
                                           ),
                                           backgroundColor: Color(0xffF0F0F0),
+                                            minimumSize:
+                                            Size(100, 40),
+                                            elevation:
+                                            0
                                         ),
                                         child: Text(
                                           'No',
@@ -517,6 +535,10 @@ class ReminderListScreen extends StatelessWidget {
                                                 BorderRadius.circular(8),
                                           ),
                                           backgroundColor: AppColors.primary,
+                                            minimumSize:
+                                            Size(100, 40),
+                                            elevation:
+                                            0
                                         ),
                                         child: Text(
                                           "Yes",
@@ -567,7 +589,7 @@ class ReminderListScreen extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -698,7 +720,7 @@ class ReminderListScreen extends StatelessWidget {
                           child: PopupMenuButton<String>(
                             padding: EdgeInsets.zero,
                             icon: Icon(Icons.more_horiz,
-                                color: Color(0xffAFAFAF)),
+                                color: Color(0xffAFAFAF),size: 30,),
                             onSelected: (value) async {
                               if (value == "Complete") {
                                 controller.completeReminder(reminder.id);
@@ -711,7 +733,7 @@ class ReminderListScreen extends StatelessWidget {
                                         backgroundColor: AppColors.white,
                                         title: Text(
                                           "Delete Reminder",
-                                          style: AppTextStyle.mediumBlack16,
+                                          style: AppTextStyle.mediumBlack18,
                                         ),
                                         content: Text(
                                           "Are you sure you want to delete this reminder?",
@@ -729,6 +751,10 @@ class ReminderListScreen extends StatelessWidget {
                                               ),
                                               backgroundColor:
                                                   Color(0xffF0F0F0),
+                                                minimumSize:
+                                                Size(100, 40),
+                                                elevation:
+                                                0
                                             ),
                                             child: Text(
                                               'No',
@@ -747,6 +773,10 @@ class ReminderListScreen extends StatelessWidget {
                                               ),
                                               backgroundColor:
                                                   AppColors.primary,
+                                                minimumSize:
+                                                Size(100, 40),
+                                                elevation:
+                                                0
                                             ),
                                             child: Text(
                                               "Yes",

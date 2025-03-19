@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
@@ -26,14 +27,23 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
   DateTime selectedDate = DateTime.now();
   String note = '';
 
-  // Add FocusNodes for TextFields
   final FocusNode amountFocusNode = FocusNode();
   final FocusNode noteFocusNode = FocusNode();
+  final TransactionController controller = Get.find<TransactionController>();
 
+  // List of available currency signs
+  final List<String> currencyOptions = [
+    'Rs', '\$', '€', '£', '¥', '₹', '₽', '₩', '₪', '฿', '₫', '₣'
+  ];
+  bool isCurrencyLocked = false;
   @override
   void initState() {
     super.initState();
-    // Optional: Add listeners for debugging focus issues
+    final savedCurrency = Hive.box('settings').get('selectedCurrency');
+    if (savedCurrency != null) {
+      isCurrencyLocked = true;
+      controller.updateCurrency(savedCurrency);
+    }
     amountFocusNode.addListener(() {
       if (amountFocusNode.hasFocus) {
         print("Amount TextField gained focus");
@@ -53,12 +63,11 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
     super.dispose();
   }
 
-  // Helper method to dismiss keyboard and prevent blink
   void _dismissKeyboard(BuildContext context) {
     if (amountFocusNode.hasFocus || noteFocusNode.hasFocus) {
-      FocusScope.of(context).requestFocus(FocusNode()); // Shift focus to a dummy node
+      FocusScope.of(context).requestFocus(FocusNode());
       Future.delayed(Duration(milliseconds: 50), () {
-        FocusScope.of(context).unfocus(); // Ensure keyboard stays dismissed
+        FocusScope.of(context).unfocus();
       });
     }
   }
@@ -82,12 +91,11 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
         ),
       ),
       body: GestureDetector(
-        onTap: () => _dismissKeyboard(context), // Dismiss keyboard on tap outside
+        onTap: () => _dismissKeyboard(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10),
           child: ListView(
             children: [
-              // Tabs
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: ['Income', 'Expense', 'Transfer'].map((tab) {
@@ -119,30 +127,74 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                 }).toList(),
               ),
               SizedBox(height: 10),
-              // Amount
+              // Amount with Currency Selection
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: selectedTab == 'Income' ? Colors.green[50] : Colors.red[50],
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: TextField(
-                  focusNode: amountFocusNode, // Attach FocusNode
-                  decoration: InputDecoration(
-                    prefixText: 'Rs ',
-                    hintText: '0',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey[600]),
-                  ),
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    amount = double.tryParse(value) ?? 0.0;
-                  },
+                child: Row(
+                  children: [
+                    Obx(() => Container(
+                      decoration: BoxDecoration(
+                        color: selectedTab == 'Income' ? Colors.green[50] : Colors.red[50],
+                        borderRadius: BorderRadius.circular(8),
+
+                      ),
+                      child: DropdownButton<String>(
+                        value: controller.selectedCurrency.value,
+                        items: currencyOptions
+                            .map((String currency) => DropdownMenuItem<String>(
+                          value: currency,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              currency,
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ))
+                            .toList(),
+                        onChanged: isCurrencyLocked
+                            ? null // Disable dropdown if currency is locked
+                            : (value) {
+                          if (value != null) {
+                            controller.updateCurrency(value);
+                          }
+                        },
+                        underline: SizedBox(),
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.black54,
+                        ),
+                        dropdownColor: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    )),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        focusNode: amountFocusNode,
+                        decoration: InputDecoration(
+                          hintText: '0',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.grey[600]),
+                        ),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          amount = double.tryParse(value) ?? 0.0;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 10),
-              // Fields
               if (selectedTab != 'Transfer') ...[
                 Container(
                   decoration: BoxDecoration(
@@ -154,15 +206,9 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                     title: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          'Category',
-                          style: AppTextStyle.regularBlack16,
-                        ),
+                        Text('Category', style: AppTextStyle.regularBlack16),
                         SizedBox(width: 5),
-                        Icon(
-                          Icons.chevron_right,
-                          color: AppColors.lightRed,
-                        ),
+                        Icon(Icons.chevron_right, color: AppColors.lightRed),
                         SizedBox(width: 5),
                         Text(
                           selectedCategory ?? 'Select',
@@ -171,7 +217,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       ],
                     ),
                     onTap: () {
-                      _dismissKeyboard(context); // Dismiss before bottom sheet
+                      _dismissKeyboard(context);
                       Get.bottomSheet(CategoryBottomSheet(
                         onCategorySelected: (category) {
                           setState(() {
@@ -192,15 +238,9 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                   child: ListTile(
                     title: Row(
                       children: [
-                        Text(
-                          'Payment Method',
-                          style: AppTextStyle.regularBlack16,
-                        ),
+                        Text('Payment Method', style: AppTextStyle.regularBlack16),
                         SizedBox(width: 5),
-                        Icon(
-                          Icons.chevron_right,
-                          color: AppColors.lightRed,
-                        ),
+                        Icon(Icons.chevron_right, color: AppColors.lightRed),
                         SizedBox(width: 5),
                         Text(
                           selectedPaymentMethod ?? 'Select',
@@ -209,7 +249,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       ],
                     ),
                     onTap: () {
-                      _dismissKeyboard(context); // Dismiss before bottom sheet
+                      _dismissKeyboard(context);
                       Get.bottomSheet(PaymentMethodBottomSheet(
                         onMethodSelected: (method) {
                           setState(() {
@@ -230,15 +270,9 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                   child: ListTile(
                     title: Row(
                       children: [
-                        Text(
-                          'From',
-                          style: AppTextStyle.regularBlack16,
-                        ),
+                        Text('From', style: AppTextStyle.regularBlack16),
                         SizedBox(width: 5),
-                        Icon(
-                          Icons.chevron_right,
-                          color: AppColors.lightRed,
-                        ),
+                        Icon(Icons.chevron_right, color: AppColors.lightRed),
                         SizedBox(width: 5),
                         Text(
                           fromWallet ?? 'Select',
@@ -247,7 +281,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       ],
                     ),
                     onTap: () {
-                      _dismissKeyboard(context); // Dismiss before bottom sheet
+                      _dismissKeyboard(context);
                       Get.bottomSheet(WalletBottomSheet(
                         onWalletSelected: (wallet) {
                           setState(() {
@@ -267,15 +301,9 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                   child: ListTile(
                     title: Row(
                       children: [
-                        Text(
-                          'To',
-                          style: AppTextStyle.regularBlack16,
-                        ),
+                        Text('To', style: AppTextStyle.regularBlack16),
                         SizedBox(width: 5),
-                        Icon(
-                          Icons.chevron_right,
-                          color: AppColors.lightRed,
-                        ),
+                        Icon(Icons.chevron_right, color: AppColors.lightRed),
                         SizedBox(width: 5),
                         Text(
                           toWallet ?? 'Select',
@@ -284,7 +312,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       ],
                     ),
                     onTap: () {
-                      _dismissKeyboard(context); // Dismiss before bottom sheet
+                      _dismissKeyboard(context);
                       Get.bottomSheet(WalletBottomSheet(
                         onWalletSelected: (wallet) {
                           setState(() {
@@ -305,15 +333,9 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                 child: ListTile(
                   title: Row(
                     children: [
-                      Text(
-                        'Date',
-                        style: AppTextStyle.regularBlack16,
-                      ),
+                      Text('Date', style: AppTextStyle.regularBlack16),
                       SizedBox(width: 5),
-                      Icon(
-                        Icons.chevron_right,
-                        color: AppColors.lightRed,
-                      ),
+                      Icon(Icons.chevron_right, color: AppColors.lightRed),
                       SizedBox(width: 5),
                       Text(
                         DateFormat('EEE, dd/MM/yyyy').format(selectedDate),
@@ -322,7 +344,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                     ],
                   ),
                   onTap: () async {
-                    _dismissKeyboard(context); // Dismiss keyboard before picker
+                    _dismissKeyboard(context);
                     final DateTime? picked = await showRoundedDatePicker(
                       context: context,
                       initialDate: selectedDate,
@@ -331,12 +353,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       theme: ThemeData(
                         primaryColor: AppColors.primary,
                       ),
-                      // Add height constraint
                       height: MediaQuery.of(context).size.height * 0.4,
-                      // 70% of screen height
-                      // Customize appearance
                       styleDatePicker: MaterialRoundedDatePickerStyle(
-                        // Apply your theme colors
                         textStyleDayButton: TextStyle(color: AppColors.white, fontSize: 20),
                         textStyleYearButton: TextStyle(color: AppColors.white, fontSize: 20),
                         textStyleDayHeader: TextStyle(color: AppColors.primary, fontSize: 14),
@@ -351,7 +369,6 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                           fontSize: 14,
                           color: AppColors.primary,
                         ),
-                        // // Add padding if needed
                       ),
                     );
                     if (picked != null && picked != selectedDate) {
@@ -360,12 +377,12 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       });
                     }
                     await Future.delayed(Duration(milliseconds: 50));
-                    _dismissKeyboard(context); // Ensure no refocus after picker
+                    _dismissKeyboard(context);
                   },
                 ),
               ),
               TextField(
-                focusNode: noteFocusNode, // Attach FocusNode
+                focusNode: noteFocusNode,
                 decoration: InputDecoration(
                   hintText: "Note",
                   hintStyle: AppTextStyle.regularBlack16
@@ -387,7 +404,6 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  final controller = Get.find<TransactionController>();
                   final transaction = Transaction(
                     id: DateTime.now().millisecondsSinceEpoch.toString(),
                     amount: amount,
@@ -400,6 +416,12 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                     toWallet: toWallet,
                   );
                   controller.addTransaction(transaction);
+                  if (!isCurrencyLocked) {
+                    Hive.box('settings').put('selectedCurrency', controller.selectedCurrency.value);
+                    setState(() {
+                      isCurrencyLocked = true;
+                    });
+                  }
                   Get.back();
                 },
                 style: ElevatedButton.styleFrom(

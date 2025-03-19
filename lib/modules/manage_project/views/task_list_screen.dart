@@ -37,70 +37,78 @@ class TaskListScreen extends StatelessWidget {
             final project = box.getAt(projectIndex);
             return Text(
               project?.title ?? 'Task List',
-              style: AppTextStyle.mediumBlack20.copyWith(
-                  fontWeight: FontWeight.w700),
+              style: AppTextStyle.mediumBlack20
+                  .copyWith(fontWeight: FontWeight.w700),
             );
           },
         ),
         actions: [
-         GestureDetector(
-           onTap: (){
-             showDialog<bool>(
-               context: context,
-               builder: (context) {
-                 return AlertDialog(
-                   backgroundColor: AppColors.white,
-                   title: Text(
-                     "Delete Project",
-                     style: AppTextStyle.mediumBlack16,
-                   ),
-                   content: Text(
-                     "Are you sure you want to delete this Project?",
-                     style: AppTextStyle.regularBlack14,
-                   ),
-                   actions: [
-                     ElevatedButton(
-                       onPressed: () {
-                         Navigator.pop(context);
-                       },
-                       style: ElevatedButton.styleFrom(
-                         shape: RoundedRectangleBorder(
-                           borderRadius: BorderRadius.circular(8),
-                         ),
-                         backgroundColor: const Color(0xffF0F0F0),
-                       ),
-                       child: Text(
-                         'No',
-                         style: AppTextStyle.mediumPrimary14,
-                       ),
-                     ),
-                     ElevatedButton(
-                       onPressed: () {
-                         projectC.deleteProject(projectIndex);
-                         Get.back(); // Close the dialog
-                       },
-                       style: ElevatedButton.styleFrom(
-                         shape: RoundedRectangleBorder(
-                           borderRadius: BorderRadius.circular(8),
-                         ),
-                         backgroundColor: AppColors.primary,
-                       ),
-                       child: Text(
-                         "Yes",
-                         style: AppTextStyle.mediumBlack14
-                             .copyWith(color: AppColors.white),
-                       ),
-                     ),
-                   ],
-                 );
-               },
-             );
-           },
-           child: Padding(
-             padding: const EdgeInsets.only(right: 14.0),
-             child: Image.asset('assets/icons/ic_delete.png',height: 22,),
-           ),
-         )
+          GestureDetector(
+            onTap: () {
+              showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    backgroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    title: Text(
+                      "Delete Project",
+                      style: AppTextStyle.mediumBlack18,
+                    ),
+                    content: Text(
+                      "Are you sure you want to delete this Project?",
+                      style: AppTextStyle.regularBlack14,
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: const Color(0xffF0F0F0),
+                            minimumSize: Size(100, 40),
+                            elevation: 0),
+                        child: Text(
+                          'No',
+                          style: AppTextStyle.mediumPrimary14,
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          projectC.deleteProject(projectIndex);
+                          Get.back(); // Close the dialog
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: AppColors.primary,
+                            minimumSize: Size(100, 40),
+                            elevation: 0),
+                        child: Text(
+                          "Yes",
+                          style: AppTextStyle.mediumBlack14
+                              .copyWith(color: AppColors.white),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 14.0),
+              child: Image.asset(
+                'assets/icons/ic_delete.png',
+                height: 22,
+              ),
+            ),
+          )
         ],
       ),
       body: ValueListenableBuilder(
@@ -128,24 +136,33 @@ class TaskListScreen extends StatelessWidget {
                 ),
                 margin: EdgeInsets.symmetric(vertical: 8),
                 child: Padding(
-                  padding: EdgeInsets.only(left: 12,bottom: 12,top: 12),
+                  padding: EdgeInsets.only(left: 12, bottom: 12, top: 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        task.title,
+                        style: AppTextStyle.mediumBlack16.copyWith(
+                          fontWeight: FontWeight.w600,
+                          decoration: isCompleted
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                          color: isCompleted ? Color(0xffAFAFAF) : Colors.black,
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            child: Text(
-                              task.title,
-                              style: AppTextStyle.mediumBlack16.copyWith(
-                                fontWeight: FontWeight.w600,
-                                decoration: isCompleted
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                                color: isCompleted ? Color(0xffAFAFAF) : Colors
-                                    .black,
-                              ),
+                          Text(
+                            task.description,
+                            style: AppTextStyle.regularBlack14.copyWith(
+                              fontSize: 13,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                              color: isCompleted
+                                  ? Color(0xffAFAFAF)
+                                  : Colors.black,
                             ),
                           ),
                           Theme(
@@ -160,27 +177,35 @@ class TaskListScreen extends StatelessWidget {
                             child: PopupMenuButton<String>(
                               padding: EdgeInsets.zero,
                               icon: const Icon(
-                                  Icons.more_vert, color: Color(0xffAFAFAF)),
+                                Icons.more_vert,
+                                color: Color(0xffAFAFAF),
+                                size: 30,
+                              ),
                               onSelected: (value) async {
                                 if (value == "Edit") {
-                                  Get.to(() =>
-                                      AddTaskScreen(
-                                          projectIndex: projectIndex,
-                                          taskIndex: taskIndex,
-                                          task: task));
+                                  Get.to(() => AddTaskScreen(
+                                      projectIndex: projectIndex,
+                                      taskIndex: taskIndex,
+                                      task: task));
                                 } else if (value == "Delete") {
                                   bool? shouldDelete = await showDialog<bool>(
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
                                         backgroundColor: AppColors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
                                         title: Column(
                                           children: [
-                                            Image.asset('assets/icons/ic_delete.webp', height: 74),
+                                            Image.asset(
+                                                'assets/icons/ic_delete.webp',
+                                                height: 74),
                                             const SizedBox(height: 10),
                                             Text(
                                               "Delete Task",
-                                              style: AppTextStyle.mediumBlack16,
+                                              style: AppTextStyle.mediumBlack18,
                                             ),
                                           ],
                                         ),
@@ -194,17 +219,18 @@ class TaskListScreen extends StatelessWidget {
                                               Navigator.pop(context);
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius
-                                                    .circular(8),
-                                              ),
-                                              backgroundColor: const Color(
-                                                  0xffF0F0F0),
-                                            ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                backgroundColor:
+                                                    const Color(0xffF0F0F0),
+                                                minimumSize: Size(100, 40),
+                                                elevation: 0),
                                             child: Text(
                                               'No',
-                                              style: AppTextStyle
-                                                  .mediumPrimary14,
+                                              style:
+                                                  AppTextStyle.mediumPrimary14,
                                             ),
                                           ),
                                           ElevatedButton(
@@ -212,18 +238,19 @@ class TaskListScreen extends StatelessWidget {
                                               Navigator.of(context).pop(true);
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius
-                                                    .circular(8),
-                                              ),
-                                              backgroundColor: AppColors
-                                                  .primary,
-                                            ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.primary,
+                                                minimumSize: Size(100, 40),
+                                                elevation: 0),
                                             child: Text(
                                               "Yes",
                                               style: AppTextStyle.mediumBlack14
                                                   .copyWith(
-                                                  color: AppColors.white),
+                                                      color: AppColors.white),
                                             ),
                                           ),
                                         ],
@@ -237,8 +264,7 @@ class TaskListScreen extends StatelessWidget {
                                   }
                                 }
                               },
-                              itemBuilder: (context) =>
-                              [
+                              itemBuilder: (context) => [
                                 PopupMenuItem(
                                   value: "Edit",
                                   child: Text(
@@ -259,17 +285,6 @@ class TaskListScreen extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 5),
-                      Text(
-                        task.description,
-                        style: AppTextStyle.regularBlack14.copyWith(
-                          fontSize: 13,
-                          decoration: isCompleted
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                          color: isCompleted ? Color(0xffAFAFAF) : Colors.black,
-                        ),
-                      ),
-                      SizedBox(height: 5),
                       Container(
                         height: Get.height * 0.003,
                         color: Color(0xffEEEEEE),
@@ -284,8 +299,9 @@ class TaskListScreen extends StatelessWidget {
                               decoration: isCompleted
                                   ? TextDecoration.lineThrough
                                   : TextDecoration.none,
-                              color: isCompleted ? Color(0xffAFAFAF) : Color(
-                                  0xffAFAFAF),
+                              color: isCompleted
+                                  ? Color(0xffAFAFAF)
+                                  : Color(0xffAFAFAF),
                             ),
                           ),
                           Padding(
@@ -299,9 +315,9 @@ class TaskListScreen extends StatelessWidget {
                                     color: task.status == 'Complete'
                                         ? Colors.green
                                         : task.status == 'In Progress'
-                                        ? AppColors
-                                        .orange // Yellow for "In Progress"
-                                        : Colors.red, // Red for "Pending"
+                                            ? AppColors
+                                                .orange // Yellow for "In Progress"
+                                            : Colors.red, // Red for "Pending"
                                   ),
                                 ),
                               ],
@@ -336,8 +352,8 @@ class TaskListScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 "Add new Task",
-                style: AppTextStyle.mediumBlack16.copyWith(
-                    color: AppColors.white),
+                style:
+                    AppTextStyle.mediumBlack16.copyWith(color: AppColors.white),
               ),
             ),
           ),
