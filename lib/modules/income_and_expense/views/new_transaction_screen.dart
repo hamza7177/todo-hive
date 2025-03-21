@@ -140,9 +140,17 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                       decoration: BoxDecoration(
                         color: selectedTab == 'Income' ? Colors.green[50] : Colors.red[50],
                         borderRadius: BorderRadius.circular(8),
-
                       ),
-                      child: DropdownButton<String>(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: isCurrencyLocked
+                          ? Text(
+                        controller.selectedCurrency.value,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.black87,
+                        ),
+                      )
+                          : DropdownButton<String>(
                         value: controller.selectedCurrency.value,
                         items: currencyOptions
                             .map((String currency) => DropdownMenuItem<String>(
@@ -159,9 +167,7 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                           ),
                         ))
                             .toList(),
-                        onChanged: isCurrencyLocked
-                            ? null // Disable dropdown if currency is locked
-                            : (value) {
+                        onChanged: (value) {
                           if (value != null) {
                             controller.updateCurrency(value);
                           }
@@ -198,8 +204,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
               if (selectedTab != 'Transfer') ...[
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.textFieldColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   margin: const EdgeInsets.only(bottom: 8), // Fix: Replace 'custom' with 'bottom'
                   child: ListTile(
@@ -231,8 +237,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.textFieldColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   margin: const EdgeInsets.only(bottom: 8), // Fix: Replace 'custom' with 'bottom'
                   child: ListTile(
@@ -263,8 +269,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
               ] else ...[
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.textFieldColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   margin: const EdgeInsets.only(bottom: 8), // Fix: Replace 'custom' with 'bottom'
                   child: ListTile(
@@ -294,8 +300,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.textFieldColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   margin: const EdgeInsets.only(bottom: 8), // Fix: Replace 'custom' with 'bottom'
                   child: ListTile(
@@ -326,8 +332,8 @@ class _NewTransactionScreenState extends State<NewTransactionScreen> {
               ],
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.cardColor,
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppColors.textFieldColor,
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 margin: const EdgeInsets.only(bottom: 8), // Fix: Replace 'custom' with 'bottom'
                 child: ListTile(

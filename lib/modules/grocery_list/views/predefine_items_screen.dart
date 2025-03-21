@@ -139,7 +139,7 @@ class PredefinedItemsScreen extends GetView<GroceryListController> {
                         leading: Obx(() {
                           final quantity = controller.itemQuantities[itemName] ?? 0;
                           return GestureDetector(
-                            onTap: () => controller.addPredefinedItem(itemName),
+                            onTap: () => controller.addPredefinedItem(itemName,context),
                             child: Container(
                               height: 20,
                               width: 20,

@@ -64,8 +64,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              controller.saveReminder();
-              Navigator.pop(context);
+              controller.saveReminder(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -127,7 +126,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                 style: AppTextStyle.regularBlack16,
                 onChanged: (value) => controller.reminderName.value = value,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               _buildSwitchTile('Interval', controller.isInterval, () {
                 _dismissKeyboard(context); // Dismiss before interaction
                 controller.toggleInterval();
@@ -171,9 +170,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
 
   Widget _buildSwitchTile(String title, RxBool value, VoidCallback onChanged) {
     return Obx(() => Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           decoration: BoxDecoration(
-            color: AppColors.cardColor,
+            color: AppColors.textFieldColor,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../../utils/app_colors.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../models/grocery_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -103,7 +105,7 @@ class GroceryListController extends GetxController {
     }
   }
 
-  void deleteList(String listId) {
+  void deleteList(String listId,BuildContext context) {
     if (!isLoading.value) {
       // Find the index of the list to delete
       final index = groceryLists.indexWhere((list) => list.id == listId);
@@ -132,19 +134,33 @@ class GroceryListController extends GetxController {
         update(); // Force UI update
 
         // Notify user
-        Get.snackbar('Success', 'List and all associated items deleted successfully.');
+        CustomFlashBar.show(
+          context: context,
+          message: "List deleted successfully",
+          isAdmin: true, // optional
+          isShaking: false, // optional
+          primaryColor: AppColors.primary, // optional
+          secondaryColor: Colors.white, // optional
+        );
       }
     }
   }
 
 
-  void permanentlyDeleteList(String listId) {
+  void permanentlyDeleteList(String listId,BuildContext context) {
     if (!isLoading.value) {
       // This method can be the same as deleteList for now, but with a different name for clarity
-      deleteList(listId); // Reuse the existing deletion logic
+      deleteList(listId, context); // Reuse the existing deletion logic
 
       // Optionally, add additional cleanup or logging for permanent deletion
-      Get.snackbar('Success', 'List and all items permanently deleted.');
+      CustomFlashBar.show(
+        context: context,
+        message: "List and all items permanently delete",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
     }
   }
 
@@ -213,12 +229,19 @@ class GroceryListController extends GetxController {
     }
   }
 
-  void addPredefinedItem(String itemName) {
+  void addPredefinedItem(String itemName,BuildContext context) {
     if (!isLoading.value && currentListId.value.isNotEmpty) {
       final currentQuantity = itemQuantities[itemName] ?? 0;
       updateQuantity(itemName, currentQuantity + 1);
     } else {
-      Get.snackbar('Error', 'Please select a list before adding items.');
+      CustomFlashBar.show(
+        context: context,
+        message: "Please select a list before adding items",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
     }
   }
 

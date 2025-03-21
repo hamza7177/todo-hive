@@ -113,7 +113,7 @@ class TodoController extends GetxController {
     completedTaskBox.add(completedTask);
     deleteTask(task);
     fetchCompletedTasks();
-    Get.snackbar('Success', 'Task marked as completed');
+
   }
 
   List<Task> getFilteredTasks() {
@@ -173,7 +173,7 @@ class TodoController extends GetxController {
       taskBox.add(task);
       fetchTasks();
       fetchCompletedTasks();
-      Get.snackbar('Success', 'Task marked as active again');
+
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../controllers/notes_controller.dart';
 
 class NoteAddScreen extends StatefulWidget {
@@ -137,11 +138,32 @@ class _NoteAddScreenState extends State<NoteAddScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (noteController.titleController.text.isEmpty) {
-                    Get.snackbar("Error", "Please enter title");
+                    CustomFlashBar.show(
+                      context: context,
+                      message: "Enter a title",
+                      isAdmin: true, // optional
+                      isShaking: false, // optional
+                      primaryColor: AppColors.primary, // optional
+                      secondaryColor: Colors.white, // optional
+                    );
                   } else if (noteController.selectedCategory.value.isEmpty) {
-                    Get.snackbar("Error", "Please select category");
+                    CustomFlashBar.show(
+                      context: context,
+                      message: "Select category",
+                      isAdmin: true, // optional
+                      isShaking: false, // optional
+                      primaryColor: AppColors.primary, // optional
+                      secondaryColor: Colors.white, // optional
+                    );
                   } else if (noteController.noteController.text.isEmpty) {
-                    Get.snackbar("Error", "Please enter note");
+                    CustomFlashBar.show(
+                      context: context,
+                      message: "enter note description",
+                      isAdmin: true, // optional
+                      isShaking: false, // optional
+                      primaryColor: AppColors.primary, // optional
+                      secondaryColor: Colors.white, // optional
+                    );
                   } else {
                     noteController.addNote(
                         noteController.titleController.text,

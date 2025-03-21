@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 
 import '../../../utils/app_text_style.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../controllers/todo_controller.dart';
 import '../model/task_model.dart';
 import '../widgets/todo_list_filter.dart';
@@ -102,14 +103,15 @@ class TodoListScreen extends StatelessWidget {
                   dashPattern: [8, 4],
                   strokeWidth: 2,
                   borderType: BorderType.RRect,
-                  radius: Radius.circular(12),
+                  radius: Radius.circular(10),
                   child: GestureDetector(
                     onTap: () => showCategoryDialog(context),
                     child: Container(
+                      height: 54,
                       padding:
                           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: AppColors.cardColor,
+                        color: AppColors.textFieldColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -247,15 +249,16 @@ class TodoListScreen extends StatelessWidget {
                   dashPattern: [8, 4],
                   strokeWidth: 2,
                   borderType: BorderType.RRect,
-                  radius: Radius.circular(12),
+                  radius: Radius.circular(10),
                   child: GestureDetector(
                     onTap: () =>
                         showUpdateCategoryDialog(context, task.category),
                     child: Container(
+                      height: 52,
                       padding:
                           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: AppColors.cardColor,
+                        color: AppColors.textFieldColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -476,6 +479,14 @@ class TodoListScreen extends StatelessWidget {
                                   GestureDetector(
                                     onTap: () {
                                       todoC.completeTask(task);
+                                      CustomFlashBar.show(
+                                        context: context,
+                                        message: "Task marked as completed",
+                                        isAdmin: true, // optional
+                                        isShaking: false, // optional
+                                        primaryColor: AppColors.primary, // optional
+                                        secondaryColor: Colors.white, // optional
+                                      );
                                     },
                                     child: Container(
                                       height: 20,
@@ -634,6 +645,14 @@ class TodoListScreen extends StatelessWidget {
                                   GestureDetector(
                                     onTap: () {
                                       todoC.uncompleteTask(task);
+                                      CustomFlashBar.show(
+                                        context: context,
+                                        message: "Task marked as active again",
+                                        isAdmin: true, // optional
+                                        isShaking: false, // optional
+                                        primaryColor: AppColors.primary, // optional
+                                        secondaryColor: Colors.white, // optional
+                                      );
                                     },
                                     child: Container(
                                       height: 20,
@@ -760,8 +779,14 @@ class TodoListScreen extends StatelessWidget {
                                                 todoC.completedTaskBox
                                                     .delete(taskKey);
                                                 todoC.fetchCompletedTasks();
-                                                Get.snackbar('Success',
-                                                    'Completed task deleted');
+                                                CustomFlashBar.show(
+                                                  context: context,
+                                                  message: "Completed task deleted",
+                                                  isAdmin: true, // optional
+                                                  isShaking: false, // optional
+                                                  primaryColor: AppColors.primary, // optional
+                                                  secondaryColor: Colors.white, // optional
+                                                );
                                               }
                                             }
                                           }

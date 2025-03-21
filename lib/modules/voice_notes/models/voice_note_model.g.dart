@@ -21,13 +21,14 @@ class VoiceNoteAdapter extends TypeAdapter<VoiceNote> {
       audioPath: fields[1] as String,
       createdAt: fields[2] as DateTime,
       isStarred: fields[3] as bool,
+      duration: fields[4] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, VoiceNote obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class VoiceNoteAdapter extends TypeAdapter<VoiceNote> {
       ..writeByte(2)
       ..write(obj.createdAt)
       ..writeByte(3)
-      ..write(obj.isStarred);
+      ..write(obj.isStarred)
+      ..writeByte(4)
+      ..write(obj.duration);
   }
 
   @override

@@ -12,6 +12,11 @@ class VoiceNoteListScreen extends StatelessWidget {
 
   final VoiceNoteController voiceC = Get.put(VoiceNoteController());
   final TextEditingController titleController = TextEditingController();
+  String _formatDuration(double durationInSeconds) {
+    int minutes = (durationInSeconds ~/ 60);
+    int seconds = (durationInSeconds % 60).toInt();
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
 
   void _showRecordingBottomSheet(BuildContext context) {
     Get.bottomSheet(Container(
@@ -202,7 +207,7 @@ class VoiceNoteListScreen extends StatelessWidget {
                 : GestureDetector(
                     onTap: voiceC.isRecording.value
                         ? () => voiceC.stopRecording(titleController.text)
-                        : () => voiceC.startRecording(),
+                        : () => voiceC.startRecording(context),
                     child: Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -386,48 +391,50 @@ class VoiceNoteListScreen extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: 5,
+                                        height: 8,
                                       ),
                                       Container(
                                         height: 43,
-                                        width: 93,
+                                        width: 97, // Responsive width
                                         decoration: BoxDecoration(
                                           color: Color(0xffEAEAEA),
-                                          borderRadius:
-                                              BorderRadius.circular(66),
+                                          borderRadius: BorderRadius.circular(66),
                                         ),
                                         child: Obx(
-                                          () => IconButton(
-                                            icon: Icon(
-                                              voiceC.isPlaying.value &&
-                                                      voiceC.audioPlayer
-                                                              .audioSource
-                                                          is UriAudioSource &&
-                                                      (voiceC.audioPlayer
-                                                                      .audioSource
-                                                                  as UriAudioSource)
-                                                              .uri
-                                                              .path ==
-                                                          note.audioPath
-                                                  ? Icons.pause
-                                                  : Icons.play_arrow,
-                                            ),
-                                            onPressed: () {
-                                              if (voiceC.isPlaying.value &&
-                                                  voiceC.audioPlayer.audioSource
-                                                      is UriAudioSource &&
-                                                  (voiceC.audioPlayer
-                                                                  .audioSource
-                                                              as UriAudioSource)
+                                              () => Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (voiceC.isPlaying.value &&
+                                                      voiceC.audioPlayer.audioSource is UriAudioSource &&
+                                                      (voiceC.audioPlayer.audioSource as UriAudioSource)
                                                           .uri
                                                           .path ==
-                                                      note.audioPath) {
-                                                voiceC.pauseVoiceNote();
-                                              } else {
-                                                voiceC.playVoiceNote(
-                                                    note.audioPath);
-                                              }
-                                            },
+                                                          note.audioPath) {
+                                                    voiceC.pauseVoiceNote();
+                                                  } else {
+                                                    voiceC.playVoiceNote(note.audioPath);
+                                                  }
+                                                },
+                                                child: Icon(
+                                                  voiceC.isPlaying.value &&
+                                                      voiceC.audioPlayer.audioSource is UriAudioSource &&
+                                                      (voiceC.audioPlayer.audioSource as UriAudioSource)
+                                                          .uri
+                                                          .path ==
+                                                          note.audioPath
+                                                      ? Icons.pause
+                                                      : Icons.play_arrow,
+                                                  size: 24, // You can adjust the size as needed
+                                                ),
+                                              ),
+                                              SizedBox(width: 5), // Add some spacing between icon and text
+                                              Text(
+                                                _formatDuration(note.duration),
+                                                style: AppTextStyle.mediumBlack16,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),

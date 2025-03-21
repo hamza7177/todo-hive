@@ -10,6 +10,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../../utils/app_colors.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../models/schedule_model.dart';
 
 class ScheduleController extends GetxController {
@@ -40,7 +41,7 @@ class ScheduleController extends GetxController {
     completedScheduleBox = Hive.box<ScheduleModel>('completedSchedules');
     loadSchedules();
     loadCompletedSchedules();
-    await initializeNotifications();
+    await initializeNotifications(Get.context!);
     startCleanupTimer(); // Start the timer for cleanup
   }
 
@@ -84,7 +85,7 @@ class ScheduleController extends GetxController {
     loadCompletedSchedules(); // Refresh the completed schedules list
   }
 
-  Future<void> initializeNotifications() async {
+  Future<void> initializeNotifications(BuildContext context) async {
     tz.initializeTimeZones();
     final String timeZoneName = tz.local.name;
     print('Current time zone: $timeZoneName');
@@ -115,11 +116,15 @@ class ScheduleController extends GetxController {
       print('Exact alarm permission granted: $grantedExactAlarms');
 
       if (grantedNotifications != true || grantedExactAlarms != true) {
-        Get.snackbar(
-          'Permission Required',
-          'Please grant notification and exact alarm permissions to receive reminders.',
-          snackPosition: SnackPosition.BOTTOM,
+        CustomFlashBar.show(
+          context: context,
+          message: "Please grant notification permission",
+          isAdmin: true, // optional
+          isShaking: false, // optional
+          primaryColor: AppColors.primary, // optional
+          secondaryColor: Colors.white, // optional
         );
+
       }
     }
   }

@@ -158,9 +158,13 @@ class MainScreen extends GetView<TransactionController> {
                               builder: (context) {
                                 return AlertDialog(
                                   backgroundColor: AppColors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                    BorderRadius.circular(10),
+                                  ),
                                   title: Text(
                                     "Delete Transaction",
-                                    style: AppTextStyle.mediumBlack16,
+                                    style: AppTextStyle.mediumBlack18,
                                   ),
                                   content: Text(
                                     "Are you sure you want to delete this transaction?",
@@ -176,6 +180,10 @@ class MainScreen extends GetView<TransactionController> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         backgroundColor: const Color(0xffF0F0F0),
+                                          minimumSize:
+                                          Size(100, 40),
+                                          elevation:
+                                          0
                                       ),
                                       child: Text(
                                         'No',
@@ -192,6 +200,10 @@ class MainScreen extends GetView<TransactionController> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         backgroundColor: AppColors.primary,
+                                          minimumSize:
+                                          Size(100, 40),
+                                          elevation:
+                                          0
                                       ),
                                       child: Text(
                                         "Yes",

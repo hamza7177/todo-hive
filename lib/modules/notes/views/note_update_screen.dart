@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../controllers/notes_controller.dart';
 import '../models/note_model.dart';
 
@@ -148,9 +149,24 @@ class _NoteUpdateScreenState extends State<NoteUpdateScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (titleController.text.isEmpty) {
-                    Get.snackbar("Error", "Please enter title");
+                    CustomFlashBar.show(
+                      context: context,
+                      message: "Enter a title",
+                      isAdmin: true, // optional
+                      isShaking: false, // optional
+                      primaryColor: AppColors.primary, // optional
+                      secondaryColor: Colors.white, // optional
+                    );
+
                   } else if (descriptionController.text.isEmpty) {
-                    Get.snackbar("Error", "Please enter note");
+                    CustomFlashBar.show(
+                      context: context,
+                      message: "Enter note description",
+                      isAdmin: true, // optional
+                      isShaking: false, // optional
+                      primaryColor: AppColors.primary, // optional
+                      secondaryColor: Colors.white, // optional
+                    );
                   } else {
                     noteController.updateNote(
                         widget.index,

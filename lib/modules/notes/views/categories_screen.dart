@@ -98,7 +98,7 @@ class CategoriesScreen extends StatelessWidget {
         ),
         title: Text("Delete Category", style: AppTextStyle.mediumBlack18),
         content: Text(
-          "Are you sure you want to delete '${category.name}'? Notes with this category will be set to 'Untitled'.",
+          "Are you sure you want to delete the category '${category.name}'? This action cannot be undone.",
           style: AppTextStyle.regularBlack14,
         ),
         actions: [

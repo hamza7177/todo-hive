@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -8,6 +10,8 @@ import 'dart:io';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../utils/app_colors.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../models/voice_note_model.dart';
 
 class VoiceNoteController extends GetxController{
@@ -36,7 +40,7 @@ class VoiceNoteController extends GetxController{
       print('Recorder opened successfully');
     } catch (e) {
       print('Error opening recorder: $e');
-      Get.snackbar('Error', 'Failed to initialize recorder: $e');
+
     }
     voiceBox = await Hive.openBox<VoiceNote>('voiceNotes');
     loadVoiceNotes();
@@ -56,12 +60,20 @@ class VoiceNoteController extends GetxController{
     }
   }
 
-  Future<bool> checkMicrophonePermission() async {
+  Future<bool> checkMicrophonePermission(BuildContext context) async {
     var status = await Permission.microphone.status;
     if (status.isDenied || status.isPermanentlyDenied) {
       status = await Permission.microphone.request();
       if (status.isPermanentlyDenied) {
-        Get.snackbar('Permission Required', 'Please enable microphone access in settings.');
+        CustomFlashBar.show(
+          context: context,
+          message: "Please enable microphone access in settings",
+          isAdmin: true, // optional
+          isShaking: false, // optional
+          primaryColor: AppColors.primary, // optional
+          secondaryColor: Colors.white, // optional
+        );
+
         await openAppSettings();
         return false;
       }
@@ -69,11 +81,18 @@ class VoiceNoteController extends GetxController{
     return status.isGranted;
   }
 
-  Future<void> startRecording() async {
+  Future<void> startRecording(BuildContext context) async {
     try {
       print('Attempting to start recording...');
-      if (await checkMicrophonePermission()) {
-        Get.snackbar('Permission Granted', 'Starting recording...');
+      if (await checkMicrophonePermission(context)) {
+        CustomFlashBar.show(
+          context: context,
+          message: "Starting recording...",
+          isAdmin: true, // optional
+          isShaking: false, // optional
+          primaryColor: AppColors.primary, // optional
+          secondaryColor: Colors.white, // optional
+        );
         Directory tempDir = await getTemporaryDirectory();
         String path = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.aac';
         await _recorder.startRecorder(toFile: path);
@@ -95,7 +114,7 @@ class VoiceNoteController extends GetxController{
           },
           onError: (error) {
             print('Error in recording progress: $error');
-            Get.snackbar('Error', 'Failed to track recording progress: $error');
+
           },
         );
 
@@ -104,10 +123,16 @@ class VoiceNoteController extends GetxController{
           _updateProgressPeriodically();
         });
       } else {
-        Get.snackbar('Permission Denied', 'Microphone permission is required to record audio.');
+        CustomFlashBar.show(
+          context: context,
+          message: "Microphone permission is required to record audio",
+          isAdmin: true, // optional
+          isShaking: false, // optional
+          primaryColor: AppColors.primary, // optional
+          secondaryColor: Colors.white, // optional
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to start recording: $e');
       print('Error starting recording: $e');
     }
   }
@@ -139,7 +164,6 @@ class VoiceNoteController extends GetxController{
         },
         onError: (error) {
           print('Error in recording progress: $error');
-          Get.snackbar('Error', 'Failed to track recording progress: $error');
         },
       );
 
@@ -154,6 +178,7 @@ class VoiceNoteController extends GetxController{
     try {
       await _recorder.stopRecorder();
       isRecording.value = false;
+      double finalDuration = recordingProgress.value; // Save the duration before resetting
       recordingProgress.value = 0.0;
 
       // Cancel the progress subscription
@@ -165,6 +190,7 @@ class VoiceNoteController extends GetxController{
           title: title ?? 'Untitled Note',
           audioPath: currentRecordingPath!,
           createdAt: DateTime.now(),
+          duration: finalDuration, // Save the duration
         );
 
         await voiceBox.add(voiceNote);
@@ -172,7 +198,7 @@ class VoiceNoteController extends GetxController{
         currentRecordingPath = null;
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save recording: $e');
+      print('Error stopping recording: $e');
     }
   }
 
@@ -199,7 +225,7 @@ class VoiceNoteController extends GetxController{
       }
     } catch (e) {
       print('Error cancelling recording: $e');
-      Get.snackbar('Error', 'Failed to cancel recording: $e');
+
     }
   }
 
@@ -224,7 +250,7 @@ class VoiceNoteController extends GetxController{
         }
       });
     } catch (e) {
-      Get.snackbar('Error', 'Failed to play audio: $e');
+      print('Error playing audio: $e');
     }
   }
 

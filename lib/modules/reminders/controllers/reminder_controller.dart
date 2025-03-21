@@ -11,6 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import '../../../utils/app_colors.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../models/reminder_model.dart';
 
 class ReminderController extends GetxController {
@@ -95,7 +96,7 @@ class ReminderController extends GetxController {
     selectedTimeStr.value = DateFormat('hh:mm a').format(DateTime.now());
   }
 
-  void deleteReminder(String id) {
+  void deleteReminder(String id,BuildContext context) {
     final reminder =
         reminderBox.values.firstWhere((element) => element.id == id);
     reminder.delete();
@@ -103,7 +104,14 @@ class ReminderController extends GetxController {
     countdowns.remove(id);
     nextTriggerTimes.remove(id);
     triggeredNotifications.remove(id);
-    Get.snackbar('Success', 'Reminder deleted successfully');
+    CustomFlashBar.show(
+      context: context,
+      message: "Reminder deleted successfully",
+      isAdmin: true, // optional
+      isShaking: false, // optional
+      primaryColor: AppColors.primary, // optional
+      secondaryColor: Colors.white, // optional
+    );
   }
 
   Future<void> pickDate(BuildContext context) async {
@@ -216,9 +224,16 @@ class ReminderController extends GetxController {
     }
   }
 
-  void saveReminder() {
+  void saveReminder(BuildContext context) {
     if (reminderName.value.isEmpty) {
-      Get.snackbar('Error', 'Please enter a reminder name');
+      CustomFlashBar.show(
+        context: context,
+        message: "enter a reminder name",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
       return;
     }
 
@@ -262,7 +277,14 @@ class ReminderController extends GetxController {
         selectedTime.value!.minute,
       );
     } else {
-      Get.snackbar('Error', 'Please select a reminder type');
+      CustomFlashBar.show(
+        context: context,
+        message: "Select a reminder type",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
       return;
     }
 
@@ -280,7 +302,7 @@ class ReminderController extends GetxController {
     );
 
     if (!reminder.isValid()) {
-      Get.snackbar('Error', 'Invalid reminder configuration');
+      // Get.snackbar('Error', 'Invalid reminder configuration');
       return;
     }
 
@@ -288,12 +310,20 @@ class ReminderController extends GetxController {
       reminderBox.add(reminder);
       loadReminders();
       scheduleNotification(reminder);
-      Get.snackbar('Success', 'Reminder saved successfully');
+      CustomFlashBar.show(
+        context: context,
+        message: "Reminder saved successfully",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
+
       resetForm();
       Get.back();
     } catch (e) {
       print('Error saving reminder: $e');
-      Get.snackbar('Error', 'Failed to save reminder');
+
     }
   }
 
@@ -501,7 +531,7 @@ class ReminderController extends GetxController {
     return nextTime;
   }
 
-  void completeReminder(String id) {
+  void completeReminder(String id,BuildContext context) {
     try {
       final reminder =
           reminderBox.values.firstWhere((element) => element.id == id);
@@ -526,7 +556,15 @@ class ReminderController extends GetxController {
       countdowns.remove(id);
       nextTriggerTimes.remove(id);
       triggeredNotifications.remove(id);
-      Get.snackbar('Success', 'Reminder marked as completed');
+      CustomFlashBar.show(
+        context: context,
+        message: "Reminder marked as completed",
+        isAdmin: true, // optional
+        isShaking: false, // optional
+        primaryColor: AppColors.primary, // optional
+        secondaryColor: Colors.white, // optional
+      );
+
     } catch (e) {
       print('Error completing reminder: $e');
       Get.snackbar('Error', 'Failed to complete reminder');

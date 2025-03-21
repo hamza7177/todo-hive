@@ -195,41 +195,36 @@ class ReminderListScreen extends StatelessWidget {
                     Row(
                       children: [
                         reminder.isRepeating == true
-                            ? Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 16),
-                                decoration: BoxDecoration(
-                                    color: Color(int.parse(reminder.color
-                                            .replaceFirst('#', '0xff')))
-                                        .withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(66)),
-                                child: Icon(
-                                  Icons.repeat_rounded,
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
-                                  size: 12,
-                                ),
-                              )
+                            ? Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                              decoration: BoxDecoration(
+                                  color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
+                                      .withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(66)),
+                              child: Icon(
+                                Icons.repeat_rounded,
+                                color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
+                                size: 12,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                          ],
+                        )
                             : SizedBox.shrink(),
-                        SizedBox(
-                          width: 10,
-                        ),
                         Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                          padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Color(int.parse(
-                                    reminder.color.replaceFirst('#', '0xff')))
+                            color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
                                 .withOpacity(0.2),
                             borderRadius: BorderRadius.circular(66),
                           ),
                           child: Text(
                             '${reminder.intervalHours > 0 ? '${reminder.intervalHours}hours ' : ''}'
-                            '${reminder.intervalMinutes > 0 ? '${reminder.intervalMinutes} minutes' : ''}',
+                                '${reminder.intervalMinutes > 0 ? '${reminder.intervalMinutes} minutes' : ''}',
                             style: AppTextStyle.regularBlack12.copyWith(
-                              color: Color(int.parse(
-                                reminder.color.replaceFirst('#', '0xff'),
-                              )),
+                              color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
                             ),
                           ),
                         ),
@@ -254,7 +249,7 @@ class ReminderListScreen extends StatelessWidget {
                     icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF),size: 30,),
                     onSelected: (value) async {
                       if (value == "Complete") {
-                        controller.completeReminder(reminder.id);
+                        controller.completeReminder(reminder.id, context);
                       } else if (value == "Delete") {
                         bool? shouldDelete = await showDialog<bool>(
                           context: context,
@@ -322,7 +317,7 @@ class ReminderListScreen extends StatelessWidget {
                         );
 
                         if (shouldDelete == true) {
-                          controller.deleteReminder(reminder.id);
+                          controller.deleteReminder(reminder.id, context);
                         }
                       }
                     },
@@ -409,59 +404,50 @@ class ReminderListScreen extends StatelessWidget {
                         Row(
                           children: [
                             reminder.isRepeating == true
-                                ? Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 16),
-                                    decoration: BoxDecoration(
-                                        color: Color(int.parse(reminder.color
-                                                .replaceFirst('#', '0xff')))
-                                            .withOpacity(0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(66)),
-                                    child: Icon(
-                                      Icons.repeat_rounded,
-                                      color: Color(int.parse(reminder.color
-                                          .replaceFirst('#', '0xff'))),
-                                      size: 12,
-                                    ),
-                                  )
+                                ? Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                      color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
+                                          .withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(66)),
+                                  child: Icon(
+                                    Icons.repeat_rounded,
+                                    color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
+                                    size: 12,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                              ],
+                            )
                                 : SizedBox(),
-                            SizedBox(
-                              width: 10,
-                            ),
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 12),
+                              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                               decoration: BoxDecoration(
-                                color: Color(int.parse(reminder.color
-                                        .replaceFirst('#', '0xff')))
+                                color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
                                     .withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(66),
                               ),
                               child: Text(
-                                DateFormat('EEE, MMM d')
-                                    .format(reminder.dateTime!),
+                                DateFormat('EEE, MMM d').format(reminder.dateTime!),
                                 style: AppTextStyle.regularBlack12.copyWith(
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
+                                  color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
                                 ),
                               ),
                             ),
                             SizedBox(width: 8),
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 12),
+                              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                               decoration: BoxDecoration(
-                                color: Color(int.parse(reminder.color
-                                        .replaceFirst('#', '0xff')))
+                                color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
                                     .withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(66),
                               ),
                               child: Text(
                                 DateFormat('h:mm a').format(reminder.dateTime!),
                                 style: AppTextStyle.regularBlack12.copyWith(
-                                  color: Color(int.parse(reminder.color
-                                      .replaceFirst('#', '0xff'))),
+                                  color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
                                 ),
                               ),
                             ),
@@ -485,7 +471,7 @@ class ReminderListScreen extends StatelessWidget {
                         icon: Icon(Icons.more_horiz, color: Color(0xffAFAFAF),size: 30,),
                         onSelected: (value) async {
                           if (value == "Complete") {
-                            controller.completeReminder(reminder.id);
+                            controller.completeReminder(reminder.id,context);
                           } else if (value == "Delete") {
                             bool? shouldDelete = await showDialog<bool>(
                               context: context,
@@ -555,7 +541,7 @@ class ReminderListScreen extends StatelessWidget {
                             );
 
                             if (shouldDelete == true) {
-                              controller.deleteReminder(reminder.id);
+                              controller.deleteReminder(reminder.id, context);
                             }
                           }
                         },
@@ -645,60 +631,50 @@ class ReminderListScreen extends StatelessWidget {
                             Row(
                               children: [
                                 reminder.isRepeating == true
-                                    ? Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 6, horizontal: 12),
-                                        decoration: BoxDecoration(
-                                            color: Color(int.parse(reminder
-                                                    .color
-                                                    .replaceFirst('#', '0xff')))
-                                                .withOpacity(0.2),
-                                            borderRadius:
-                                                BorderRadius.circular(66)),
-                                        child: Icon(
-                                          Icons.repeat_rounded,
-                                          color: Color(int.parse(reminder.color
-                                              .replaceFirst('#', '0xff'))),
-                                          size: 12,
-                                        ),
-                                      )
+                                    ? Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                                      decoration: BoxDecoration(
+                                          color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
+                                              .withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(66)),
+                                      child: Icon(
+                                        Icons.repeat_rounded,
+                                        color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
+                                        size: 12,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                  ],
+                                )
                                     : SizedBox(),
-                                SizedBox(
-                                  width: 10,
-                                ),
                                 Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 12),
+                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: Color(int.parse(reminder.color
-                                            .replaceFirst('#', '0xff')))
+                                    color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
                                         .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(66),
                                   ),
                                   child: Text(
                                     '${reminder.weekdays.map((d) => _getWeekdayName(d)).join(", ")}',
                                     style: AppTextStyle.regularBlack12.copyWith(
-                                      color: Color(int.parse(reminder.color
-                                          .replaceFirst('#', '0xff'))),
+                                      color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
                                     ),
                                   ),
                                 ),
                                 SizedBox(width: 8),
                                 Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 12),
+                                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: Color(int.parse(reminder.color
-                                            .replaceFirst('#', '0xff')))
+                                    color: Color(int.parse(reminder.color.replaceFirst('#', '0xff')))
                                         .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(66),
                                   ),
                                   child: Text(
-                                    DateFormat('h:mm a')
-                                        .format(reminder.dateTime!),
+                                    DateFormat('h:mm a').format(reminder.dateTime!),
                                     style: AppTextStyle.regularBlack12.copyWith(
-                                      color: Color(int.parse(reminder.color
-                                          .replaceFirst('#', '0xff'))),
+                                      color: Color(int.parse(reminder.color.replaceFirst('#', '0xff'))),
                                     ),
                                   ),
                                 ),
@@ -723,7 +699,7 @@ class ReminderListScreen extends StatelessWidget {
                                 color: Color(0xffAFAFAF),size: 30,),
                             onSelected: (value) async {
                               if (value == "Complete") {
-                                controller.completeReminder(reminder.id);
+                                controller.completeReminder(reminder.id, context);
                               } else if (value == "Delete") {
                                 bool? shouldDelete = await showDialog<bool>(
                                   context: context,
@@ -793,7 +769,7 @@ class ReminderListScreen extends StatelessWidget {
                                 );
 
                                 if (shouldDelete == true) {
-                                  controller.deleteReminder(reminder.id);
+                                  controller.deleteReminder(reminder.id,context);
                                 }
                               }
                             },

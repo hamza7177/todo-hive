@@ -6,6 +6,7 @@ import 'package:todo_hive/modules/manage_project/models/task.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import 'package:todo_hive/utils/app_text_style.dart';
 
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../../schedule_planner/widgets/priority_filter.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -134,12 +135,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 _dismissKeyboard(context); // Ensure no refocus after picker
               },
               child: Container(
-                height: 51,
+                height: 54,
                 width: 175,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Color(0xffF9F9F9),
-                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.textFieldColor,
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Obx(() => Row(
                   children: [
@@ -283,7 +284,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   descriptionController.clear();
                   Get.back();
                 } else {
-                  Get.snackbar('Error', 'Please enter a title and select a due date');
+                  CustomFlashBar.show(
+                    context: context,
+                    message: "Enter a title and select a due date",
+                    isAdmin: true, // optional
+                    isShaking: false, // optional
+                    primaryColor: AppColors.primary, // optional
+                    secondaryColor: Colors.white, // optional
+                  );
+
                 }
               },
               style: ElevatedButton.styleFrom(

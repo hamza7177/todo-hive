@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../controllers/schedule_controller.dart';
 import '../widgets/priority_filter.dart';
 
@@ -134,6 +135,7 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
               'Description',
               style: AppTextStyle.mediumBlack16,
             ),
+            SizedBox(height: 5,),
             TextField(
               controller: descriptionController,
               focusNode: descriptionFocusNode,
@@ -189,7 +191,7 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
-                  color: AppColors.cardColor,
+                  color: AppColors.textFieldColor,
                   borderRadius: BorderRadius.circular(10)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,8 +231,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                     width: Get.width * 0.43,
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Color(0xffF9F9F9),
-                      borderRadius: BorderRadius.circular(15),
+                      color: AppColors.textFieldColor,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Obx(() => Row(
                       children: [
@@ -261,8 +263,8 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                     width: Get.width * 0.43,
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Color(0xffF9F9F9),
-                      borderRadius: BorderRadius.circular(15),
+                      color: AppColors.textFieldColor,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Obx(
                           () => Row(
@@ -289,7 +291,7 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
               dashPattern: [8, 4],
               strokeWidth: 2,
               borderType: BorderType.RRect,
-              radius: Radius.circular(12),
+              radius: Radius.circular(10),
               child: GestureDetector(
                 onTap: () async {
                   _dismissKeyboard(context); // Dismiss before dialog
@@ -301,7 +303,7 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.cardColor,
+                    color: AppColors.textFieldColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -329,7 +331,14 @@ class _AddSchedulerScreenState extends State<AddSchedulerScreen> {
                   );
                   Get.back();
                 } else {
-                  Get.snackbar('Error', 'Please enter a title');
+                  CustomFlashBar.show(
+                    context: context,
+                    message: "Enter a title",
+                    isAdmin: true, // optional
+                    isShaking: false, // optional
+                    primaryColor: AppColors.primary, // optional
+                    secondaryColor: Colors.white, // optional
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(

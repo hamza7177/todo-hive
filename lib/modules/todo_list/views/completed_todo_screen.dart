@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_hive/utils/app_colors.dart';
 import '../../../utils/app_text_style.dart';
+import '../../../utils/widgets/custom_flash_bar.dart';
 import '../controllers/todo_controller.dart';
 import '../model/task_model.dart';
 
@@ -140,7 +141,15 @@ class CompletedTodoScreen extends StatelessWidget {
                                           if (shouldDelete == true) {
                                             task.delete();
                                             todoC.fetchCompletedTasks();
-                                            Get.snackbar('Success', 'Completed task deleted');
+                                            CustomFlashBar.show(
+                                              context: context,
+                                              message: "Completed task deleted",
+                                              isAdmin: true, // optional
+                                              isShaking: false, // optional
+                                              primaryColor: AppColors.primary, // optional
+                                              secondaryColor: Colors.white, // optional
+                                            );
+
                                           }
                                         }
                                       },
